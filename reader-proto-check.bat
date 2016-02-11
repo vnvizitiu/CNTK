@@ -16,8 +16,8 @@ if not exist %CYGWIN_BIN% (
 )
 echo on
 
-@REM TODO need to get into working state again:
-set a_notests=1
+@REM TODO
+set a_nospeech=1
 
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1
@@ -53,21 +53,21 @@ if not defined a_noe2e (
 if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
-    python2.7.exe Tests/TestDriver.py run -d gpu -f release Speech/QuickE2E
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d gpu -f release Speech/QuickE2E
     if errorlevel 1 exit /b 1
 )
 
-    python2.7.exe Tests/TestDriver.py run -d cpu -f release Speech/QuickE2E
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d cpu -f release Speech/QuickE2E
     if errorlevel 1 exit /b 1
 )
 
 if not defined a_nodebug (
 if not defined a_nogpu (
-    python2.7.exe Tests/TestDriver.py run -d gpu -f debug Speech/QuickE2E
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d gpu -f debug Speech/QuickE2E
     if errorlevel 1 exit /b 1
 )
 
-    python2.7.exe Tests/TestDriver.py run -d cpu -f debug Speech/QuickE2E
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d cpu -f debug Speech/QuickE2E
     if errorlevel 1 exit /b 1
 )
 )

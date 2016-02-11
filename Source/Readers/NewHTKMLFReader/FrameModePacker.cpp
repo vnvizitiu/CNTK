@@ -9,7 +9,7 @@
 #include <DataReader.h>
 #include "Bundler.h"
 #include "ConfigHelper.h"
-#include "BlockRandomizer.h"
+#include "LegacyBlockRandomizer.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -65,7 +65,7 @@ void FrameModePacker::InitFromConfig(const ConfigParameters& readerConfig)
     {
         RuntimeError("readMethod must be 'blockRandomize'");
     }
-    m_transformer = std::make_shared<BlockRandomizer>(m_verbosity, window, bundler);
+    m_transformer = std::make_shared<LegacyBlockRandomizer>(m_verbosity, window, bundler);
 
     intargvector numberOfuttsPerMinibatchForAllEpochs =
         readerConfig(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));

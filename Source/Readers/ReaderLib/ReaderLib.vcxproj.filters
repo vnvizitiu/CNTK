@@ -43,6 +43,9 @@
     <ClInclude Include="SampleModePacker.h">
       <Filter>Packers</Filter>
     </ClInclude>
+    <ClInclude Include="LegacyBlockRandomizer.h">
+      <Filter>Randomizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlockRandomizer.cpp">
@@ -56,6 +59,9 @@
     </ClCompile>
     <ClCompile Include="SampleModePacker.cpp">
       <Filter>Packers</Filter>
+    </ClCompile>
+    <ClCompile Include="LegacyBlockRandomizer.cpp">
+      <Filter>Randomizers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
