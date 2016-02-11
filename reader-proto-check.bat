@@ -16,9 +16,6 @@ if not exist %CYGWIN_BIN% (
 )
 echo on
 
-@REM TODO
-set a_nospeech=1
-
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1
 
