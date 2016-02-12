@@ -16,7 +16,34 @@ if not exist %CYGWIN_BIN% (
 )
 echo on
 
-set TEST_SPEC=-t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11
+set TEST_SPEC=^
+  -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop5
+
+:: SHOULD WORK
+::   HTKMLFReaderSimpleDataLoop4_Config.cntk
+::   HTKMLFReaderSimpleDataLoop3_Config.cntk // action write?!
+::   HTKMLFReaderSimpleDataLoop21_Config.cntk // distributed
+::     HTKMLFReaderSimpleDataLoop21_{0,1}
+:: 
+:: NO
+::   UCIFastReaderSimpleDataLoop_Config.cntk
+::   HTKMLFReaderSimpleDataLoop10_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop12_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop13_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop16_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop17_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop19_Config.cntk // !frameMode
+::   HTKMLFReaderSimpleDataLoop2_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop20_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop22_Config.cntk // !frameMode
+::   HTKMLFReaderSimpleDataLoop6_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop7_Config.cntk // rollingWindow
+::   HTKMLFReaderSimpleDataLoop8_Config.cntk // !frameMode
+::   HTKMLFReaderSimpleDataLoop9_Config.cntk // !frameMode
+::   HTKMLFReaderSimpleDataLoop14_Config.cntk // !frameMode
+
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1
 
