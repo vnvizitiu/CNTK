@@ -35,6 +35,11 @@ public:
     {
         throw std::logic_error("Not implemented");
     }
+
+    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType&) override
+    {
+        throw std::logic_error("Not implemented");
+    }
 };
 
 BOOST_AUTO_TEST_CASE(BlockRandomizerInstantiate)

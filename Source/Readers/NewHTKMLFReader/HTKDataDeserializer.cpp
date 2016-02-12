@@ -37,15 +37,14 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         const size_t uttframes = utterance.numframes(); // will throw if frame bounds not given --required to be given in this mode
 
         Utterance description(std::move(utterance));
-        description.m_id = corpus->GenerateSequenceId(description.m_key);
-
+        description.m_id = i;
         // description.chunkId, description.key // TODO
 
         // we need at least 2 frames for boundary markers to work
         if (uttframes < 2)
         {
             fprintf(stderr, "minibatchutterancesource: skipping %d-th file (%d frames) because it has less than 2 frames: %ls\n",
-                    i, static_cast<int>(uttframes), utterance.key().c_str());
+                i, static_cast<int>(uttframes), utterance.key().c_str());
             description.m_numberOfSamples = 0;
             description.m_isValid = false;
         }
@@ -64,9 +63,9 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         m_utterances.end(),
         static_cast<size_t>(0),
         [](size_t sum, const Utterance& s)
-        {
-            return s.m_numberOfSamples + sum;
-        });
+    {
+        return s.m_numberOfSamples + sum;
+    });
 
     // distribute them over chunks
     // We simply count off frames until we reach the chunk size.
@@ -81,7 +80,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     m_chunks.reserve(totalSize / chunkframes);
 
     int chunkId = -1;
-    foreach_index (i, m_utterances)
+    foreach_index(i, m_utterances)
     {
         // if exceeding current entry--create a new one
         // I.e. our chunks are a little larger than wanted (on av. half the av. utterance length).
@@ -101,10 +100,10 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     }
 
     fprintf(stderr, "minibatchutterancesource: %d utterances grouped into %d chunks, av. chunk size: %.1f utterances, %.1f frames\n",
-            static_cast<int>(m_utterances.size()),
-            static_cast<int>(m_chunks.size()),
-            m_utterances.size() / (double) m_chunks.size(),
-            totalSize / (double) m_chunks.size());
+        static_cast<int>(m_utterances.size()),
+        static_cast<int>(m_chunks.size()),
+        m_utterances.size() / (double)m_chunks.size(),
+        totalSize / (double)m_chunks.size());
     // Now utterances are stored exclusively in allchunks[]. They are never referred to by a sequential utterance id at this point, only by chunk/within-chunk index.
 
     if (m_frameMode)
@@ -116,13 +115,16 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         m_sequences.reserve(m_utterances.size());
     }
 
-    foreach_index (i, m_utterances)
+    foreach_index(i, m_utterances)
     {
         if (m_frameMode)
         {
+            m_utterances[i].frameStart = m_frames.size();
             for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
             {
                 Frame f(&m_utterances[i]);
+                f.m_key.major = m_utterances[i].utterance.key();
+                f.m_key.minor = k;
                 f.m_id = m_frames.size();
                 f.m_chunkId = m_utterances[i].m_chunkId;
                 f.m_numberOfSamples = 1;
@@ -277,6 +279,13 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         assert(false);
         throw std::runtime_error("Not implemented");
     }
+}
+
+const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
+{
+    size_t sequenceId = m_keyToSequence[key.major];
+    size_t index = m_utterances[sequenceId].frameStart + key.minor;
+    return m_sequences[index];
 }
 
 /*

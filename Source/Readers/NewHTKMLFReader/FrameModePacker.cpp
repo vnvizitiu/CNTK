@@ -54,8 +54,9 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         deserializers.insert(deserializers.end(), featureDeserializers.begin(), featureDeserializers.end());
         deserializers.insert(deserializers.end(), labelDeserializers.begin(), labelDeserializers.end());
 
+        // SIMILAR CHECKS ALREADY DONE IN THE BUNDLER.
         // Checking end sequences.
-        size_t expected = deserializers[0]->GetSequenceDescriptions().size();
+        /*size_t expected = deserializers[0]->GetSequenceDescriptions().size();
         std::vector<bool> isValid(expected, true);
         for (auto d : deserializers)
         {
@@ -93,7 +94,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
                 "Found inconsistent durations across feature streams in %d out of %d files\n",
                 static_cast<int>(invalidUtts),
                 static_cast<int>(isValid.size()));
-        }
+        }*/
 
         return deserializers;
     }

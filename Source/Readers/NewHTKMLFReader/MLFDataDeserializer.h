@@ -16,6 +16,7 @@ struct MLFUtterance : public SequenceDescription
 {
     // Where the sequence is stored in m_classIds
     size_t sequenceStart;
+    size_t frameStart;
 };
 
 struct MLFFrame : public SequenceDescription
@@ -26,6 +27,7 @@ struct MLFFrame : public SequenceDescription
 
 class MLFDataDeserializer : public IDataDeserializer
 {
+    std::map<wstring, size_t> m_keyToSequence;
     size_t m_dimension;
     TensorShapePtr m_layout;
     std::wstring m_stateListPath;
@@ -52,6 +54,8 @@ public:
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
 
     virtual ChunkPtr GetChunk(size_t) override;
+
+    const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
 private:
     std::vector<SequenceDataPtr> GetSequenceById(size_t sequenceId);

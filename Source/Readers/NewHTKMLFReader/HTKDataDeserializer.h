@@ -166,6 +166,7 @@ struct Utterance : public SequenceDescription
 
     utterancedesc utterance;
     size_t indexInsideChunk;
+    size_t frameStart;
 };
 
 // Should not this be splitted to different deserializers?
@@ -182,6 +183,8 @@ struct Frame : public SequenceDescription
 
 class HTKDataDeserializer : public IDataDeserializer
 {
+    std::map<std::wstring, size_t> m_keyToSequence;
+
     size_t m_dimension;
     TensorShapePtr m_layout;
     std::vector<std::wstring> m_featureFiles;
@@ -211,6 +214,8 @@ public:
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
 
     virtual ChunkPtr GetChunk(size_t) override;
+
+    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
 private:
     class HTKChunk;

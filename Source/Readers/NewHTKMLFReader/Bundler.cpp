@@ -34,26 +34,38 @@ Bundler::Bundler(
 
 void Bundler::CreateSequenceDescriptions()
 {
+    m_sequenceToSequence.resize(m_deserializers.size());
     m_sequenceToChunk.resize(m_deserializers.size());
-    m_sequenceDescriptions.resize(m_driver->GetSequenceDescriptions().size());
+    m_sequenceDescriptions.reserve(m_driver->GetSequenceDescriptions().size());
+
+    size_t maxNumberOfSequences = m_driver->GetSequenceDescriptions().size();
+    for (int i = 0; i < m_deserializers.size(); ++i)
+    {
+        m_sequenceToSequence[i].resize(maxNumberOfSequences);
+    }
 
     size_t previousChunk = SIZE_MAX;
+    size_t currentMapping = 0;
     for (int i = 0; i < m_driver->GetSequenceDescriptions().size(); ++i)
     {
         auto sequenceDescription = m_driver->GetSequenceDescriptions()[i];
 
         bool isValid = true;
-        for (int j = 0; j < m_deserializers.size(); ++j)
+        for (int j = 1; j < m_deserializers.size(); ++j)
         {
-            auto s = m_deserializers[j]->GetSequenceDescriptions()[i];
-            if (!s->m_isValid)
+            auto description = m_deserializers[j]->GetSequenceDescriptionByKey(sequenceDescription->m_key);
+            if (!description->m_isValid)
             {
                 isValid = false;
                 break;
             }
 
-            m_sequenceToChunk[j][s->m_id] = s->m_chunkId;
+            m_sequenceToChunk[j][description->m_id] = description->m_chunkId;
+            m_sequenceToSequence[j][currentMapping] = description->m_id;
         }
+
+        m_sequenceToChunk[0][sequenceDescription->m_id] = sequenceDescription->m_chunkId;
+        m_sequenceToSequence[0][currentMapping] = sequenceDescription->m_id;
 
         if (isValid)
         {
@@ -64,8 +76,19 @@ void Bundler::CreateSequenceDescriptions()
             }
 
             m_sequenceDescriptions.push_back(*sequenceDescription);
+            m_sequenceDescriptions.back().m_id = m_sequenceDescriptions.size() - 1;
+            m_sequenceToSequence[0][currentMapping] = sequenceDescription->m_id;
+            currentMapping++;
         }
     }
+
+    for (int i = 0; i < m_deserializers.size(); ++i)
+    {
+        m_sequenceToSequence.resize(currentMapping);
+    }
+
+    // Last
+    m_chunkOffsets.push_back(m_sequenceDescriptions.size());
 
     m_sequences.resize(m_sequenceDescriptions.size());
     for (int k = 0; k < m_sequenceDescriptions.size(); ++k)
@@ -76,19 +99,24 @@ void Bundler::CreateSequenceDescriptions()
 
 class BundlingChunk : public Chunk
 {
+    size_t m_numberOfInputs;
+    Bundler* m_parent;
+
 public:
-    BundlingChunk(const std::map<size_t, std::vector<ChunkPtr>>& sequences) : m_sequences(sequences)
+    BundlingChunk(size_t numberOfInputs, Bundler* parent, const std::map<size_t, std::vector<ChunkPtr>>& sequences)
+        : m_sequences(sequences), m_numberOfInputs(numberOfInputs), m_parent(parent)
     {}
 
     virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
     {
         const auto& chunks = m_sequences[sequenceId];
         std::vector<SequenceDataPtr> result;
-        result.resize(chunks.size());
+        result.reserve(m_numberOfInputs);
 
         for (int i = 0; i < chunks.size(); ++i)
         {
-            chunks[i]->GetSequence(sequenceId);
+            auto sequences = chunks[i]->GetSequence(m_parent->m_sequenceToSequence[i][sequenceId]);
+            result.insert(result.end(), sequences.begin(), sequences.end());
         }
 
         return result;
@@ -112,7 +140,7 @@ ChunkPtr Bundler::GetChunk(size_t chunkId)
         }
     }
 
-    return std::make_shared<BundlingChunk>(sequences);
+    return std::make_shared<BundlingChunk>(m_streams.size(), this, sequences);
 }
 
 const SequenceDescriptions& Bundler::GetSequenceDescriptions() const
@@ -123,6 +151,11 @@ const SequenceDescriptions& Bundler::GetSequenceDescriptions() const
 std::vector<StreamDescriptionPtr> Bundler::GetStreamDescriptions() const
 {
     return m_streams;
+}
+
+const SequenceDescription* Bundler::GetSequenceDescriptionByKey(const KeyType&)
+{
+    throw std::logic_error("Not implemented");
 }
 
 }}}

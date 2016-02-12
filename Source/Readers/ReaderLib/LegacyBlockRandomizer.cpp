@@ -390,12 +390,12 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
 
     // Construct vector of original IDs and request data
     std::vector<size_t> originalIds;
-    result.m_data.resize(ids.size());
+    result.m_data.reserve(ids.size());
     for (auto id : ids)
     {
         const auto& seqDesc = m_randomTimeline[id];
         originalIds.push_back(seqDesc.m_id);
-        result.m_data.push_back(m_chunks[seqDesc.m_chunkId]->GetSequence(seqDesc.m_id));
+        result.m_data.push_back(m_chunks[m_randomizedChunks[seqDesc.m_chunkId].m_originalChunkIndex]->GetSequence(seqDesc.m_id));
     }
 
     return result;

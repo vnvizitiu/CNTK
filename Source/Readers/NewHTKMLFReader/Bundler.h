@@ -18,6 +18,7 @@ public:
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
     virtual ChunkPtr GetChunk(size_t) override;
+    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
 private:
     void CreateSequenceDescriptions();
@@ -30,8 +31,11 @@ private:
 
     std::vector<SequenceDescription> m_sequenceDescriptions;
     std::vector<std::map<size_t, size_t>> m_sequenceToChunk;
+    std::vector<std::vector<size_t>> m_sequenceToSequence;
     std::vector<size_t> m_chunkOffsets;
     SequenceDescriptions m_sequences;
+
+    friend class BundlingChunk;
 };
 
 }}}

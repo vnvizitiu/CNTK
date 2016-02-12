@@ -40,7 +40,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         "Type 'msra::asr::htkmlfreader' should be move constructible!");
 
     MLFUtterance description;
-    description.m_id = 0;
+    //description.m_id = 0;
     description.m_isValid = true; // right now we throw for invalid sequences
     // TODO .chunk, .key
 
@@ -48,7 +48,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     // Have to iterate in the same order as utterances inside the HTK data de-serializer to be aligned.
     for (const auto& l : labels)
     {
-        wstring key = l.first;
+        description.m_key.major = l.first;
 
         // todo check that actually exists.
         const auto& labseq = l.second;
@@ -56,7 +56,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         description.sequenceStart = m_classIds.size(); // TODO
         description.m_isValid = true;
         size_t numofframes = 0;
-        description.m_id++;
+        //description.m_id = corpus->GetId(key, 0);
 
         foreach_index (i, labseq)
         {
@@ -90,25 +90,31 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         description.m_numberOfSamples = numofframes;
         totalFrames += numofframes;
         m_utterances.push_back(description);
+        m_keyToSequence[description.m_key.major] = m_utterances.size() - 1;
     }
 
     if (m_frameMode)
     {
         m_frames.reserve(totalFrames);
+        m_sequences.reserve(totalFrames);
+
     }
     else
     {
         m_sequences.reserve(m_utterances.size());
     }
 
-    foreach_index (i, m_utterances)
+    foreach_index(i, m_utterances)
     {
         if (m_frameMode)
         {
+            m_utterances[i].frameStart = m_frames.size();
             for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
             {
                 MLFFrame f;
                 f.m_id = m_frames.size();
+                f.m_key.major = m_utterances[i].m_key.major;
+                f.m_key.minor = k;
                 f.m_chunkId = 0;
                 f.m_numberOfSamples = 1;
                 f.index = m_utterances[i].sequenceStart + k;
@@ -184,6 +190,13 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
 
         r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
         return std::vector<SequenceDataPtr> { r };
+}
+
+const SequenceDescription* MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
+{
+    size_t sequenceId = m_keyToSequence[key.major];
+    size_t index = m_utterances[sequenceId].frameStart + key.minor;
+    return m_sequences[index];
 }
 
 }}}

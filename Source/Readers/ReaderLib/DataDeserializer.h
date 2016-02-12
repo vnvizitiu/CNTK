@@ -10,6 +10,12 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
+struct KeyType
+{
+    std::wstring major;
+    size_t minor;
+};
+
 // Defines main properties of a sequence.
 // Sequence descriptions are used by the randomizer to establish a global timeline for complete input.
 // A sequence is defined as an ordered set of samples (size == 1 is used for sample training).
@@ -21,7 +27,7 @@ struct SequenceDescription
                               // particular data deserializer (or bundler). The randomizer guarantees to request
                               // sequences from only limited subset of chunks at any moment in time.
     bool m_isValid;           // Indicates whether the sequence is valid.
-    std::wstring m_key;       // Unique sequence key.
+    KeyType m_key;            // Sequence key, used for correlations between sequences of different deserializers.
 };
 typedef std::vector<const SequenceDescription*> SequenceDescriptions;
 
@@ -97,6 +103,9 @@ public:
 
     // Retrieves description of all sequences this data deserializer can produce.
     virtual const SequenceDescriptions& GetSequenceDescriptions() const = 0;
+
+    // Retrieves description of a single sequence given its key.
+    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) = 0;
 
     // Gets a chunk.
     virtual ChunkPtr GetChunk(size_t chunkId) = 0;
