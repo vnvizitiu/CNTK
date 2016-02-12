@@ -114,7 +114,7 @@ void LegacyBlockRandomizer::RandomizeChunks()
         }
         while (chunk.m_info.m_samplePositionStart - m_randomizedChunks[chunk.m_windowBegin].m_info.m_samplePositionStart > halfWindowRange)
             chunk.m_windowBegin++; // too early
-        // TODO m_randomizedChunks[chunk.windowend + 1].info.samplePositionStart - m_randomizedChunks[chunk.windowbegin].info.samplePositionStart < m_randomizationRangeInSamples 
+        // TODO m_randomizedChunks[chunk.windowend + 1].info.samplePositionStart - m_randomizedChunks[chunk.windowbegin].info.samplePositionStart < m_randomizationRangeInSamples
         while (chunk.m_windowEnd < m_numChunks &&
                m_randomizedChunks[chunk.m_windowEnd + 1].m_info.m_samplePositionStart - chunk.m_info.m_samplePositionStart < halfWindowRange)
             chunk.m_windowEnd++; // got more space
@@ -375,15 +375,18 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
 
     for (size_t chunkId = 0; chunkId < m_numChunks; chunkId++)
     {
-        auto originalChunkIndex = m_randomizedChunks[chunkId].m_originalChunkIndex;
+        if ((chunkId % m_numberOfWorkers) == m_workerRank)
+        {
+            auto originalChunkIndex = m_randomizedChunks[chunkId].m_originalChunkIndex;
 
-        if (windowBegin <= chunkId && chunkId < windowEnd)
-        {
-            m_deserializer->RequireChunk(originalChunkIndex);
-        }
-        else
-        {
-            m_deserializer->ReleaseChunk(originalChunkIndex);
+            if (windowBegin <= chunkId && chunkId < windowEnd)
+            {
+                m_deserializer->RequireChunk(originalChunkIndex);
+            }
+            else
+            {
+                m_deserializer->ReleaseChunk(originalChunkIndex);
+            }
         }
     }
 
