@@ -253,15 +253,22 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         void* buffer = nullptr;
         if (m_elementSize == sizeof(float))
         {
-            buffer = new float[featOri.rows()];
+            buffer = new float[dimensions];
+            memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
         }
         else
         {
-            buffer = new double[featOri.rows()];
+            double *doubleBuffer = new double[dimensions];
+            const float *floatBuffer = reinterpret_cast<const float*>(tmp);
+
+            for (size_t i = 0; i < dimensions; i++)
+            {
+                doubleBuffer[i] = floatBuffer[i];
+            }
+
+            buffer = doubleBuffer;
         }
 
-        memset(buffer, 0, m_elementSize * dimensions);
-        memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
         r->m_data = buffer;
         return std::vector<SequenceDataPtr>{r};
     }

@@ -337,7 +337,7 @@ Minibatch FrameModePacker::ReadMinibatch()
         // }
     } while (skip); // keep going if we didn't get the right size minibatch
 
-    m_pMBLayout->Init(m_mbNumTimeSteps, 1);
+    m_pMBLayout->InitAsFrameMode(m_mbNumTimeSteps);
     if (m_mbNumTimeSteps > 0)
     {
         FillOneUttDataforParallelmode(0, m_mbNumTimeSteps, 0, 0);

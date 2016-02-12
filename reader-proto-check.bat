@@ -16,9 +16,7 @@ if not exist %CYGWIN_BIN% (
 )
 echo on
 
-@REM TODO
-set a_nospeech=1
-
+set TEST_SPEC=-t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1
 
@@ -28,7 +26,7 @@ if not defined a_nodebug (
 
 if not defined a_notests (
 if not defined a_nounittests (
-        .\x64\Debug\UnitTests\ReaderTests.exe -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1
+        .\x64\Debug\UnitTests\ReaderTests.exe %TEST_SPEC%
         if errorlevel 1 exit /b 1
 )
 )
@@ -40,7 +38,7 @@ if not defined a_norelease (
 
 if not defined a_notests (
 if not defined a_nounittests (
-    .\x64\Release\UnitTests\ReaderTests.exe -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1
+    .\x64\Release\UnitTests\ReaderTests.exe %TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 )
