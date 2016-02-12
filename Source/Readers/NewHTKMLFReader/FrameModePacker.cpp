@@ -371,21 +371,17 @@ void FrameModePacker::ReNewBufferForMultiIO(size_t parallelSequenceNumber)
     }
 
     std::vector<std::vector<SequenceDataPtr>> sequences;
-    for (size_t currentIndex = 0; currentIndex < m_requestedMBSize; ++currentIndex)
+    for (size_t currentIndex = 0; currentIndex < m_requestedMBSize && !m_noData; ++currentIndex)
     {
         auto sequence = m_transformer->GetNextSequences(1 /* TODO */);
-        if (sequence.m_endOfEpoch)
-        {
-            m_noData = true;
-            break;
-        }
 
-        assert(sequence.m_data.size() == 1); // TODO
-
-        if (!sequence.m_data[0].empty())
+        if (sequence.m_data.size() && !sequence.m_data[0].empty())
         {
+            assert(sequence.m_data.size() == 1);
             sequences.push_back(sequence.m_data[0]);
         }
+
+        m_noData = sequence.m_endOfEpoch;
     }
 
     if (sequences.size() == 0)

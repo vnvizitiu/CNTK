@@ -20,12 +20,10 @@ set TEST_SPEC=^
   -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 ^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop4 ^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop5 ^
-  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_0 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_1
 
-:: NEEDS WORK
-::   HTKMLFReaderSimpleDataLoop21_Config.cntk // distributed
-::     HTKMLFReaderSimpleDataLoop21_{0,1}
-:: 
 :: NO
 ::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
 ::   HTKMLFReaderSimpleDataLoop3_Config.cntk // !frameMode

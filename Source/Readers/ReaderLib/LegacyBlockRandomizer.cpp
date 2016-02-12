@@ -334,86 +334,76 @@ void LegacyBlockRandomizer::StartEpoch(const EpochConfiguration& config)
     RandomizeForGlobalSamplePosition(timeframe);
 };
 
-bool LegacyBlockRandomizer::AdvanceToNextPositionForThisWorker()
+bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<size_t>& originalIds, std::unordered_set<size_t>& originalChunks)
 {
-    while (m_samplePositionInEpoch < m_epochSize)
+    assert(m_frameMode); // TODO !m_frameMode not implemented yet
+    assert(originalIds.size() == 0);
+    assert(originalChunks.size() == 0);
+    assert(sampleCount < m_numSamples);
+
+    if (m_samplePositionInEpoch < m_epochSize)
     {
-        RandomizeIfNewSweepIsEntered();
+        size_t distributedSampleCount = 0;
 
-        const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
-
-        if ((seqDesc.m_chunkId % m_numberOfWorkers) == m_workerRank)
+        while ((m_samplePositionInEpoch < m_epochSize) &&
+               (distributedSampleCount < sampleCount))
         {
-            // Got one
-            break;
-        }
+            RandomizeIfNewSweepIsEntered();
 
-        m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
-        m_sequencePositionInSweep++;
+            const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
+            if ((seqDesc.m_chunkId % m_numberOfWorkers) == m_workerRank)
+            {
+                // Got one, collect it (and its window of chunks)
+                originalIds.push_back(seqDesc.m_id);
+
+                const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowBegin;
+                const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowEnd;
+
+                for (size_t chunk = windowBegin; chunk < windowEnd; chunk++)
+                {
+                    if ((chunk % m_numberOfWorkers) == m_workerRank)
+                    {
+                        originalChunks.insert(m_randomizedChunks[chunk].m_originalChunkIndex);
+                    }
+                }
+            }
+
+            m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
+            m_sequencePositionInSweep++;
+            distributedSampleCount++;
+        }
     }
 
     return m_epochSize <= m_samplePositionInEpoch;
 }
 
-Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
+Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
 {
+    assert(m_frameMode); // TODO sequence mode not implemented yet
     assert(m_samplePositionInEpoch != SIZE_MAX); // SetEpochConfiguration() must be called first
 
-    std::vector<size_t> ids;
-    bool endOfEpoch = false;
+    std::vector<size_t> originalIds;
+    std::unordered_set<size_t> originalChunks;
     Sequences result;
 
-    while (ids.size() < count)
-    {
-        endOfEpoch = AdvanceToNextPositionForThisWorker();
-        if (endOfEpoch)
-        {
-            break;
-        }
-        else
-        {
-            assert(m_sequencePositionInSweep < m_numSequences);
-            ids.push_back(m_sequencePositionInSweep);
-            const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
-            m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
-            m_sequencePositionInSweep++;
-        }
-    };
+    result.m_endOfEpoch = GetNextSequenceIds(sampleCount, originalIds, originalChunks);
 
-    result.m_endOfEpoch = endOfEpoch;
-
-    if (ids.size() == 0)
+    if (originalIds.size() == 0)
     {
         return result;
     }
 
     // Require and release chunks from the data deserializer
-    const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[ids[0]]].m_windowBegin;
-    const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[ids.back()]].m_windowEnd;
-
-    for (size_t chunkId = 0; chunkId < m_numChunks; chunkId++)
+    for (size_t originalChunkIndex = 0; originalChunkIndex < m_numChunks; originalChunkIndex++)
     {
-        if ((chunkId % m_numberOfWorkers) == m_workerRank)
+        if (originalChunks.find(originalChunkIndex) != originalChunks.end())
         {
-            auto originalChunkIndex = m_randomizedChunks[chunkId].m_originalChunkIndex;
-
-            if (windowBegin <= chunkId && chunkId < windowEnd)
-            {
-                m_deserializer->RequireChunk(originalChunkIndex);
-            }
-            else
-            {
-                m_deserializer->ReleaseChunk(originalChunkIndex);
-            }
+            m_deserializer->RequireChunk(originalChunkIndex);
         }
-    }
-
-    // Construct vector of original IDs and request data
-    std::vector<size_t> originalIds;
-    for (auto id : ids)
-    {
-        const auto& seqDesc = m_randomTimeline[id];
-        originalIds.push_back(seqDesc.m_id);
+        else
+        {
+            m_deserializer->ReleaseChunk(originalChunkIndex);
+        }
     }
 
     result.m_data = m_deserializer->GetSequencesById(originalIds);

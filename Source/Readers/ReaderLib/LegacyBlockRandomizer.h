@@ -6,6 +6,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_set>
 
 #include "Transformer.h"
 #include "DataDeserializer.h"
@@ -22,7 +23,7 @@ public:
 
     virtual void Initialize(TransformerPtr next, const ConfigParameters& readerConfig) override;
     virtual void StartEpoch(const EpochConfiguration& config) override;
-    virtual Sequences GetNextSequences(size_t count) override;
+    virtual Sequences GetNextSequences(size_t sampleCount) override;
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override
     {
         return m_deserializer->GetStreamDescriptions();
@@ -88,6 +89,7 @@ private:
 
     void RandomizeIfNewSweepIsEntered();
 
-    bool AdvanceToNextPositionForThisWorker();
+    bool GetNextSequenceIds(size_t sampleCount, std::vector<size_t>& originalIds, std::unordered_set<size_t>& originalChunks);
+
 };
 } } }
