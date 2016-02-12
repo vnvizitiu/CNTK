@@ -112,6 +112,7 @@
     <ClInclude Include="..\..\Common\Include\fileutil.h" />
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
     <ClInclude Include="ConfigHelper.h" />
+    <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="FrameModePacker.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="htkfeatio.h" />

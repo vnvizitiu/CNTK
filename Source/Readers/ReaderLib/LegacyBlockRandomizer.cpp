@@ -244,7 +244,7 @@ void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t sample
 // Public methods
 //
 
-LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, DataDeserializerPtr deserializer)
+LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, IDataDeserializerPtr deserializer)
     : m_verbosity(verbosity), m_randomizationRangeInSamples(randomizationRangeInSamples), m_deserializer(deserializer), m_sweep(SIZE_MAX), m_sequencePositionInSweep(SIZE_MAX), m_samplePositionInEpoch(SIZE_MAX), m_epochSize(SIZE_MAX)
 {
     assert(deserializer != nullptr);
@@ -293,8 +293,6 @@ void LegacyBlockRandomizer::Initialize(TransformerPtr next, const ConfigParamete
 
 void LegacyBlockRandomizer::StartEpoch(const EpochConfiguration& config)
 {
-    m_deserializer->StartEpoch(config);
-
     m_workerRank = config.m_workerRank;
     m_numberOfWorkers = config.m_numberOfWorkers;
 
@@ -379,23 +377,27 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
 
         if (windowBegin <= chunkId && chunkId < windowEnd)
         {
-            m_deserializer->RequireChunk(originalChunkIndex);
+            if (m_chunks.find(originalChunkIndex) == m_chunks.end())
+            {
+                m_chunks[originalChunkIndex] = m_deserializer->GetChunk(originalChunkIndex);
+            }
         }
         else
         {
-            m_deserializer->ReleaseChunk(originalChunkIndex);
+            m_chunks.erase(originalChunkIndex);
         }
     }
 
     // Construct vector of original IDs and request data
     std::vector<size_t> originalIds;
+    result.m_data.resize(ids.size());
     for (auto id : ids)
     {
         const auto& seqDesc = m_randomTimeline[id];
         originalIds.push_back(seqDesc.m_id);
+        result.m_data.push_back(m_chunks[seqDesc.m_chunkId]->GetSequence(seqDesc.m_id));
     }
 
-    result.m_data = m_deserializer->GetSequencesById(originalIds);
     return result;
 };
 } } }

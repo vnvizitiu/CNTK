@@ -11,8 +11,8 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-MLFDataDeserializer::MLFDataDeserializer(const ConfigParameters& label, size_t elementSize, const HTKDataDeserializer* featureDeserializer, bool frameMode, const std::wstring& name)
-    : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_elementSize(elementSize), m_featureDeserializer(featureDeserializer), m_frameMode(frameMode), m_name(name)
+    MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, size_t elementSize, bool frameMode, const std::wstring& name)
+    : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_elementSize(elementSize), m_frameMode(frameMode), m_name(name)
 {
     ConfigHelper::CheckLabelType(label);
 
@@ -46,13 +46,12 @@ MLFDataDeserializer::MLFDataDeserializer(const ConfigParameters& label, size_t e
 
     size_t totalFrames = 0;
     // Have to iterate in the same order as utterances inside the HTK data de-serializer to be aligned.
-    for (const auto& u : featureDeserializer->GetUtterances())
+    for (const auto& l : labels)
     {
-        wstring key = u.utterance.key();
+        wstring key = l.first;
 
         // todo check that actually exists.
-        auto l = labels.find(key);
-        const auto& labseq = l->second;
+        const auto& labseq = l.second;
 
         description.sequenceStart = m_classIds.size(); // TODO
         description.m_isValid = true;
@@ -66,7 +65,7 @@ MLFDataDeserializer::MLFDataDeserializer(const ConfigParameters& label, size_t e
             if ((i == 0 && e.firstframe != 0) ||
                 (i > 0 && labseq[i - 1].firstframe + labseq[i - 1].numframes != e.firstframe))
             {
-                RuntimeError("minibatchutterancesource: labels not in consecutive order MLF in label set: %ls", l->first.c_str());
+                RuntimeError("minibatchutterancesource: labels not in consecutive order MLF in label set: %ls", l.first.c_str());
             }
 
             if (e.classid >= m_dimension)
@@ -127,11 +126,6 @@ MLFDataDeserializer::MLFDataDeserializer(const ConfigParameters& label, size_t e
     }
 }
 
-void Microsoft::MSR::CNTK::MLFDataDeserializer::StartEpoch(const EpochConfiguration& /*config*/)
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
 const SequenceDescriptions& Microsoft::MSR::CNTK::MLFDataDeserializer::GetSequenceDescriptions() const
 {
     return m_sequences;
@@ -147,46 +141,49 @@ std::vector<StreamDescriptionPtr> MLFDataDeserializer::GetStreamDescriptions() c
     return std::vector<StreamDescriptionPtr>{stream};
 }
 
-std::vector<std::vector<SequenceDataPtr>> MLFDataDeserializer::GetSequencesById(const std::vector<size_t>& ids)
+class MLFDataDeserializer::MLFChunk : public Chunk
 {
-    assert(m_frameMode);
-    assert(ids.size() == 1);
-    auto id = ids[0];
+    MLFDataDeserializer* m_parent;
+public:
+    MLFChunk(MLFDataDeserializer* parent) : m_parent(parent)
+    {}
 
-    size_t label = m_classIds[m_frames[id].index];
-    DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
-    if (m_elementSize == sizeof(float))
+    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
     {
-        float* tmp = new float[m_dimension];
-        memset(tmp, 0, m_elementSize * m_dimension);
-        tmp[label] = 1;
-        r->m_data = tmp;
+        return m_parent->GetSequenceById(sequenceId);
     }
-    else
-    {
-        double* tmp = new double[m_dimension];
-        memset(tmp, 0, m_elementSize * m_dimension);
-        tmp[label] = 1;
-        r->m_data = tmp;
-    }
+};
 
-    r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
-
-    std::vector<std::vector<SequenceDataPtr>> result;
-    result.push_back(std::vector<SequenceDataPtr>{r});
-    return result;
-}
-
-void MLFDataDeserializer::RequireChunk(size_t /*chunkIndex*/)
+ChunkPtr MLFDataDeserializer::GetChunk(size_t chunkId)
 {
+    assert(chunkId == 0);
+    UNREFERENCED_PARAMETER(chunkId);
+    return std::make_shared<MLFChunk>(this);
 }
 
-void MLFDataDeserializer::ReleaseChunk(size_t /*chunkIndex*/)
+std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenceId)
 {
+    auto id = sequenceId;
+
+        size_t label = m_classIds[m_frames[id].index];
+        DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
+        if (m_elementSize == sizeof(float))
+        {
+            float* tmp = new float[m_dimension];
+            memset(tmp, 0, m_elementSize * m_dimension);
+            tmp[label] = 1;
+            r->m_data = tmp;
+        }
+        else
+        {
+            double* tmp = new double[m_dimension];
+            memset(tmp, 0, m_elementSize * m_dimension);
+            tmp[label] = 1;
+            r->m_data = tmp;
+        }
+
+        r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
+        return std::vector<SequenceDataPtr> { r };
 }
 
-const std::vector<MLFUtterance>& MLFDataDeserializer::GetUtterances() const
-{
-    return m_utterances;
-}
-} } }
+}}}

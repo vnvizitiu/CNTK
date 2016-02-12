@@ -9,6 +9,7 @@
 #include "Config.h" // for ConfigParameters
 #include "htkfeatio.h"      // for htkfeatreader
 #include "minibatchiterator.h"
+#include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -179,7 +180,7 @@ struct Frame : public SequenceDescription
     size_t frameIndexInUtterance;
 };
 
-class HTKDataDeserializer : public DataDeserializer
+class HTKDataDeserializer : public IDataDeserializer
 {
     size_t m_dimension;
     TensorShapePtr m_layout;
@@ -203,22 +204,17 @@ class HTKDataDeserializer : public DataDeserializer
     std::wstring m_featureName;
 
 public:
-    HTKDataDeserializer(const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName);
-
-    virtual void StartEpoch(const EpochConfiguration& config) override;
+    HTKDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName);
 
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
 
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
 
-    virtual std::vector<std::vector<SequenceDataPtr>> GetSequencesById(const std::vector<size_t>& ids) override;
+    virtual ChunkPtr GetChunk(size_t) override;
 
-    virtual void RequireChunk(size_t chunkIndex) override;
-
-    virtual void ReleaseChunk(size_t chunkIndex) override;
-
-public:
-    const std::vector<Utterance>& GetUtterances() const;
+private:
+    class HTKChunk;
+    std::vector<SequenceDataPtr> GetSequenceById(size_t id);
 };
 
 typedef std::shared_ptr<HTKDataDeserializer> HTKDataDeserializerPtr;

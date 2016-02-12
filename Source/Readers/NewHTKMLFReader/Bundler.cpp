@@ -5,108 +5,16 @@
 #include "stdafx.h"
 #include "Bundler.h"
 #include "ConfigHelper.h"
-#include "HTKDataDeserializer.h"
-#include "MLFDataDeserializer.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-std::vector<DataDeserializerPtr> CreateDeserializers(const ConfigParameters& readerConfig,
-                                                     bool framemode,
-                                                     size_t elementSize)
-{
-    std::vector<std::wstring> featureNames;
-    std::vector<std::wstring> labelNames;
-
-    std::vector<std::wstring> notused;
-    ConfigHelper::GetDataNamesFromConfig(readerConfig, featureNames, labelNames, notused, notused);
-    if (featureNames.size() < 1 || labelNames.size() < 1)
-    {
-        // eldak: Don't we support unsupervised training?
-        InvalidArgument("network needs at least 1 input and 1 output specified!");
-    }
-
-    std::vector<HTKDataDeserializerPtr> featureDeserializers;
-    std::vector<MLFDataDeserializerPtr> labelDeserializers;
-
-    for (const auto& featureName : featureNames)
-    {
-        auto deserializer = std::make_shared<HTKDataDeserializer>(readerConfig(featureName), elementSize, framemode, featureName);
-        featureDeserializers.push_back(deserializer);
-    }
-
-    assert(featureDeserializers.size() == 1);
-
-    for (const auto& labelName : labelNames)
-    {
-        auto deserializer = std::make_shared<MLFDataDeserializer>(readerConfig(labelName), elementSize,
-                                                                  featureDeserializers[0].get(), framemode, labelName);
-
-        labelDeserializers.push_back(deserializer);
-    }
-
-    assert(labelDeserializers.size() == 1);
-
-    std::vector<DataDeserializerPtr> deserializers;
-    deserializers.insert(deserializers.end(), featureDeserializers.begin(), featureDeserializers.end());
-    deserializers.insert(deserializers.end(), labelDeserializers.begin(), labelDeserializers.end());
-
-    // Checking end sequences.
-    size_t expected = deserializers[0]->GetSequenceDescriptions().size();
-    std::vector<bool> isValid(expected, true);
-    for (auto d : deserializers)
-    {
-        const auto& sequences = d->GetSequenceDescriptions();
-        if (sequences.size() != expected)
-        {
-            RuntimeError("We have some invalid alignment\n");
-        }
-
-        foreach_index (i, sequences)
-        {
-            isValid[i] = isValid[i] && sequences[i]->m_isValid;
-            assert(isValid[i]);
-        }
-    }
-
-    // shouldn't this be checked (again) later? more utterances can be invalidated...
-    size_t invalidUtts = 0;
-    foreach_index (i, isValid)
-    {
-        if (!isValid[i])
-        {
-            invalidUtts++;
-        }
-    }
-    assert(invalidUtts == 0); // For us it's zero
-
-    if (invalidUtts > isValid.size() / 2)
-    {
-        RuntimeError("minibatchutterancesource: too many files with inconsistent durations, assuming broken configuration\n");
-    }
-    else if (invalidUtts > 0)
-    {
-        fprintf(stderr,
-                "Found inconsistent durations across feature streams in %d out of %d files\n",
-                static_cast<int>(invalidUtts),
-                static_cast<int>(isValid.size()));
-    }
-
-    return deserializers;
-}
-
 Bundler::Bundler(
     const ConfigParameters& readerConfig,
-    bool framemode,
-    int verbosity,
-    DataDeserializerPtr driver,
-    std::vector<DataDeserializerPtr> deserializers)
+    IDataDeserializerPtr driver,
+    std::vector<IDataDeserializerPtr> deserializers)
     : m_deserializers(deserializers), m_driver(driver)
 {
-    m_framemode = framemode;
-    m_chunksinram = 0;
-    m_verbosity = readerConfig(L"verbosity", 2);
-    m_verbosity = verbosity; // not needed
-
+    UNREFERENCED_PARAMETER(readerConfig);
     std::vector<StreamDescriptionPtr> streams;
     for (auto d : deserializers)
     {
@@ -121,32 +29,95 @@ Bundler::Bundler(
     }
 
     m_streams = streams;
+    CreateSequenceDescriptions();
 }
 
-void Bundler::RequireChunk(size_t chunkindex)
+void Bundler::CreateSequenceDescriptions()
 {
-    // currently simply redirect
-    // todo: we should have a mapping per deserializer actually.
-    for (const auto& d : m_deserializers)
+    m_sequenceToChunk.resize(m_deserializers.size());
+    m_sequenceDescriptions.resize(m_driver->GetSequenceDescriptions().size());
+
+    size_t previousChunk = SIZE_MAX;
+    for (int i = 0; i < m_driver->GetSequenceDescriptions().size(); ++i)
     {
-        d->RequireChunk(chunkindex);
+        auto sequenceDescription = m_driver->GetSequenceDescriptions()[i];
+
+        bool isValid = true;
+        for (int j = 0; j < m_deserializers.size(); ++j)
+        {
+            auto s = m_deserializers[j]->GetSequenceDescriptions()[i];
+            if (!s->m_isValid)
+            {
+                isValid = false;
+                break;
+            }
+
+            m_sequenceToChunk[j][s->m_id] = s->m_chunkId;
+        }
+
+        if (isValid)
+        {
+            if (sequenceDescription->m_chunkId != previousChunk)
+            {
+                m_chunkOffsets.push_back(m_sequenceDescriptions.size());
+                previousChunk = sequenceDescription->m_chunkId;
+            }
+
+            m_sequenceDescriptions.push_back(*sequenceDescription);
+        }
+    }
+
+    m_sequences.resize(m_sequenceDescriptions.size());
+    for (int k = 0; k < m_sequenceDescriptions.size(); ++k)
+    {
+        m_sequences[k] = &m_sequenceDescriptions[k];
     }
 }
 
-void Bundler::ReleaseChunk(size_t chunkIndex)
+class BundlingChunk : public Chunk
 {
-    // currently simply redirect
-    // todo: we should have a mapping per deserializer actually.
-    for (const auto& d : m_deserializers)
+public:
+    BundlingChunk(const std::map<size_t, std::vector<ChunkPtr>>& sequences) : m_sequences(sequences)
+    {}
+
+    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
     {
-        d->ReleaseChunk(chunkIndex);
+        const auto& chunks = m_sequences[sequenceId];
+        std::vector<SequenceDataPtr> result;
+        result.resize(chunks.size());
+
+        for (int i = 0; i < chunks.size(); ++i)
+        {
+            chunks[i]->GetSequence(sequenceId);
+        }
+
+        return result;
     }
+
+private:
+    std::map<size_t, std::vector<ChunkPtr>> m_sequences;
+};
+
+ChunkPtr Bundler::GetChunk(size_t chunkId)
+{
+    std::map<size_t, std::vector<ChunkPtr>> sequences;
+    for (size_t j = m_chunkOffsets[chunkId]; j < m_chunkOffsets[chunkId + 1]; ++j)
+    {
+        size_t sequenceId = m_sequenceDescriptions[j].m_id;
+        sequences[j].resize(m_deserializers.size());
+        for (size_t i = 0; i < m_deserializers.size(); ++i)
+        {
+            size_t innerChunkId = m_sequenceToChunk[i][sequenceId];
+            sequences[sequenceId][i] = m_deserializers[i]->GetChunk(innerChunkId);
+        }
+    }
+
+    return std::make_shared<BundlingChunk>(sequences);
 }
 
 const SequenceDescriptions& Bundler::GetSequenceDescriptions() const
 {
-    // TODO: we probably will take different deserializers from here.
-    return m_driver->GetSequenceDescriptions();
+    return m_sequences;
 }
 
 std::vector<StreamDescriptionPtr> Bundler::GetStreamDescriptions() const
@@ -154,21 +125,4 @@ std::vector<StreamDescriptionPtr> Bundler::GetStreamDescriptions() const
     return m_streams;
 }
 
-std::vector<std::vector<SequenceDataPtr>> Bundler::GetSequencesById(const std::vector<size_t>& ids)
-{
-    assert(ids.size() == 1); // TODO
-    std::vector<std::vector<SequenceDataPtr>> result;
-    result.push_back(std::vector<SequenceDataPtr>{});
-    for (auto& d : m_deserializers)
-    {
-        auto r = d->GetSequencesById(ids);
-        result[0].insert(result[0].end(), r[0].begin(), r[0].end());
-    }
-    return result;
-}
-
-void Bundler::StartEpoch(const EpochConfiguration& /*config*/)
-{
-    // TODO do we keep SetEpochConfiguration(), now empty?
-}
-} } }
+}}}

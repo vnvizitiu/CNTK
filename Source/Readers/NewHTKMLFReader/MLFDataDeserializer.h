@@ -8,6 +8,7 @@
 #include "DataDeserializer.h"
 #include "HTKDataDeserializer.h"
 #include "biggrowablevectors.h"
+#include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -23,13 +24,12 @@ struct MLFFrame : public SequenceDescription
     size_t index;
 };
 
-class MLFDataDeserializer : public DataDeserializer
+class MLFDataDeserializer : public IDataDeserializer
 {
     size_t m_dimension;
     TensorShapePtr m_layout;
     std::wstring m_stateListPath;
     std::vector<std::wstring> m_mlfPaths;
-    const HTKDataDeserializer* m_featureDeserializer;
 
     // [classidsbegin+t] concatenation of all state sequences
     msra::dbn::biggrowablevector<msra::dbn::CLASSIDTYPE> m_classIds;
@@ -42,23 +42,19 @@ class MLFDataDeserializer : public DataDeserializer
     bool m_frameMode;
     std::wstring m_name;
 
-public:
-    MLFDataDeserializer(const ConfigParameters& label, size_t elementSize, const HTKDataDeserializer* featureDeserializer, bool framMode, const std::wstring& featureName);
+    class MLFChunk;
 
-    virtual void StartEpoch(const EpochConfiguration& config) override;
+public:
+    MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, size_t elementSize, bool framMode, const std::wstring& featureName);
 
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
 
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
 
-    virtual std::vector<std::vector<SequenceDataPtr>> GetSequencesById(const std::vector<size_t>& ids) override;
+    virtual ChunkPtr GetChunk(size_t) override;
 
-    virtual void RequireChunk(size_t chunkIndex) override;
-
-    virtual void ReleaseChunk(size_t chunkIndex) override;
-
-public:
-    const std::vector<MLFUtterance>& GetUtterances() const;
+private:
+    std::vector<SequenceDataPtr> GetSequenceById(size_t sequenceId);
 };
 
 typedef std::shared_ptr<MLFDataDeserializer> MLFDataDeserializerPtr;

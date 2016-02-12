@@ -10,34 +10,28 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-class Bundler : public DataDeserializer
+class Bundler : public IDataDeserializer
 {
-    void operator=(const Bundler& other); // non-assignable
-
-    bool m_framemode; // true -> actually return frame-level randomized frames (not possible in lattice mode)
-    int m_verbosity;
-
-    size_t m_totalframes; // total frames (same as classids.size() if we have labels)
-    size_t m_chunksinram; // (for diagnostics messages)
-
-    std::vector<StreamDescriptionPtr> m_streams;
-    std::vector<DataDeserializerPtr> m_deserializers;
-    DataDeserializerPtr m_driver;
-
 public:
-    Bundler(const ConfigParameters& readerConfig, bool framemode, int verbosity,
-            DataDeserializerPtr driver, std::vector<DataDeserializerPtr> deserializers);
-
-    virtual void StartEpoch(const EpochConfiguration& config) override;
+    Bundler(const ConfigParameters& readerConfig, IDataDeserializerPtr driver, std::vector<IDataDeserializerPtr> deserializers);
 
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
-    virtual std::vector<std::vector<SequenceDataPtr>> GetSequencesById(const std::vector<size_t>& ids) override;
-    virtual void RequireChunk(size_t chunkindex) override;
-    virtual void ReleaseChunk(size_t chunkIndex) override;
+    virtual ChunkPtr GetChunk(size_t) override;
+
+private:
+    void CreateSequenceDescriptions();
+
+    void operator=(const Bundler& other); // non-assignable
+
+    std::vector<StreamDescriptionPtr> m_streams;
+    std::vector<IDataDeserializerPtr> m_deserializers;
+    IDataDeserializerPtr m_driver;
+
+    std::vector<SequenceDescription> m_sequenceDescriptions;
+    std::vector<std::map<size_t, size_t>> m_sequenceToChunk;
+    std::vector<size_t> m_chunkOffsets;
+    SequenceDescriptions m_sequences;
 };
 
-std::vector<DataDeserializerPtr> CreateDeserializers(const ConfigParameters& readerConfig,
-                                                     bool framemode,
-                                                     size_t elementSize);
-} } }
+}}}

@@ -15,7 +15,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 class LegacyBlockRandomizer : public Transformer
 {
 public:
-    LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, DataDeserializerPtr deserializer);
+    LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, IDataDeserializerPtr deserializer);
     virtual ~LegacyBlockRandomizer()
     {
     }
@@ -53,7 +53,7 @@ private:
     size_t m_randomizationRangeInSamples; // full window
 
     // Deserializer and information on the original timeline
-    DataDeserializerPtr m_deserializer;
+    IDataDeserializerPtr m_deserializer;
     size_t m_numSequences;
     size_t m_numChunks;
     size_t m_numSamples;
@@ -89,5 +89,7 @@ private:
     void RandomizeIfNewSweepIsEntered();
 
     bool AdvanceToNextPositionForThisWorker();
+
+    std::map<size_t, ChunkPtr> m_chunks;
 };
 } } }

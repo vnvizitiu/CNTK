@@ -61,6 +61,7 @@
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="MLFDataDeserializer.h" />
     <ClInclude Include="Bundler.h" />
+    <ClInclude Include="CorpusDescriptor.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

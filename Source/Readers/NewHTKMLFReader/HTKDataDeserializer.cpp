@@ -12,7 +12,7 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-HTKDataDeserializer::HTKDataDeserializer(const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName)
+    HTKDataDeserializer::HTKDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName)
     : m_featureFiles(std::move(ConfigHelper::GetFeaturePaths(feature))), m_elementSize(elementSize), m_featdim(0), m_sampperiod(0), m_verbosity(0), m_frameMode(frameMode), m_featureName(featureName)
 {
     ConfigHelper::CheckFeatureType(feature);
@@ -37,7 +37,8 @@ HTKDataDeserializer::HTKDataDeserializer(const ConfigParameters& feature, size_t
         const size_t uttframes = utterance.numframes(); // will throw if frame bounds not given --required to be given in this mode
 
         Utterance description(std::move(utterance));
-        description.m_id = i;
+        description.m_id = corpus->GenerateSequenceId(description.m_key);
+
         // description.chunkId, description.key // TODO
 
         // we need at least 2 frames for boundary markers to work
@@ -141,11 +142,6 @@ HTKDataDeserializer::HTKDataDeserializer(const ConfigParameters& feature, size_t
     }
 }
 
-void HTKDataDeserializer::StartEpoch(const EpochConfiguration& /*config*/)
-{
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
 const SequenceDescriptions& HTKDataDeserializer::GetSequenceDescriptions() const
 {
     return m_sequences;
@@ -181,11 +177,41 @@ public:
     }
 };
 
-std::vector<std::vector<SequenceDataPtr>> HTKDataDeserializer::GetSequencesById(const std::vector<size_t>& ids)
+class HTKDataDeserializer::HTKChunk : public Chunk
 {
-    assert(ids.size() == 1); // TODO
-    auto id = ids[0];
+    HTKDataDeserializer* m_parent;
+    size_t m_chunkId;
+public:
+    HTKChunk(HTKDataDeserializer* parent, size_t chunkId) : m_parent(parent), m_chunkId(chunkId)
+    {}
 
+    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    {
+        return m_parent->GetSequenceById(sequenceId);
+    }
+};
+
+ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
+{
+    auto& chunkdata = m_chunks[chunkId];
+    if (!chunkdata.isinram())
+    {
+        msra::util::attempt(5, [&]() // (reading from network)
+        {
+            std::unordered_map<std::string, size_t> empty;
+            msra::dbn::latticesource lattices(
+                std::pair<std::vector<std::wstring>, std::vector<std::wstring>>(),
+                empty,
+                std::wstring());
+            chunkdata.requiredata(m_featKind, m_featdim, m_sampperiod, lattices, m_verbosity);
+        });
+    }
+
+    return std::make_shared<HTKChunk>(this, chunkId);
+};
+
+std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
+{
     if (m_frameMode)
     {
         const auto& frame = m_frames[id];
@@ -237,39 +263,17 @@ std::vector<std::vector<SequenceDataPtr>> HTKDataDeserializer::GetSequencesById(
         memset(buffer, 0, m_elementSize * dimensions);
         memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
         r->m_data = buffer;
-
-        std::vector<std::vector<SequenceDataPtr>> result;
-        result.push_back(std::vector<SequenceDataPtr>{r});
-        return result;
+        return std::vector<SequenceDataPtr>{r};
     }
     else
     {
         assert(false);
-        return std::vector<std::vector<SequenceDataPtr>>();
+        throw std::runtime_error("Not implemented");
     }
 }
 
-void HTKDataDeserializer::RequireChunk(size_t chunkIndex)
-{
-    auto& chunkdata = m_chunks[chunkIndex];
-    if (chunkdata.isinram())
-    {
-        return;
-    }
-
-    msra::util::attempt(5, [&]() // (reading from network)
-                        {
-                            std::unordered_map<std::string, size_t> empty;
-                            msra::dbn::latticesource lattices(
-                                std::pair<std::vector<std::wstring>, std::vector<std::wstring>>(),
-                                empty,
-                                std::wstring());
-                            chunkdata.requiredata(m_featKind, m_featdim, m_sampperiod, lattices, m_verbosity);
-                        });
-
-    m_chunksinram++;
-}
-
+/*
+TODO: SHOULD DO RELEASE ON A CHUNK.
 void HTKDataDeserializer::ReleaseChunk(size_t chunkIndex)
 {
     auto& chunkdata = m_chunks[chunkIndex];
@@ -279,9 +283,6 @@ void HTKDataDeserializer::ReleaseChunk(size_t chunkIndex)
         m_chunksinram--;
     }
 }
+*/
 
-const std::vector<Utterance>& HTKDataDeserializer::GetUtterances() const
-{
-    return m_utterances;
-}
 } } }

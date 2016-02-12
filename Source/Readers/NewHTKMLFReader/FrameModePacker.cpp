@@ -10,8 +10,93 @@
 #include "Bundler.h"
 #include "ConfigHelper.h"
 #include "LegacyBlockRandomizer.h"
+#include "HTKDataDeserializer.h"
+#include "MLFDataDeserializer.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
+
+    std::vector<IDataDeserializerPtr> CreateDeserializers(const ConfigParameters& readerConfig,
+        bool framemode,
+        size_t elementSize)
+    {
+        std::vector<std::wstring> featureNames;
+        std::vector<std::wstring> labelNames;
+
+        std::vector<std::wstring> notused;
+        ConfigHelper::GetDataNamesFromConfig(readerConfig, featureNames, labelNames, notused, notused);
+        if (featureNames.size() < 1 || labelNames.size() < 1)
+        {
+            // eldak: Don't we support unsupervised training?
+            InvalidArgument("network needs at least 1 input and 1 output specified!");
+        }
+
+        std::vector<HTKDataDeserializerPtr> featureDeserializers;
+        std::vector<MLFDataDeserializerPtr> labelDeserializers;
+        CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>();
+        for (const auto& featureName : featureNames)
+        {
+            auto deserializer = std::make_shared<HTKDataDeserializer>(corpus, readerConfig(featureName), elementSize, framemode, featureName);
+            featureDeserializers.push_back(deserializer);
+        }
+
+        assert(featureDeserializers.size() == 1);
+
+        for (const auto& labelName : labelNames)
+        {
+            auto deserializer = std::make_shared<MLFDataDeserializer>(corpus, readerConfig(labelName), elementSize, framemode, labelName);
+
+            labelDeserializers.push_back(deserializer);
+        }
+
+        assert(labelDeserializers.size() == 1);
+
+        std::vector<IDataDeserializerPtr> deserializers;
+        deserializers.insert(deserializers.end(), featureDeserializers.begin(), featureDeserializers.end());
+        deserializers.insert(deserializers.end(), labelDeserializers.begin(), labelDeserializers.end());
+
+        // Checking end sequences.
+        size_t expected = deserializers[0]->GetSequenceDescriptions().size();
+        std::vector<bool> isValid(expected, true);
+        for (auto d : deserializers)
+        {
+            const auto& sequences = d->GetSequenceDescriptions();
+            if (sequences.size() != expected)
+            {
+                RuntimeError("We have some invalid alignment\n");
+            }
+
+            foreach_index(i, sequences)
+            {
+                isValid[i] = isValid[i] && sequences[i]->m_isValid;
+                assert(isValid[i]);
+            }
+        }
+
+        // shouldn't this be checked (again) later? more utterances can be invalidated...
+        size_t invalidUtts = 0;
+        foreach_index(i, isValid)
+        {
+            if (!isValid[i])
+            {
+                invalidUtts++;
+            }
+        }
+        assert(invalidUtts == 0); // For us it's zero
+
+        if (invalidUtts > isValid.size() / 2)
+        {
+            RuntimeError("minibatchutterancesource: too many files with inconsistent durations, assuming broken configuration\n");
+        }
+        else if (invalidUtts > 0)
+        {
+            fprintf(stderr,
+                "Found inconsistent durations across feature streams in %d out of %d files\n",
+                static_cast<int>(invalidUtts),
+                static_cast<int>(isValid.size()));
+        }
+
+        return deserializers;
+    }
 
 StreamDescriptionPtr GetStreamByName(const std::wstring& name, const std::vector<StreamDescriptionPtr>& streams)
 {
@@ -57,7 +142,7 @@ void FrameModePacker::InitFromConfig(const ConfigParameters& readerConfig)
     auto deserializers = CreateDeserializers(readerConfig, true, m_elementSize);
     assert(deserializers.size() == 2);
 
-    auto bundler = std::make_shared<Bundler>(readerConfig, true, m_verbosity, deserializers[0], deserializers);
+    auto bundler = std::make_shared<Bundler>(readerConfig, deserializers[0], deserializers);
     m_streams = bundler->GetStreamDescriptions();
 
     std::wstring readMethod = ConfigHelper::GetRandomizer(readerConfig);
