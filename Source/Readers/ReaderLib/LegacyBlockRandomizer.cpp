@@ -215,6 +215,9 @@ void LegacyBlockRandomizer::Randomize()
 
 void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
 {
+    // Check that StartEpoch() was called
+    assert(m_sequencePositionInSweep != SIZE_MAX);
+
     if (m_sequencePositionInSweep >= m_numSequences)
     {
         if (m_verbosity > 0)
@@ -223,7 +226,8 @@ void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
         m_sweep++;
         m_sweepStartInSamples += m_numSamples;
         Randomize();
-        m_sequencePositionInSweep = 0;
+        m_sequencePositionInSweep -= m_numSequences;
+        assert(m_sequencePositionInSweep < m_numSequences); // cannot jump ahead more than a sweep
     };
 }
 
@@ -237,7 +241,7 @@ void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t sample
         m_sweepStartInSamples = sweep * m_numSamples;
         Randomize();
     }
-    m_sequencePositionInSweep = samplePosition % m_numSamples;
+    m_sequencePositionInSweep = samplePosition % m_numSamples; // TODO only for m_frameMode
 };
 
 //
@@ -245,15 +249,29 @@ void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t sample
 //
 
 LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, DataDeserializerPtr deserializer)
-    : m_verbosity(verbosity), m_randomizationRangeInSamples(randomizationRangeInSamples), m_deserializer(deserializer), m_sweep(SIZE_MAX), m_sequencePositionInSweep(SIZE_MAX), m_samplePositionInEpoch(SIZE_MAX), m_epochSize(SIZE_MAX)
+    : m_verbosity(verbosity),
+      m_randomizationRangeInSamples(randomizationRangeInSamples),
+      m_deserializer(deserializer),
+      m_sweep(SIZE_MAX),
+      m_sequencePositionInSweep(SIZE_MAX),
+      m_samplePositionInEpoch(SIZE_MAX),
+      m_epochSize(SIZE_MAX)
 {
     assert(deserializer != nullptr);
     const SequenceDescriptions& timeline = m_deserializer->GetSequenceDescriptions();
     assert(TimelineIsValidForRandomization(timeline));
 
-    // TODO let timeline keep this info?
-    m_numSequences = timeline.back()->m_id + 1;
-    m_numChunks = timeline.back()->m_chunkId + 1;
+    if (timeline.size() == 0)
+    {
+        m_numSequences = 0;
+        m_numChunks = 0;
+    }
+    else
+    {
+        // TODO let timeline keep this info?
+        m_numSequences = timeline.back()->m_id + 1;
+        m_numChunks = timeline.back()->m_chunkId + 1;
+    }
 
     // Generate additional information about physical chunks
     assert(m_chunkInformation.size() == 0);
@@ -311,7 +329,7 @@ void LegacyBlockRandomizer::StartEpoch(const EpochConfiguration& config)
     // TODO add some asserts on EpochConfiguration
     m_samplePositionInEpoch = 0;
     size_t timeframe = m_epochSize * config.m_epochIndex;
-    assert(m_frameMode);           // TODO not (tested) yet
+    assert(m_frameMode); // TODO !m_frameMode needs fixes
     assert(timeframe != SIZE_MAX); // used as special value for init
     RandomizeForGlobalSamplePosition(timeframe);
 };
