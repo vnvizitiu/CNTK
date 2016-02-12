@@ -18,17 +18,18 @@ echo on
 
 set TEST_SPEC=^
   -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 ^
-  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11 ^
-  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop5
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop4 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop5 ^
+  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11
 
-:: SHOULD WORK
-::   HTKMLFReaderSimpleDataLoop4_Config.cntk
-::   HTKMLFReaderSimpleDataLoop3_Config.cntk // action write?!
+:: NEEDS WORK
 ::   HTKMLFReaderSimpleDataLoop21_Config.cntk // distributed
 ::     HTKMLFReaderSimpleDataLoop21_{0,1}
 :: 
 :: NO
-::   UCIFastReaderSimpleDataLoop_Config.cntk
+::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
+::   HTKMLFReaderSimpleDataLoop3_Config.cntk // !frameMode
+::   HTKMLFReaderSimpleDataLoop4_Config.cntk // !frameMode
 ::   HTKMLFReaderSimpleDataLoop10_Config.cntk // rollingWindow
 ::   HTKMLFReaderSimpleDataLoop12_Config.cntk // rollingWindow
 ::   HTKMLFReaderSimpleDataLoop13_Config.cntk // rollingWindow
