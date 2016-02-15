@@ -156,6 +156,7 @@ std::vector<StreamDescriptionPtr> HTKDataDeserializer::GetStreamDescriptions() c
     stream->m_name = m_featureName;
     stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
     stream->m_elementType = m_elementSize == sizeof(float) ? ElementType::tfloat : ElementType::tdouble;
+    stream->m_storageType = StorageType::dense;
     return std::vector<StreamDescriptionPtr>{stream};
 }
 
@@ -245,7 +246,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         msra::dbn::augmentneighbors(uttframevectors, noboundaryflags, frame.frameIndexInUtterance, leftextent, rightextent, feat, 0);
 
         DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
-        r->m_numberOfSamples = utterance.m_numberOfSamples;
+        r->m_numberOfSamples = frame.m_numberOfSamples;
 
         const msra::dbn::matrixstripe featOri = msra::dbn::matrixstripe(feat, 0, feat.cols());
         const size_t dimensions = featOri.rows();

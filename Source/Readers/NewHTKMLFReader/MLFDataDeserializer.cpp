@@ -143,6 +143,7 @@ std::vector<StreamDescriptionPtr> MLFDataDeserializer::GetStreamDescriptions() c
     stream->m_id = 0;
     stream->m_name = m_name;
     stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
+    stream->m_storageType = StorageType::dense;
     stream->m_elementType = m_elementSize == sizeof(float) ? ElementType::tfloat : ElementType::tdouble;
     return std::vector<StreamDescriptionPtr>{stream};
 }

@@ -30,8 +30,99 @@
 #include "SubstitutingMemoryProvider.h"
 #include "CudaMemoryProvider.h"
 #include "HeapMemoryProvider.h"
+#include "ConfigHelper.h"
+#include "HTKDataDeserializer.h"
+#include "MLFDataDeserializer.h"
+#include "Bundler.h"
+#include "LegacyBlockRandomizer.h"
+#include "Utils.h"
+#include "SampleModePacker.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
+
+std::vector<IDataDeserializerPtr> CreateDeserializers(const ConfigParameters& readerConfig,
+    bool framemode,
+    size_t elementSize)
+{
+    std::vector<std::wstring> featureNames;
+    std::vector<std::wstring> labelNames;
+
+    std::vector<std::wstring> notused;
+    ConfigHelper::GetDataNamesFromConfig(readerConfig, featureNames, labelNames, notused, notused);
+    if (featureNames.size() < 1 || labelNames.size() < 1)
+    {
+        // eldak: Don't we support unsupervised training?
+        InvalidArgument("network needs at least 1 input and 1 output specified!");
+    }
+
+    std::vector<HTKDataDeserializerPtr> featureDeserializers;
+    std::vector<MLFDataDeserializerPtr> labelDeserializers;
+    CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>();
+    for (const auto& featureName : featureNames)
+    {
+        auto deserializer = std::make_shared<HTKDataDeserializer>(corpus, readerConfig(featureName), elementSize, framemode, featureName);
+        featureDeserializers.push_back(deserializer);
+    }
+
+    assert(featureDeserializers.size() == 1);
+
+    for (const auto& labelName : labelNames)
+    {
+        auto deserializer = std::make_shared<MLFDataDeserializer>(corpus, readerConfig(labelName), elementSize, framemode, labelName);
+
+        labelDeserializers.push_back(deserializer);
+    }
+
+    assert(labelDeserializers.size() == 1);
+
+    std::vector<IDataDeserializerPtr> deserializers;
+    deserializers.insert(deserializers.end(), featureDeserializers.begin(), featureDeserializers.end());
+    deserializers.insert(deserializers.end(), labelDeserializers.begin(), labelDeserializers.end());
+
+    // SIMILAR CHECKS ALREADY DONE IN THE BUNDLER.
+    // Checking end sequences.
+    /*size_t expected = deserializers[0]->GetSequenceDescriptions().size();
+    std::vector<bool> isValid(expected, true);
+    for (auto d : deserializers)
+    {
+    const auto& sequences = d->GetSequenceDescriptions();
+    if (sequences.size() != expected)
+    {
+    RuntimeError("We have some invalid alignment\n");
+    }
+
+    foreach_index(i, sequences)
+    {
+    isValid[i] = isValid[i] && sequences[i]->m_isValid;
+    assert(isValid[i]);
+    }
+    }
+
+    // shouldn't this be checked (again) later? more utterances can be invalidated...
+    size_t invalidUtts = 0;
+    foreach_index(i, isValid)
+    {
+    if (!isValid[i])
+    {
+    invalidUtts++;
+    }
+    }
+    assert(invalidUtts == 0); // For us it's zero
+
+    if (invalidUtts > isValid.size() / 2)
+    {
+    RuntimeError("minibatchutterancesource: too many files with inconsistent durations, assuming broken configuration\n");
+    }
+    else if (invalidUtts > 0)
+    {
+    fprintf(stderr,
+    "Found inconsistent durations across feature streams in %d out of %d files\n",
+    static_cast<int>(invalidUtts),
+    static_cast<int>(isValid.size()));
+    }*/
+
+    return deserializers;
+}
 
 template <class ElemType>
 void NewHTKMLFReaderShim<ElemType>::Init(const ConfigParameters& config)
@@ -40,14 +131,56 @@ void NewHTKMLFReaderShim<ElemType>::Init(const ConfigParameters& config)
 
     assert(config(L"frameMode", true));
     m_memoryProvider = std::make_shared<HeapMemoryProvider>();
-    m_packer = std::make_shared<FrameModePacker>(config, m_memoryProvider, sizeof(ElemType));
+
+    size_t window = ConfigHelper::GetRandomizationWindow(config);
+
+    auto deserializers = CreateDeserializers(config, true, sizeof(ElemType));
+    assert(deserializers.size() == 2);
+
+    auto bundler = std::make_shared<Bundler>(config, deserializers[0], deserializers);
+    m_streams = bundler->GetStreamDescriptions();
+
+    std::wstring readMethod = ConfigHelper::GetRandomizer(config);
+    if (_wcsicmp(readMethod.c_str(), L"blockRandomize"))
+    {
+        RuntimeError("readMethod must be 'blockRandomize'");
+    }
+
+    m_verbosity = config(L"verbosity", 2);
+    m_transformer = std::make_shared<LegacyBlockRandomizer>(m_verbosity, window, bundler);
 
     intargvector numberOfuttsPerMinibatchForAllEpochs =
         config(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
+    Utils::CheckMinibatchSizes(numberOfuttsPerMinibatchForAllEpochs);
+
+    // (SGD will ask before entering actual reading --TODO: This is hacky.)
+    /*m_numSeqsPerMB = m_numSeqsPerMBForAllEpochs[0];
+    m_pMBLayout->Init(m_numSeqsPerMB, 0);
+    m_noData = false;*/
+
+    if (config.Exists(L"legacyMode"))
+        RuntimeError("legacy mode has been deprecated\n");
+
+    // eldak: we should introduce a separate class describing inputs with proper interface.
+    /*for (size_t i = 0; i < m_streams.size(); ++i)
+    {
+        m_nameToId.insert(std::make_pair(m_streams[i]->m_name, m_streams[i]->m_id));
+    }*/
+
+    //size_t iFeat = 0, iLabel = 0;
+
+    std::vector<std::wstring> featureNames;
+    std::vector<std::wstring> labelNames;
+    std::vector<std::wstring> notused;
+
+    ConfigHelper::GetDataNamesFromConfig(config, featureNames, labelNames, notused, notused);
+
+    /*intargvector numberOfuttsPerMinibatchForAllEpochs =
+        config(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));*/
 
     auto numSeqsPerMBForAllEpochs = numberOfuttsPerMinibatchForAllEpochs;
     m_layout->Init(numSeqsPerMBForAllEpochs[0], 0);
-    m_streams = m_packer->GetStreamDescriptions();
+    m_streams = m_transformer->GetStreamDescriptions();
 }
 
 template <class ElemType>
@@ -65,14 +198,21 @@ void NewHTKMLFReaderShim<ElemType>::StartDistributedMinibatchLoop(size_t request
     config.m_minibatchSizeInSamples = requestedMBSize;
     config.m_totalEpochSizeInSamples = requestedEpochSamples;
     config.m_epochIndex = epoch;
+    m_endOfEpoch = false;
 
-    m_packer->StartEpoch(config);
+    m_transformer->StartEpoch(config);
+    m_packer = std::make_shared<SampleModePacker>(m_memoryProvider, m_transformer, requestedMBSize, m_streams);
 }
 
 template <class ElemType>
 bool NewHTKMLFReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices)
 {
     // eldak: Hack.
+    if (m_endOfEpoch)
+    {
+        return false;
+    }
+
     int deviceId = matrices.begin()->second->GetDeviceId();
     for (auto mx : matrices)
     {
@@ -85,10 +225,14 @@ bool NewHTKMLFReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<E
     Minibatch m = m_packer->ReadMinibatch();
     if (m.m_endOfEpoch)
     {
-        return false;
+        m_endOfEpoch = true;
+        if (m.m_data.empty())
+        {
+            return false;
+        }
     }
 
-    auto streams = m_packer->GetStreamDescriptions();
+    auto streams = m_transformer->GetStreamDescriptions();
     std::map<size_t, wstring> idToName;
     for (auto i : streams)
     {
@@ -113,7 +257,7 @@ bool NewHTKMLFReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<E
         matrices[name]->SetValue(rowNumber, columnNumber, matrices[name]->GetDeviceId(), const_cast<ElemType*>(data), matrixFlagNormal);
     }
 
-    return !m.m_endOfEpoch;
+    return !m.m_data.empty();
 }
 
 template <class ElemType>
@@ -136,4 +280,5 @@ size_t NewHTKMLFReaderShim<ElemType>::GetNumParallelSequences()
 
 template class NewHTKMLFReaderShim<float>;
 template class NewHTKMLFReaderShim<double>;
-} } }
+
+}}}

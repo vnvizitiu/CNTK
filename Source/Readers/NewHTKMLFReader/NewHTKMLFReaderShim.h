@@ -9,18 +9,22 @@
 
 #include "DataReader.h"
 #include "Config.h"
-#include "FrameModePacker.h"
+//#include "FrameModePacker.h"
 #include "SubstitutingMemoryProvider.h"
+#include "SampleModePacker.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 template <class ElemType>
 class NewHTKMLFReaderShim : public IDataReader<ElemType>
 {
-    FrameModePackerPtr m_packer;
+    SampleModePackerPtr m_packer;
     MBLayoutPtr m_layout;
     MemoryProviderPtr m_memoryProvider;
     std::vector<StreamDescriptionPtr> m_streams;
+    TransformerPtr m_transformer;
+    int m_verbosity;
+    bool m_endOfEpoch;
 
 public:
     virtual void Init(const ConfigParameters& config) override;

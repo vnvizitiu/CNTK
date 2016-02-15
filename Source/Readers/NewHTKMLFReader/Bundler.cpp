@@ -20,10 +20,8 @@ Bundler::Bundler(
     {
         for (auto i : d->GetStreamDescriptions())
         {
-            StreamDescriptionPtr stream = std::make_shared<StreamDescription>();
+            StreamDescriptionPtr stream = std::make_shared<StreamDescription>(*i);
             stream->m_id = streams.size();
-            stream->m_name = i->m_name;
-            stream->m_sampleLayout = i->m_sampleLayout;
             streams.push_back(stream);
         }
     }
