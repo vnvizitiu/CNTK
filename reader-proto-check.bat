@@ -18,7 +18,6 @@ echo on
 
 set TEST_SPEC=^
   -t ReaderTestSuite/HTKMLFReaderSimpleDataLoop1 ^
-  -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop4 ^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop5 ^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop11 ^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_0 ^
