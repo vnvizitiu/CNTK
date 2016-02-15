@@ -100,15 +100,33 @@ class BundlingChunk : public Chunk // TODO tune implementation?
 {
     size_t m_numberOfInputs;
     Bundler* m_parent;
+    size_t m_chunkId;
+    size_t m_sequenceEnd;
+    std::vector<std::vector<ChunkPtr>> m_innerChunks;
 
 public:
-    BundlingChunk(size_t numberOfInputs, Bundler* parent, const std::map<size_t, std::vector<ChunkPtr>>& sequences)
-        : m_sequences(sequences), m_numberOfInputs(numberOfInputs), m_parent(parent)
-    {}
+    BundlingChunk(size_t numberOfInputs, Bundler* parent, size_t chunkId)
+        : m_numberOfInputs(numberOfInputs), m_parent(parent), m_chunkId(chunkId)
+    {
+        size_t numberOfSequences = m_parent->m_chunkOffsets[chunkId + 1] - m_parent->m_chunkOffsets[chunkId];
+        m_innerChunks.resize(numberOfSequences);
+
+        int innerIndex = 0;
+        for (size_t sequenceId = m_parent->m_chunkOffsets[chunkId]; sequenceId < m_parent->m_chunkOffsets[chunkId + 1]; ++sequenceId, ++innerIndex)
+        {
+            m_innerChunks[innerIndex].resize(m_parent->m_deserializers.size());
+            for (size_t i = 0; i < m_parent->m_deserializers.size(); ++i)
+            {
+                size_t innerChunkId = m_parent->m_sequenceToChunk[i][sequenceId];
+                m_innerChunks[innerIndex][i] = m_parent->m_deserializers[i]->GetChunk(innerChunkId);
+            }
+        }
+    }
 
     virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
     {
-        const auto& chunks = m_sequences[sequenceId];
+        size_t index = sequenceId - m_parent->m_chunkOffsets[m_chunkId];
+        const auto& chunks = m_innerChunks[index];
         std::vector<SequenceDataPtr> result;
         result.reserve(m_numberOfInputs);
 
@@ -120,26 +138,11 @@ public:
 
         return result;
     }
-
-private:
-    std::map<size_t, std::vector<ChunkPtr>> m_sequences; // TODO re-think?
 };
 
 ChunkPtr Bundler::GetChunk(size_t chunkId)
 {
-    std::map<size_t, std::vector<ChunkPtr>> sequences;
-    for (size_t j = m_chunkOffsets[chunkId]; j < m_chunkOffsets[chunkId + 1]; ++j)
-    {
-        size_t sequenceId = m_sequenceDescriptions[j].m_id;
-        sequences[j].resize(m_deserializers.size());
-        for (size_t i = 0; i < m_deserializers.size(); ++i)
-        {
-            size_t innerChunkId = m_sequenceToChunk[i][sequenceId];
-            sequences[sequenceId][i] = m_deserializers[i]->GetChunk(innerChunkId);
-        }
-    }
-
-    return std::make_shared<BundlingChunk>(m_streams.size(), this, sequences); //TODO why so slow?
+    return std::make_shared<BundlingChunk>(m_streams.size(), this, chunkId); //TODO why so slow?
 }
 
 const SequenceDescriptions& Bundler::GetSequenceDescriptions() const
