@@ -95,7 +95,7 @@ void Bundler::CreateSequenceDescriptions()
     }
 }
 
-class BundlingChunk : public Chunk
+class BundlingChunk : public Chunk // TODO tune implementation?
 {
     size_t m_numberOfInputs;
     Bundler* m_parent;
@@ -121,7 +121,7 @@ public:
     }
 
 private:
-    std::map<size_t, std::vector<ChunkPtr>> m_sequences;
+    std::map<size_t, std::vector<ChunkPtr>> m_sequences; // TODO re-think?
 };
 
 ChunkPtr Bundler::GetChunk(size_t chunkId)
@@ -138,7 +138,7 @@ ChunkPtr Bundler::GetChunk(size_t chunkId)
         }
     }
 
-    return std::make_shared<BundlingChunk>(m_streams.size(), this, sequences);
+    return std::make_shared<BundlingChunk>(m_streams.size(), this, sequences); //TODO why so slow?
 }
 
 const SequenceDescriptions& Bundler::GetSequenceDescriptions() const

@@ -210,7 +210,7 @@ ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
         });
     }
 
-    return std::make_shared<HTKChunk>(this, chunkId);
+    return std::make_shared<HTKChunk>(this, chunkId); // TODO creating too many times?
 };
 
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
@@ -220,7 +220,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         const auto& frame = m_frames[id];
         const auto& utterance = *frame.u;
 
-        msra::dbn::matrix feat;
+        msra::dbn::matrix feat; // TODO resize in constructor?
         feat.resize(m_dimension, 1);
 
         const std::vector<char> noboundaryflags; // dummy
@@ -256,11 +256,12 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         void* buffer = nullptr;
         if (m_elementSize == sizeof(float))
         {
-            buffer = new float[dimensions];
+            buffer = new float[dimensions]; // TODO no buffer, just point to feat?
             memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
         }
         else
         {
+            // TODO allocate double, convert in-place from end to start instead
             double *doubleBuffer = new double[dimensions];
             const float *floatBuffer = reinterpret_cast<const float*>(tmp);
 
@@ -273,7 +274,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         }
 
         r->m_data = buffer;
-        return std::vector<SequenceDataPtr>{r};
+        return std::vector<SequenceDataPtr>{r}; // TODO would std::move help?
     }
     else
     {

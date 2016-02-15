@@ -172,6 +172,8 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
 {
     auto id = sequenceId;
 
+    // TODO return sparse, like in image reader
+
         size_t label = m_classIds[m_frames[id].index];
         DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
         if (m_elementSize == sizeof(float))
