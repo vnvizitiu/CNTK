@@ -30,7 +30,7 @@ private:
     IDataDeserializerPtr m_driver;
 
     std::vector<SequenceDescription> m_sequenceDescriptions;
-    std::vector<std::map<size_t, size_t>> m_sequenceToChunk; // TODO vector-of-vectors
+    std::vector<std::vector<size_t>> m_sequenceToChunk;
     std::vector<std::vector<size_t>> m_sequenceToSequence;
     std::vector<size_t> m_chunkOffsets;
     SequenceDescriptions m_sequences;

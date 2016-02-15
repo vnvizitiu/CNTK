@@ -40,6 +40,7 @@ void Bundler::CreateSequenceDescriptions()
     for (int i = 0; i < m_deserializers.size(); ++i)
     {
         m_sequenceToSequence[i].resize(maxNumberOfSequences);
+        m_sequenceToChunk[i].resize(maxNumberOfSequences);
     }
 
     size_t previousChunk = SIZE_MAX;
@@ -58,11 +59,11 @@ void Bundler::CreateSequenceDescriptions()
                 break;
             }
 
-            m_sequenceToChunk[j][description->m_id] = description->m_chunkId;
+            m_sequenceToChunk[j][currentMapping] = description->m_chunkId;
             m_sequenceToSequence[j][currentMapping] = description->m_id;
         }
 
-        m_sequenceToChunk[0][sequenceDescription->m_id] = sequenceDescription->m_chunkId;
+        m_sequenceToChunk[0][currentMapping] = sequenceDescription->m_chunkId;
         m_sequenceToSequence[0][currentMapping] = sequenceDescription->m_id;
 
         if (isValid)
