@@ -17,7 +17,6 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="NewHTKMLFReaderShim.cpp" />
-    <ClCompile Include="FrameModePacker.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="ConfigHelper.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />
@@ -55,7 +54,6 @@
       <Filter>Common\Include</Filter>
     </ClInclude>
     <ClInclude Include="NewHTKMLFReaderShim.h" />
-    <ClInclude Include="FrameModePacker.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="HTKDataDeserializer.h" />

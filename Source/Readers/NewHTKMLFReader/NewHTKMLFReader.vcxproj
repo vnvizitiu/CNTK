@@ -113,7 +113,6 @@
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="CorpusDescriptor.h" />
-    <ClInclude Include="FrameModePacker.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="htkfeatio.h" />
     <ClInclude Include="NewHTKMLFReaderShim.h" />
@@ -152,7 +151,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64' Or '$(Configuration)|$(Platform)'=='Release_CpuOnly|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="FrameModePacker.cpp" />
     <ClCompile Include="HTKDataDeserializer.cpp" />
     <ClCompile Include="NewHTKMLFReaderShim.cpp" />
     <ClCompile Include="NewHTKMLFWriter.cpp" />
