@@ -114,7 +114,7 @@ void LegacyBlockRandomizer::RandomizeChunks()
         }
         while (chunk.m_info.m_samplePositionStart - m_randomizedChunks[chunk.m_windowBegin].m_info.m_samplePositionStart > halfWindowRange)
             chunk.m_windowBegin++; // too early
-        // TODO m_randomizedChunks[chunk.windowend + 1].info.samplePositionStart - m_randomizedChunks[chunk.windowbegin].info.samplePositionStart < m_randomizationRangeInSamples 
+        // TODO m_randomizedChunks[chunk.windowend + 1].info.samplePositionStart - m_randomizedChunks[chunk.windowbegin].info.samplePositionStart < m_randomizationRangeInSamples
         while (chunk.m_windowEnd < m_numChunks &&
                m_randomizedChunks[chunk.m_windowEnd + 1].m_info.m_samplePositionStart - chunk.m_info.m_samplePositionStart < halfWindowRange)
             chunk.m_windowEnd++; // got more space
@@ -215,6 +215,9 @@ void LegacyBlockRandomizer::Randomize()
 
 void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
 {
+    // Check that StartEpoch() was called
+    assert(m_sequencePositionInSweep != SIZE_MAX);
+
     if (m_sequencePositionInSweep >= m_numSequences)
     {
         if (m_verbosity > 0)
@@ -223,7 +226,8 @@ void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
         m_sweep++;
         m_sweepStartInSamples += m_numSamples;
         Randomize();
-        m_sequencePositionInSweep = 0;
+        m_sequencePositionInSweep -= m_numSequences;
+        assert(m_sequencePositionInSweep < m_numSequences); // cannot jump ahead more than a sweep
     };
 }
 
@@ -237,7 +241,7 @@ void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t sample
         m_sweepStartInSamples = sweep * m_numSamples;
         Randomize();
     }
-    m_sequencePositionInSweep = samplePosition % m_numSamples;
+    m_sequencePositionInSweep = samplePosition % m_numSamples; // TODO only for m_frameMode
 };
 
 //
@@ -245,15 +249,29 @@ void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t sample
 //
 
 LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomizationRangeInSamples, IDataDeserializerPtr deserializer)
-    : m_verbosity(verbosity), m_randomizationRangeInSamples(randomizationRangeInSamples), m_deserializer(deserializer), m_sweep(SIZE_MAX), m_sequencePositionInSweep(SIZE_MAX), m_samplePositionInEpoch(SIZE_MAX), m_epochSize(SIZE_MAX)
+    : m_verbosity(verbosity),
+      m_randomizationRangeInSamples(randomizationRangeInSamples),
+      m_deserializer(deserializer),
+      m_sweep(SIZE_MAX),
+      m_sequencePositionInSweep(SIZE_MAX),
+      m_samplePositionInEpoch(SIZE_MAX),
+      m_epochSize(SIZE_MAX)
 {
     assert(deserializer != nullptr);
     const SequenceDescriptions& timeline = m_deserializer->GetSequenceDescriptions();
     assert(TimelineIsValidForRandomization(timeline));
 
-    // TODO let timeline keep this info?
-    m_numSequences = timeline.back()->m_id + 1;
-    m_numChunks = timeline.back()->m_chunkId + 1;
+    if (timeline.size() == 0)
+    {
+        m_numSequences = 0;
+        m_numChunks = 0;
+    }
+    else
+    {
+        // TODO let timeline keep this info?
+        m_numSequences = timeline.back()->m_id + 1;
+        m_numChunks = timeline.back()->m_chunkId + 1;
+    }
 
     // Generate additional information about physical chunks
     assert(m_chunkInformation.size() == 0);
@@ -309,73 +327,74 @@ void LegacyBlockRandomizer::StartEpoch(const EpochConfiguration& config)
     // TODO add some asserts on EpochConfiguration
     m_samplePositionInEpoch = 0;
     size_t timeframe = m_epochSize * config.m_epochIndex;
-    assert(m_frameMode);           // TODO not (tested) yet
+    assert(m_frameMode); // TODO !m_frameMode needs fixes
     assert(timeframe != SIZE_MAX); // used as special value for init
     RandomizeForGlobalSamplePosition(timeframe);
 };
 
-bool LegacyBlockRandomizer::AdvanceToNextPositionForThisWorker()
+bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<size_t>& originalIds, std::unordered_set<size_t>& originalChunks)
 {
-    while (m_samplePositionInEpoch < m_epochSize)
+    assert(m_frameMode); // TODO !m_frameMode not implemented yet
+    assert(originalIds.size() == 0);
+    assert(originalChunks.size() == 0);
+    assert(sampleCount < m_numSamples);
+
+    if (m_samplePositionInEpoch < m_epochSize)
     {
-        RandomizeIfNewSweepIsEntered();
+        size_t distributedSampleCount = 0;
 
-        const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
-
-        if ((seqDesc.m_chunkId % m_numberOfWorkers) == m_workerRank)
+        while ((m_samplePositionInEpoch < m_epochSize) &&
+               (distributedSampleCount < sampleCount))
         {
-            // Got one
-            break;
-        }
+            RandomizeIfNewSweepIsEntered();
 
-        m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
-        m_sequencePositionInSweep++;
+            const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
+            if ((seqDesc.m_chunkId % m_numberOfWorkers) == m_workerRank)
+            {
+                // Got one, collect it (and its window of chunks)
+                originalIds.push_back(seqDesc.m_id);
+
+                const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowBegin;
+                const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowEnd;
+
+                for (size_t chunk = windowBegin; chunk < windowEnd; chunk++)
+                {
+                    if ((chunk % m_numberOfWorkers) == m_workerRank)
+                    {
+                        originalChunks.insert(m_randomizedChunks[chunk].m_originalChunkIndex);
+                    }
+                }
+            }
+
+            m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
+            m_sequencePositionInSweep++;
+            distributedSampleCount++;
+        }
     }
 
     return m_epochSize <= m_samplePositionInEpoch;
 }
 
-Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
+Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
 {
+    assert(m_frameMode); // TODO sequence mode not implemented yet
     assert(m_samplePositionInEpoch != SIZE_MAX); // SetEpochConfiguration() must be called first
 
-    std::vector<size_t> ids;
-    bool endOfEpoch = false;
+    std::vector<size_t> originalIds;
+    std::unordered_set<size_t> originalChunks;
     Sequences result;
 
-    while (ids.size() < count)
-    {
-        endOfEpoch = AdvanceToNextPositionForThisWorker();
-        if (endOfEpoch)
-        {
-            break;
-        }
-        else
-        {
-            assert(m_sequencePositionInSweep < m_numSequences);
-            ids.push_back(m_sequencePositionInSweep);
-            const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
-            m_samplePositionInEpoch += seqDesc.m_numberOfSamples;
-            m_sequencePositionInSweep++;
-        }
-    };
+    result.m_endOfEpoch = GetNextSequenceIds(sampleCount, originalIds, originalChunks);
 
-    result.m_endOfEpoch = endOfEpoch;
-
-    if (ids.size() == 0)
+    if (originalIds.size() == 0)
     {
         return result;
     }
 
     // Require and release chunks from the data deserializer
-    const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[ids[0]]].m_windowBegin;
-    const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[ids.back()]].m_windowEnd;
-
-    for (size_t chunkId = 0; chunkId < m_numChunks; chunkId++)
+    for (size_t originalChunkIndex = 0; originalChunkIndex < m_numChunks; originalChunkIndex++)
     {
-        auto originalChunkIndex = m_randomizedChunks[chunkId].m_originalChunkIndex;
-
-        if (windowBegin <= chunkId && chunkId < windowEnd)
+        if (originalChunks.find(originalChunkIndex) != originalChunks.end())
         {
             if (m_chunks.find(originalChunkIndex) == m_chunks.end())
             {
@@ -388,14 +407,12 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t count)
         }
     }
 
-    // Construct vector of original IDs and request data
-    std::vector<size_t> originalIds;
-    result.m_data.reserve(ids.size());
-    for (auto id : ids)
+    auto orginalTimeline = m_deserializer->GetSequenceDescriptions();
+    result.m_data.reserve(originalIds.size());
+    for (auto id : originalIds)
     {
-        const auto& seqDesc = m_randomTimeline[id];
-        originalIds.push_back(seqDesc.m_id);
-        result.m_data.push_back(m_chunks[m_randomizedChunks[seqDesc.m_chunkId].m_originalChunkIndex]->GetSequence(seqDesc.m_id));
+        const auto& sequence = orginalTimeline[id];
+        result.m_data.push_back(m_chunks[sequence->m_chunkId]->GetSequence(id));
     }
 
     return result;
