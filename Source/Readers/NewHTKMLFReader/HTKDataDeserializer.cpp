@@ -9,15 +9,29 @@
 #include "Basics.h" // for attempt()
 #include "minibatchsourcehelpers.h"
 #include <numeric>
+#include <StringUtil.h>
+#include <ElementTypeUtils.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    HTKDataDeserializer::HTKDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName)
-    : m_featureFiles(std::move(ConfigHelper::GetFeaturePaths(feature))), m_elementSize(elementSize), m_featdim(0), m_sampperiod(0), m_verbosity(0), m_frameMode(frameMode), m_featureName(featureName)
+    HTKDataDeserializer::HTKDataDeserializer(
+        CorpusDescriptorPtr corpus,
+        const ConfigParameters& feature,
+        const std::wstring& featureName)
+        : m_featureFiles(std::move(ConfigHelper::GetFeaturePaths(feature))),
+          m_featdim(0),
+          m_sampperiod(0),
+          m_verbosity(0),
+          m_featureName(featureName)
 {
+    m_frameMode = feature.Find("frameMode", "true");
+    assert(m_frameMode);
+
     ConfigHelper::CheckFeatureType(feature);
 
     auto context = ConfigHelper::GetContextWindow(feature);
+    m_elementType = ConfigHelper::GetElementType(feature);
+    m_elementSize = GetSizeByType(m_elementType);
 
     m_dimension = ConfigHelper::GetFeatureDimension(feature);
     m_dimension = m_dimension * (1 + context.first + context.second);
@@ -155,7 +169,7 @@ std::vector<StreamDescriptionPtr> HTKDataDeserializer::GetStreamDescriptions() c
     stream->m_id = 0;
     stream->m_name = m_featureName;
     stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
-    stream->m_elementType = m_elementSize == sizeof(float) ? ElementType::tfloat : ElementType::tdouble;
+    stream->m_elementType = m_elementType;
     stream->m_storageType = StorageType::dense;
     return std::vector<StreamDescriptionPtr>{stream};
 }
@@ -254,14 +268,16 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 
         // eldak: this should not be allocated each time.
         void* buffer = nullptr;
-        if (m_elementSize == sizeof(float))
+        if (m_elementType == ElementType::tfloat)
         {
-            buffer = new float[dimensions]; // TODO no buffer, just point to feat?
+            // TODO no buffer, just point to feat?
+            buffer = new float[dimensions];
             memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
         }
-        else
+        else 
         {
             // TODO allocate double, convert in-place from end to start instead
+            assert(m_elementType == ElementType::tdouble);
             double *doubleBuffer = new double[dimensions];
             const float *floatBuffer = reinterpret_cast<const float*>(tmp);
 

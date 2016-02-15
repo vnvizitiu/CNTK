@@ -192,7 +192,9 @@ class HTKDataDeserializer : public IDataDeserializer
     std::vector<Utterance> m_utterances;
     std::vector<Frame> m_frames;
 
+    ElementType m_elementType;
     size_t m_elementSize;
+
     SequenceDescriptions m_sequences;
 
     std::vector<chunkdata> m_chunks;
@@ -207,7 +209,7 @@ class HTKDataDeserializer : public IDataDeserializer
     std::wstring m_featureName;
 
 public:
-    HTKDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& feature, size_t elementSize, bool frameMode, const std::wstring& featureName);
+    HTKDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& feature, const std::wstring& featureName);
 
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
 

@@ -10,13 +10,16 @@
 #include "Config.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
+    enum class ElementType;
 
-class ConfigHelper
+    class ConfigHelper
 {
 public:
     static std::pair<size_t, size_t> GetContextWindow(const ConfigParameters& config);
     static size_t GetFeatureDimension(const ConfigParameters& config);
     static size_t GetLabelDimension(const ConfigParameters& config);
+
+    static ElementType GetElementType(const ConfigParameters& config);
 
     static void CheckFeatureType(const ConfigParameters& config);
     static void CheckLabelType(const ConfigParameters& config);

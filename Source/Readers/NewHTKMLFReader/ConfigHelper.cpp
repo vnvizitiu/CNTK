@@ -8,6 +8,8 @@
 #include <DataReader.h>
 #include <regex>
 #include "Utils.h"
+#include <ElementTypeUtils.h>
+#include <StringUtil.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -105,6 +107,22 @@ void ConfigHelper::GetDataNamesFromConfig(
             lattices.push_back(id);
         }
     }
+}
+
+ElementType ConfigHelper::GetElementType(const ConfigParameters& config)
+{
+    string precision = config.Find("precision", "float");
+    if (AreEqualIgnoreCase(precision, std::string("float")))
+    {
+        return ElementType::tfloat;
+    }
+
+    if (AreEqualIgnoreCase(precision, std::string("double")))
+    {
+        return ElementType::tdouble;
+    }
+
+    RuntimeError("Not supported precision '%s'. Expected 'double' or 'float'.", precision.c_str());
 }
 
 size_t ConfigHelper::GetFeatureDimension(const ConfigParameters& config)

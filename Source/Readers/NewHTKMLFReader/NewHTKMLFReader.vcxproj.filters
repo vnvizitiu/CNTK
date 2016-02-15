@@ -16,12 +16,12 @@
     <ClCompile Include="..\..\Common\fileutil.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="NewHTKMLFReaderShim.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="ConfigHelper.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />
     <ClCompile Include="HTKDataDeserializer.cpp" />
     <ClCompile Include="Bundler.cpp" />
+    <ClCompile Include="HTKMLFReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="biggrowablevectors.h" />
@@ -53,13 +53,13 @@
     <ClInclude Include="..\..\Common\Include\ssematrix.h">
       <Filter>Common\Include</Filter>
     </ClInclude>
-    <ClInclude Include="NewHTKMLFReaderShim.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="MLFDataDeserializer.h" />
     <ClInclude Include="Bundler.h" />
     <ClInclude Include="CorpusDescriptor.h" />
+    <ClInclude Include="HTKMLFReader.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

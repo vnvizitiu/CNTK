@@ -19,25 +19,28 @@
 #include "chunkevalsource.h"
 #define DATAREADER_EXPORTS
 #include "DataReader.h"
-#include "NewHTKMLFReaderShim.h"
 #include "Config.h"
+#include "ReaderShim.h"
+#include "HTKMLFReader.h"
+#include "HeapMemoryProvider.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-template <class ElemType>
-void DATAREADER_API GetReader(IDataReader<ElemType>** preader)
-{
-    *preader = new NewHTKMLFReaderShim<ElemType>();
-}
+    auto factory = [](const ConfigParameters& parameters) -> ReaderPtr
+    {
+        return std::make_shared<HTKMLFReader>(std::make_shared<HeapMemoryProvider>(), parameters);
+    };
 
-extern "C" DATAREADER_API void GetReaderF(IDataReader<float>** preader)
-{
-    GetReader(preader);
-}
-extern "C" DATAREADER_API void GetReaderD(IDataReader<double>** preader)
-{
-    GetReader(preader);
-}
+    extern "C" DATAREADER_API void GetReaderF(IDataReader<float>** preader)
+    {
+        *preader = new ReaderShim<float>(factory);
+    }
+
+    extern "C" DATAREADER_API void GetReaderD(IDataReader<double>** preader)
+    {
+        *preader = new ReaderShim<double>(factory);
+    }
+
 #ifdef _WIN32
 // Utility function, in ConfigFile.cpp, but NewHTKMLFReader doesn't need that code...
 

@@ -8,13 +8,20 @@
 #include "ConfigHelper.h"
 #include "htkfeatio.h"
 #include "msra_mgram.h"
+#include <ElementTypeUtils.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, size_t elementSize, bool frameMode, const std::wstring& name)
-    : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_elementSize(elementSize), m_frameMode(frameMode), m_name(name)
+    MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
+    : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_name(name)
 {
+    m_frameMode = label.Find("frameMode", "true");
+    assert(m_frameMode);
+
     ConfigHelper::CheckLabelType(label);
+
+    m_elementType = ConfigHelper::GetElementType(label);
+    m_elementSize = GetSizeByType(m_elementType);
 
     m_dimension = ConfigHelper::GetLabelDimension(label);
     m_layout = std::make_shared<TensorShape>(m_dimension);

@@ -115,7 +115,7 @@
     <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="htkfeatio.h" />
-    <ClInclude Include="NewHTKMLFReaderShim.h" />
+    <ClInclude Include="HTKMLFReader.h" />
     <ClInclude Include="NewHTKMLFWriter.h" />
     <ClInclude Include="minibatchiterator.h" />
     <ClInclude Include="minibatchsourcehelpers.h" />
@@ -152,7 +152,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="HTKDataDeserializer.cpp" />
-    <ClCompile Include="NewHTKMLFReaderShim.cpp" />
+    <ClCompile Include="HTKMLFReader.cpp" />
     <ClCompile Include="NewHTKMLFWriter.cpp" />
     <ClCompile Include="latticearchive.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />

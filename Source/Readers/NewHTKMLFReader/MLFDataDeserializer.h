@@ -40,14 +40,16 @@ class MLFDataDeserializer : public IDataDeserializer
     std::vector<MLFFrame> m_frames;
 
     SequenceDescriptions m_sequences;
-    size_t m_elementSize;
     bool m_frameMode;
     std::wstring m_name;
+
+    ElementType m_elementType;
+    size_t m_elementSize;
 
     class MLFChunk;
 
 public:
-    MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, size_t elementSize, bool framMode, const std::wstring& featureName);
+    MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& config, const std::wstring& label);
 
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
 
