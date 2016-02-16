@@ -53,6 +53,14 @@ public:
     virtual size_t GetNumParallelSequences() override;
 
 private:
+    struct InterimBuffer
+    {
+        size_t m_rowNumber;
+        size_t m_columnNumber;
+        std::vector<ElemType> m_data;
+    };
+    std::vector<InterimBuffer> m_buffer;
+
     std::future<Minibatch> m_prefetchTask;
     ReaderPtr m_reader;
     ReaderFactory m_factory;

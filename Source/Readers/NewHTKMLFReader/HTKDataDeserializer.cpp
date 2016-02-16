@@ -133,11 +133,12 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     {
         if (m_frameMode)
         {
+            std::wstring key = m_utterances[i].utterance.key();
             m_utterances[i].frameStart = m_frames.size();
             for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
             {
                 Frame f(&m_utterances[i]);
-                f.m_key.major = m_utterances[i].utterance.key();
+                f.m_key.major = key;
                 f.m_key.minor = k;
                 f.m_id = m_frames.size();
                 f.m_chunkId = m_utterances[i].m_chunkId;

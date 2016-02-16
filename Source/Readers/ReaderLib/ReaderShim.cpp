@@ -110,27 +110,56 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
 
     if (!minibatch.m_data.empty())
     {
-        // Copy returned minibatch to the matrices.
+        m_buffer.resize(m_nameToStreamId.size());
         for (const auto& mx : matrices)
         {
             assert(m_nameToStreamId.find(mx.first) != m_nameToStreamId.end());
             size_t streamId = m_nameToStreamId[mx.first];
 
+            auto& buffer = m_buffer[streamId];
+
             const auto& stream = minibatch.m_data[streamId];
-            m_layout = stream->m_layout;
+            m_layout->CopyFrom(stream->m_layout);
 
-            size_t columnNumber = m_layout->GetNumCols();
-            size_t rowNumber = m_streams[streamId]->m_sampleLayout->GetNumElements();
+            buffer.m_columnNumber = m_layout->GetNumCols();
+            buffer.m_rowNumber = m_streams[streamId]->m_sampleLayout->GetNumElements();
+            size_t totalSize = buffer.m_columnNumber * buffer.m_rowNumber;
+            buffer.m_data.resize(totalSize);
+            memcpy(buffer.m_data.data(), stream->m_data, totalSize * sizeof(ElemType));
+        }
 
-            auto data = reinterpret_cast<const ElemType*>(stream->m_data);
-            mx.second->SetValue(rowNumber, columnNumber, mx.second->GetDeviceId(), const_cast<ElemType*>(data), matrixFlagNormal);
+        if (!minibatch.m_endOfEpoch)
+        {
+            m_prefetchTask = std::async(m_launchType, [this]()
+            {
+                return m_reader->ReadMinibatch();
+            });
+        }
+
+        // Copy returned minibatch to the matrices.
+        for (const auto& mx : matrices)
+        {
+            size_t streamId = m_nameToStreamId[mx.first];
+            auto& buffer = m_buffer[streamId];
+
+            mx.second->SetValue(
+                buffer.m_rowNumber,
+                buffer.m_columnNumber,
+                mx.second->GetDeviceId(),
+                const_cast<ElemType*>(buffer.m_data.data()),
+                matrixFlagNormal);
         }
     }
-
-    m_prefetchTask = std::async(m_launchType, [this]()
+    else
     {
-        return m_reader->ReadMinibatch();
-    });
+        if (!minibatch.m_endOfEpoch)
+        {
+            m_prefetchTask = std::async(m_launchType, [this]()
+            {
+                return m_reader->ReadMinibatch();
+            });
+        }
+    }
 
     return !minibatch.m_data.empty();
 }
