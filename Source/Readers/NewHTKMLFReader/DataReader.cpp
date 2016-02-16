@@ -8,15 +8,6 @@
 #include "stdafx.h"
 #include "Basics.h"
 
-#include "htkfeatio.h" // for reading HTK features
-#ifdef _WIN32
-#include "latticearchive.h" // for reading HTK phoneme lattices (MMI training)
-#endif
-#include "simplesenonehmm.h" // for MMI scoring
-#include "msra_mgram.h"      // for unigram scores of ground-truth path in sequence training
-
-#include "utterancesourcemulti.h" // minibatch sources
-#include "chunkevalsource.h"
 #define DATAREADER_EXPORTS
 #include "DataReader.h"
 #include "Config.h"

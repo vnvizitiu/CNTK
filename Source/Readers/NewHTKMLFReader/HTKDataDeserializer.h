@@ -8,7 +8,7 @@
 #include "DataDeserializer.h"
 #include "Config.h" // for ConfigParameters
 #include "htkfeatio.h"      // for htkfeatreader
-#include "minibatchiterator.h"
+#include "latticesource.h"
 #include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {

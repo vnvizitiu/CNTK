@@ -49,6 +49,11 @@ if not defined a_nodebug (
     msbuild /m /p:Platform=x64 /p:Configuration=Debug CNTK.sln
     if errorlevel 1 exit /b 1
 
+if not defined a_nocpuonly (
+    msbuild /m /p:Platform=x64 /p:Configuration=Debug_CpuOnly CNTK.sln
+    if errorlevel 1 exit /b 1
+)
+
 if not defined a_notests (
 if not defined a_nounittests (
         .\x64\Debug\UnitTests\ReaderTests.exe %TEST_SPEC%
@@ -60,6 +65,11 @@ if not defined a_nounittests (
 if not defined a_norelease (
     msbuild /m /p:Platform=x64 /p:Configuration=Release CNTK.sln
     if errorlevel 1 exit /b 1
+
+if not defined a_nocpuonly (
+    msbuild /m /p:Platform=x64 /p:Configuration=Release_CpuOnly CNTK.sln
+    if errorlevel 1 exit /b 1
+)
 
 if not defined a_notests (
 if not defined a_nounittests (

@@ -9,10 +9,6 @@
 
 #include "Config.h"
 
-#include "biggrowablevectors.h"
-#include "utterancesourcemulti.h"
-#include "minibatchiterator.h"
-
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 class Utils

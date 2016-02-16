@@ -12,7 +12,7 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
+MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
     : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_name(name)
 {
     m_frameMode = label.Find("frameMode", "true");
@@ -150,7 +150,7 @@ std::vector<StreamDescriptionPtr> MLFDataDeserializer::GetStreamDescriptions() c
     stream->m_id = 0;
     stream->m_name = m_name;
     stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
-    stream->m_storageType = StorageType::dense;
+    stream->m_storageType = StorageType::sparse_csc;
     stream->m_elementType = m_elementSize == sizeof(float) ? ElementType::tfloat : ElementType::tdouble;
     return std::vector<StreamDescriptionPtr>{stream};
 }
@@ -179,27 +179,24 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
 {
     auto id = sequenceId;
 
-    // TODO return sparse, like in image reader
+    static float oneFloat = 1.0;
+    static double oneDouble = 1.0;
 
-        size_t label = m_classIds[m_frames[id].index];
-        DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
-        if (m_elementSize == sizeof(float))
-        {
-            float* tmp = new float[m_dimension];
-            memset(tmp, 0, m_elementSize * m_dimension);
-            tmp[label] = 1;
-            r->m_data = tmp;
-        }
-        else
-        {
-            double* tmp = new double[m_dimension];
-            memset(tmp, 0, m_elementSize * m_dimension);
-            tmp[label] = 1;
-            r->m_data = tmp;
-        }
+    size_t label = m_classIds[m_frames[id].index];
+    SparseSequenceDataPtr r = std::make_shared<SparseSequenceData>();
+    r->m_indices.resize(1);
+    r->m_indices[0] = std::vector<size_t>{ label };
 
-        r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
-        return std::vector<SequenceDataPtr> { r };
+    if (m_elementSize == sizeof(float))
+    {
+        r->m_data = &oneFloat;
+    }
+    else
+    {
+        r->m_data = &oneDouble;
+    }
+
+    return std::vector<SequenceDataPtr> { r };
 }
 
 const SequenceDescription* MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
