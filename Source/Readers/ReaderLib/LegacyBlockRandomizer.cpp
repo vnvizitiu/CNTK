@@ -407,12 +407,12 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
         }
     }
 
-    auto orginalTimeline = m_deserializer->GetSequenceDescriptions();
-    result.m_data.reserve(originalIds.size());
-    for (auto id : originalIds)
+    const auto& originalTimeline = m_deserializer->GetSequenceDescriptions();
+    result.m_data.resize(originalIds.size());
+    for (size_t i = 0; i < originalIds.size(); ++i)
     {
-        const auto& sequence = orginalTimeline[id];
-        result.m_data.push_back(m_chunks[sequence->m_chunkId]->GetSequence(id));
+        const auto& sequence = originalTimeline[originalIds[i]];
+        result.m_data[i] = std::move(m_chunks[sequence->m_chunkId]->GetSequence(originalIds[i]));
     }
 
     return result;

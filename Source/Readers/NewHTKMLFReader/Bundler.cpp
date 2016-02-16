@@ -132,7 +132,8 @@ public:
 
         for (int i = 0; i < chunks.size(); ++i)
         {
-            auto sequences = chunks[i]->GetSequence(m_parent->m_sequenceToSequence[i][sequenceId]);
+            size_t originalSequenceId = m_parent->m_sequenceToSequence[i][sequenceId];
+            auto sequences = chunks[i]->GetSequence(originalSequenceId);
             result.insert(result.end(), sequences.begin(), sequences.end());
         }
 

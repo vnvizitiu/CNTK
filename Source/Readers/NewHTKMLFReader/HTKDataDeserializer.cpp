@@ -227,21 +227,37 @@ ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
     return std::make_shared<HTKChunk>(this, chunkId); // TODO creating too many times?
 };
 
+struct HTKSequenceData : DenseSequenceData
+{
+    msra::dbn::matrix utterance;
+
+    ~HTKSequenceData()
+    {
+        msra::dbn::matrixstripe frame(utterance, 0, utterance.cols());
+        if (m_data != &frame(0, 0))
+
+        {
+            delete[] m_data;
+            m_data = nullptr;
+        }
+    }
+};
+
+typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
+
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
     if (m_frameMode)
     {
         const auto& frame = m_frames[id];
-        const auto& utterance = *frame.u;
+        Utterance* utterance = frame.u;
 
-        msra::dbn::matrix feat; // TODO resize in constructor?
-        feat.resize(m_dimension, 1);
+        HTKSequenceDataPtr r = std::make_shared<HTKSequenceData>();
+        r->utterance.resize(m_dimension, 1);
 
-        const std::vector<char> noboundaryflags; // dummy
+        const auto& chunkdata = m_chunks[utterance->m_chunkId];
 
-        const auto& chunkdata = m_chunks[utterance.m_chunkId];
-
-        auto uttframes = chunkdata.getutteranceframes(utterance.indexInsideChunk);
+        auto uttframes = chunkdata.getutteranceframes(utterance->indexInsideChunk);
         matrixasvectorofvectors uttframevectors(uttframes); // (wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors())
 
         size_t leftextent, rightextent;
@@ -257,40 +273,33 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
             rightextent = m_context.second;
         }
 
-        msra::dbn::augmentneighbors(uttframevectors, noboundaryflags, frame.frameIndexInUtterance, leftextent, rightextent, feat, 0);
+        const std::vector<char> noboundaryflags; // dummy
+        msra::dbn::augmentneighbors(uttframevectors, noboundaryflags, frame.frameIndexInUtterance, leftextent, rightextent, r->utterance, 0);
 
-        DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
         r->m_numberOfSamples = frame.m_numberOfSamples;
+        msra::dbn::matrixstripe featOr(r->utterance, 0, r->utterance.cols());
+        const size_t dimensions = featOr.rows();
 
-        const msra::dbn::matrixstripe featOri = msra::dbn::matrixstripe(feat, 0, feat.cols());
-        const size_t dimensions = featOri.rows();
-        const void* tmp = &featOri(0, 0);
-
-        // eldak: this should not be allocated each time.
-        void* buffer = nullptr;
         if (m_elementType == ElementType::tfloat)
         {
-            // TODO no buffer, just point to feat?
-            buffer = new float[dimensions];
-            memcpy_s(buffer, m_elementSize * dimensions, tmp, m_elementSize * dimensions);
+            r->m_data = &featOr(0, 0);
         }
         else 
         {
             // TODO allocate double, convert in-place from end to start instead
             assert(m_elementType == ElementType::tdouble);
             double *doubleBuffer = new double[dimensions];
-            const float *floatBuffer = reinterpret_cast<const float*>(tmp);
+            const float *floatBuffer = &featOr(0, 0);
 
             for (size_t i = 0; i < dimensions; i++)
             {
                 doubleBuffer[i] = floatBuffer[i];
             }
 
-            buffer = doubleBuffer;
+            r->m_data = doubleBuffer;
         }
 
-        r->m_data = buffer;
-        return std::vector<SequenceDataPtr>{r}; // TODO would std::move help?
+        return std::vector<SequenceDataPtr>(1, r); // TODO would std::move help?
     }
     else
     {
