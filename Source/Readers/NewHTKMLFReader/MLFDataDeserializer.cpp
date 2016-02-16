@@ -12,7 +12,7 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
+MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
     : m_mlfPaths(std::move(ConfigHelper::GetMlfPaths(label))), m_name(name)
 {
     m_frameMode = label.Find("frameMode", "true");
@@ -181,25 +181,25 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
 
     // TODO return sparse, like in image reader
 
-        size_t label = m_classIds[m_frames[id].index];
-        DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
-        if (m_elementSize == sizeof(float))
-        {
-            float* tmp = new float[m_dimension];
-            memset(tmp, 0, m_elementSize * m_dimension);
-            tmp[label] = 1;
-            r->m_data = tmp;
-        }
-        else
-        {
-            double* tmp = new double[m_dimension];
-            memset(tmp, 0, m_elementSize * m_dimension);
-            tmp[label] = 1;
-            r->m_data = tmp;
-        }
+    size_t label = m_classIds[m_frames[id].index];
+    DenseSequenceDataPtr r = std::make_shared<DenseSequenceData>();
+    if (m_elementSize == sizeof(float))
+    {
+        float* tmp = new float[m_dimension];
+        memset(tmp, 0, m_elementSize * m_dimension);
+        tmp[label] = 1;
+        r->m_data = tmp;
+    }
+    else
+    {
+        double* tmp = new double[m_dimension];
+        memset(tmp, 0, m_elementSize * m_dimension);
+        tmp[label] = 1;
+        r->m_data = tmp;
+    }
 
-        r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
-        return std::vector<SequenceDataPtr> { r };
+    r->m_numberOfSamples = m_sequences[id]->m_numberOfSamples;
+    return std::vector<SequenceDataPtr> { r };
 }
 
 const SequenceDescription* MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
