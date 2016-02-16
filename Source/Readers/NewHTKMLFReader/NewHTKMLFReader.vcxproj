@@ -108,7 +108,6 @@
     <ClInclude Include="basetypes.h" />
     <ClInclude Include="biggrowablevectors.h" />
     <ClInclude Include="Bundler.h" />
-    <ClInclude Include="chunkevalsource.h" />
     <ClInclude Include="..\..\Common\Include\fileutil.h" />
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
     <ClInclude Include="ConfigHelper.h" />

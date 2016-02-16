@@ -25,7 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="biggrowablevectors.h" />
-    <ClInclude Include="chunkevalsource.h" />
     <ClInclude Include="htkfeatio.h" />
     <ClInclude Include="NewHTKMLFWriter.h" />
     <ClInclude Include="minibatchsourcehelpers.h" />
