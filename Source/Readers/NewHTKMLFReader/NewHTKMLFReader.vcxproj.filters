@@ -28,7 +28,6 @@
     <ClInclude Include="chunkevalsource.h" />
     <ClInclude Include="htkfeatio.h" />
     <ClInclude Include="NewHTKMLFWriter.h" />
-    <ClInclude Include="minibatchiterator.h" />
     <ClInclude Include="minibatchsourcehelpers.h" />
     <ClInclude Include="msra_mgram.h" />
     <ClInclude Include="stdafx.h" />
