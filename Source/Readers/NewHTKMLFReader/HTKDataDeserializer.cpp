@@ -290,7 +290,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         }
 
         r->m_data = buffer;
-        return std::vector<SequenceDataPtr>{r}; // TODO would std::move help?
+        return std::move(std::vector<SequenceDataPtr>{r});
     }
     else
     {
