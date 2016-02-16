@@ -52,6 +52,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         std::vector<IDataDeserializerPtr> deserializers;
         deserializers.insert(deserializers.end(), featureDeserializers.begin(), featureDeserializers.end());
         deserializers.insert(deserializers.end(), labelDeserializers.begin(), labelDeserializers.end());
+
         return deserializers;
     }
 
@@ -86,7 +87,17 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             config(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
         Utils::CheckMinibatchSizes(numberOfuttsPerMinibatchForAllEpochs);
 
-        m_streams = m_randomizer->GetStreamDescriptions();
+        // Create output stream descriptions (all dense)
+        for (auto d : deserializers)
+        {
+            for (auto i : d->GetStreamDescriptions())
+            {
+                StreamDescriptionPtr stream = std::make_shared<StreamDescription>(*i);
+                stream->m_storageType = StorageType::dense;
+                stream->m_id = m_streams.size();
+                m_streams.push_back(stream);
+            }
+        }
     }
 
     std::vector<StreamDescriptionPtr> HTKMLFReader::GetStreamDescriptions()
