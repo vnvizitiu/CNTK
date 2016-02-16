@@ -112,7 +112,7 @@ public:
         m_innerChunks.resize(numberOfSequences);
 
         int innerIndex = 0;
-        for (size_t sequenceId = m_parent->m_chunkOffsets[chunkId]; sequenceId < m_parent->m_chunkOffsets[chunkId + 1]; ++sequenceId, ++innerIndex)
+        for (size_t sequenceId = m_parent->m_chunkOffsets[chunkId]; innerIndex < numberOfSequences; ++sequenceId, ++innerIndex)
         {
             m_innerChunks[innerIndex].resize(m_parent->m_deserializers.size());
             for (size_t i = 0; i < m_parent->m_deserializers.size(); ++i)
