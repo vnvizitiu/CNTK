@@ -24,7 +24,15 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
-    Speech/QuickE2E
+    Speech/QuickE2E ^
+    Speech/DNN/ParallelNoQuantization ^
+    Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
+    Speech/SVD
+
+:: TODO could work:
+:: Speech/DNN/Parallel1BitQuantization
+:: Speech/DNN/ParallelBufferedAsyncGradientAggregation
+:: Speech/DNN/DiscriminativePreTraining
 
 :: NO
 ::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
@@ -89,21 +97,21 @@ if not defined a_noe2e (
 if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d gpu -f release %END2END_TEST_SPEC%
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d cpu -f release %END2END_TEST_SPEC%
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d cpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 
 if not defined a_nodebug (
 if not defined a_nogpu (
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d gpu -f debug %END2END_TEST_SPEC%
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -d cpu -f debug %END2END_TEST_SPEC%
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d cpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 )
