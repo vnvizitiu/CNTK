@@ -13,7 +13,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
     // Implementation of the HTKMLF reader.
     // Currently represents a factory for connecting the packer,
-    // transformers and deserialzier together.
+    // transformers and deserializer together.
     class HTKMLFReader : public Reader
     {
     public:
