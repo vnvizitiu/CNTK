@@ -4,7 +4,6 @@
     <ClCompile Include="DataWriter.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="NewHTKMLFWriter.cpp" />
-    <ClCompile Include="latticearchive.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="..\..\Common\DebugUtil.cpp">
       <Filter>Duplicates to remove</Filter>
