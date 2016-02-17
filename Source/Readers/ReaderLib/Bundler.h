@@ -6,7 +6,7 @@
 #pragma once
 
 #include "DataDeserializer.h"
-#include "Config.h" // for ConfigParameters
+#include "Config.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -23,7 +23,7 @@ public:
 private:
     void CreateSequenceDescriptions();
 
-    void operator=(const Bundler& other); // non-assignable
+    void operator=(const Bundler& other);
 
     std::vector<StreamDescriptionPtr> m_streams;
     std::vector<IDataDeserializerPtr> m_deserializers;

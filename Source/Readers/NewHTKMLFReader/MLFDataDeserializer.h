@@ -12,56 +12,42 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-struct MLFUtterance : public SequenceDescription
-{
-    // Where the sequence is stored in m_classIds
-    size_t sequenceStart;
-    size_t frameStart;
-};
-
-struct MLFFrame : public SequenceDescription
-{
-    // Where the sequence is stored in m_classIds
-    size_t index;
-};
-
 class MLFDataDeserializer : public IDataDeserializer
 {
-    std::map<wstring, size_t> m_keyToSequence;
-    size_t m_dimension;
-    TensorShapePtr m_layout;
-    std::wstring m_stateListPath;
-    std::vector<std::wstring> m_mlfPaths;
-
-    // [classidsbegin+t] concatenation of all state sequences
-    msra::dbn::biggrowablevector<msra::dbn::CLASSIDTYPE> m_classIds;
-
-    std::vector<MLFUtterance> m_utterances;
-    std::vector<MLFFrame> m_frames;
-
-    SequenceDescriptions m_sequences;
-    bool m_frameMode;
-    std::wstring m_name;
-
-    ElementType m_elementType;
-    size_t m_elementSize;
-
-    class MLFChunk;
-
 public:
-    MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& config, const std::wstring& label);
-
-    virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
+    MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& config, const std::wstring& streamName);
 
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
+    virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
+    const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
     virtual ChunkPtr GetChunk(size_t) override;
 
-    const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
-
 private:
+    // Inner classes for frames, utterances and chunks.
+    struct MLFUtterance;
+    struct MLFFrame;
+    class MLFChunk;
+
     std::vector<SequenceDataPtr> GetSequenceById(size_t sequenceId);
+
+    std::map<wstring, size_t> m_keyToSequence;
+    TensorShapePtr m_layout;
+
+    msra::dbn::biggrowablevector<msra::dbn::CLASSIDTYPE> m_classIds;
+    msra::dbn::biggrowablevector<size_t> m_utteranceIndex;
+
+    // All sequences = frames, this deserializer provides.
+    // This interface will be changed when the randomizer asks
+    // timeline in sequences.
+    msra::dbn::biggrowablevector<MLFFrame> m_frames;
+    SequenceDescriptions m_sequences;
+
+    // Type of the data this serializer provdes.
+    ElementType m_elementType;
+
+    // Streams, this deserializer provides. A single mlf stream.
+    std::vector<StreamDescriptionPtr> m_streams;
 };
 
-typedef std::shared_ptr<MLFDataDeserializer> MLFDataDeserializerPtr;
-} } }
+}}}

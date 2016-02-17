@@ -18,8 +18,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         CorpusDescriptorPtr corpus,
         const ConfigParameters& feature,
         const std::wstring& featureName)
-        : m_featureFiles(std::move(ConfigHelper::GetFeaturePaths(feature))),
-          m_featdim(0),
+        : m_featdim(0),
           m_sampperiod(0),
           m_verbosity(0),
           m_featureName(featureName)
@@ -27,13 +26,17 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     m_frameMode = feature.Find("frameMode", "true");
     assert(m_frameMode);
 
-    ConfigHelper::CheckFeatureType(feature);
+    ConfigHelper config(feature);
 
-    auto context = ConfigHelper::GetContextWindow(feature);
-    m_elementType = ConfigHelper::GetElementType(feature);
+    config.CheckFeatureType();
+
+    m_featureFiles = config.GetFeaturePaths();
+
+    auto context = config.GetContextWindow();
+    m_elementType = config.GetElementType();
     m_elementSize = GetSizeByType(m_elementType);
 
-    m_dimension = ConfigHelper::GetFeatureDimension(feature);
+    m_dimension = config.GetFeatureDimension();
     m_dimension = m_dimension * (1 + context.first + context.second);
 
     m_layout = std::make_shared<TensorShape>(m_dimension);
@@ -42,7 +45,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
     m_utterances.reserve(numSequences);
 
-    m_context = ConfigHelper::GetContextWindow(feature);
+    m_context = config.GetContextWindow();
 
     size_t totalFrames = 0;
     foreach_index (i, m_featureFiles)
