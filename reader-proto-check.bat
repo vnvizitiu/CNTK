@@ -25,12 +25,14 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
-    Speech/DNN/Parallel1BitQuantization ^
-    Speech/DNN/ParallelBufferedAsyncGradientAggregation ^
     Speech/DNN/ParallelNoQuantization ^
     Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
     Speech/QuickE2E ^
     Speech/SVD
+
+set END2END_TEST_SPEC_1B=^
+    Speech/DNN/Parallel1BitQuantization ^
+    Speech/DNN/ParallelBufferedAsyncGradientAggregation ^
 
 :: Speech/DNN/DiscriminativePreTraining // epoch spanning sweep, different behavior
 
@@ -97,8 +99,7 @@ if not defined a_noe2e (
 if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release -s 1bitsgd %END2END_TEST_SPEC%
-    @REM Running 1-bit SGD build pretending it's a GPU one:
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release -s 1bitsgd %END2END_TEST_SPEC_1B%
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
@@ -111,8 +112,7 @@ if not defined a_nocpu (
 
 if not defined a_nodebug (
 if not defined a_nogpu (
-    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug -s 1bitsgd %END2END_TEST_SPEC%
-    @REM Running 1-bit SGD build pretending it's a GPU one:
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug -s 1bitsgd %END2END_TEST_SPEC_1B%
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
