@@ -305,6 +305,7 @@ LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomization
 
     // Frame mode to the randomizer just means there are only single-sample sequences
     m_frameMode = (maxNumberOfSamples == 1);
+    m_streams = m_deserializer->GetStreamDescriptions();
 }
 
 void LegacyBlockRandomizer::Initialize(TransformerPtr next, const ConfigParameters& readerConfig)
@@ -414,13 +415,20 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
     }
 
     const auto& originalTimeline = m_deserializer->GetSequenceDescriptions();
-    result.m_data.resize(originalIds.size());
+    result.m_data.resize(m_streams.size(), std::vector<SequenceDataPtr>(originalIds.size()));
+
     for (size_t i = 0; i < originalIds.size(); ++i)
     {
-        const auto& sequence = originalTimeline[originalIds[i]];
-        result.m_data[i] = std::move(m_chunks[sequence->m_chunkId]->GetSequence(originalIds[i]));
+        const auto& sequenceDescription = originalTimeline[originalIds[i]];
+        auto sequence = m_chunks[sequenceDescription->m_chunkId]->GetSequence(originalIds[i]);
+
+        for (int j = 0; j < m_streams.size(); ++j)
+        {
+            result.m_data[j][i] = sequence[j];
+        }
     }
 
     return result;
 };
-} } }
+
+}}}

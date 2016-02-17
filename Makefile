@@ -320,10 +320,9 @@ NEWHTKMLFREADER_SRC =\
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/ConfigHelper.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataReader.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataWriter.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/FrameModePacker.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKDataDeserializer.cpp \
+	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKMLFReader.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/MLFDataDeserializer.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/NewHTKMLFReaderShim.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/NewHTKMLFWriter.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/Utils.cpp \
 
@@ -472,8 +471,9 @@ IMAGEREADER_SRC =\
 IMAGEREADER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(IMAGEREADER_SRC))
 
 IMAGEREADER:=$(LIBDIR)/ImageReader.so
-ALL += $(IMAGEREADER)
-SRC+=$(IMAGEREADER_SRC)
+#TODO needs fixes
+#ALL += $(IMAGEREADER)
+#SRC+=$(IMAGEREADER_SRC)
 
 INCLUDEPATH += $(OPENCV_PATH)/include
 LIBPATH += $(OPENCV_PATH)/lib $(OPENCV_PATH)/release/lib

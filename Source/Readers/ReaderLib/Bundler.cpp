@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
-#include "stdafx.h"
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Bundler.h"
-#include "ConfigHelper.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -14,7 +14,7 @@ Bundler::Bundler(
     std::vector<IDataDeserializerPtr> deserializers)
     : m_deserializers(deserializers), m_driver(driver)
 {
-    UNREFERENCED_PARAMETER(readerConfig);
+    UNUSED(readerConfig);
     std::vector<StreamDescriptionPtr> streams;
     for (auto d : deserializers)
     {
@@ -96,12 +96,11 @@ void Bundler::CreateSequenceDescriptions()
     }
 }
 
-class BundlingChunk : public Chunk // TODO tune implementation?
+class BundlingChunk : public Chunk
 {
     size_t m_numberOfInputs;
     Bundler* m_parent;
     size_t m_chunkId;
-    size_t m_sequenceEnd;
     std::vector<std::vector<ChunkPtr>> m_innerChunks;
 
 public:
@@ -143,7 +142,7 @@ public:
 
 ChunkPtr Bundler::GetChunk(size_t chunkId)
 {
-    return std::make_shared<BundlingChunk>(m_streams.size(), this, chunkId); //TODO why so slow?
+    return std::make_shared<BundlingChunk>(m_streams.size(), this, chunkId);
 }
 
 const SequenceDescriptions& Bundler::GetSequenceDescriptions() const

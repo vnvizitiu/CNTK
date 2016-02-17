@@ -54,14 +54,16 @@ Minibatch SampleModePacker::ReadMinibatch()
     Minibatch minibatch;
     minibatch.m_endOfEpoch = sequences.m_endOfEpoch;
 
-    // Iterating for sequences inside the batch of sequences.
-    for (size_t sequenceIndex = 0; sequenceIndex < sequences.m_data.size(); sequenceIndex++)
+    assert(m_streamBuffers.size() == sequences.m_data.size());
+
+    // For each sequence iterating thru all the streams with this sequence id and copying to the buffer.
+    for (size_t streamIndex = 0; streamIndex < sequences.m_data.size(); streamIndex++)
     {
-        // For each sequence iterating thru all the streams with this sequence id and copying to the buffer.
-        assert(m_streamBuffers.size() == sequences.m_data[sequenceIndex].size());
-        for (int streamIndex = 0; streamIndex < sequences.m_data[sequenceIndex].size(); ++streamIndex)
+        const auto& streamSequences = sequences.m_data[streamIndex];
+        // Iterating for sequences inside the batch of sequences.
+        for (size_t sequenceIndex = 0; sequenceIndex < sequences.m_data[streamIndex].size(); ++sequenceIndex)
         {
-            CopySequenceToBuffer(sequenceIndex, streamIndex, sequences.m_data);
+            CopySequenceToBuffer(streamSequences[sequenceIndex], streamIndex, sequenceIndex);
         }
     }
 
@@ -71,12 +73,12 @@ Minibatch SampleModePacker::ReadMinibatch()
     }
 
     // Creating output minibatch with shared layout between all streams.
-    m_minibatchLayout->InitAsFrameMode(sequences.m_data.size());
+    m_minibatchLayout->InitAsFrameMode(sequences.m_data.front().size());
     for (int i = 0; i < m_outputStreams.size(); ++i)
     {
         auto stream = std::make_shared<StreamMinibatch>();
         stream->m_data = m_streamBuffers[i].get();
-        stream->m_dataSize = sequences.m_data.size() * GetSampleSize(m_outputStreams[i]);
+        stream->m_dataSize = sequences.m_data[i].size() * GetSampleSize(m_outputStreams[i]);
         stream->m_layout = m_minibatchLayout;
 
         minibatch.m_data.push_back(stream);
@@ -92,10 +94,9 @@ size_t SampleModePacker::GetSampleSize(StreamDescriptionPtr stream)
     return stream->m_sampleLayout->GetNumElements() * elementSize;
 }
 
-void SampleModePacker::CopySequenceToBuffer(size_t sampleIndex, size_t streamIndex, const std::vector<std::vector<SequenceDataPtr>>& sequences)
+void SampleModePacker::CopySequenceToBuffer(SequenceDataPtr sample, size_t streamIndex, size_t sampleIndex)
 {
     // In framemode sequence just contains a single sample.
-    const auto& sample = sequences[sampleIndex][streamIndex];
     size_t sampleSize = GetSampleSize(m_inputStreams[streamIndex]);
     auto sampleData = reinterpret_cast<const char*>(sample->m_data);
 

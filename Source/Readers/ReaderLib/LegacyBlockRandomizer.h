@@ -73,6 +73,7 @@ private:
     size_t m_sequencePositionInSweep;
     std::vector<RandomizedChunk> m_randomizedChunks;    // (includes a sentinel)
     std::vector<SequenceDescription> m_randomTimeline;
+    std::vector<StreamDescriptionPtr> m_streams;
 
     // Check that timeline has only valid sequences of non-zero length
     // with incrementing IDs and non-decreasing chunk identifiers.
