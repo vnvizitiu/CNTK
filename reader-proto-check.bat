@@ -3,7 +3,7 @@ setlocal
 cd %~dp0
 for %%f in (%*) do set a_%%f=1
 
-if not defined CNTK_ENABLE_1BitSGD echo Enable 1-bit SGD, cf. https://github.com/Microsoft/CNTK/wiki/Enabling-1bit-SGD
+if not defined CNTK_ENABLE_1BitSGD echo Enable 1-bit SGD, cf. https://github.com/Microsoft/CNTK/wiki/Enabling-1bit-SGD&exit /b 1
 @REM optionally do clean ?
 
 set ACML_FMA=0
