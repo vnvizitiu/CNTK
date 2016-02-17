@@ -14,7 +14,7 @@ Bundler::Bundler(
     std::vector<IDataDeserializerPtr> deserializers)
     : m_deserializers(deserializers), m_driver(driver)
 {
-    UNREFERENCED_PARAMETER(readerConfig);
+    UNUSED(readerConfig);
     std::vector<StreamDescriptionPtr> streams;
     for (auto d : deserializers)
     {
