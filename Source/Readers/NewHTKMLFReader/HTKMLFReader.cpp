@@ -67,7 +67,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         // We will provide ability to implement the transformer and
         // deserializer interface not only in C++ but in scripting languages as well.
 
-        assert(config(L"frameMode", true));
+        assert(readerConfig(L"frameMode", true));
         ConfigHelper config(readerConfig);
 
         size_t window = config.GetRandomizationWindow();
