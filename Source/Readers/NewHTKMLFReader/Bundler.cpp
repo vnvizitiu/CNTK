@@ -103,6 +103,7 @@ class BundlingChunk : public Chunk // TODO tune implementation?
     size_t m_chunkId;
     size_t m_sequenceEnd;
     std::vector<std::vector<ChunkPtr>> m_innerChunks;
+    std::vector<SequenceDataPtr> m_buffer;
 
 public:
     BundlingChunk(size_t numberOfInputs, Bundler* parent, size_t chunkId)
@@ -123,21 +124,19 @@ public:
         }
     }
 
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    virtual void GetSequence(const size_t& sequenceId, std::vector<SequenceDataPtr>& result) override
     {
         size_t index = sequenceId - m_parent->m_chunkOffsets[m_chunkId];
         const auto& chunks = m_innerChunks[index];
-        std::vector<SequenceDataPtr> result;
         result.reserve(m_numberOfInputs);
-
+        result.resize(0);
+        m_buffer.resize(0);
         for (int i = 0; i < chunks.size(); ++i)
         {
             size_t originalSequenceId = m_parent->m_sequenceToSequence[i][sequenceId];
-            auto sequences = chunks[i]->GetSequence(originalSequenceId);
-            result.insert(result.end(), sequences.begin(), sequences.end());
+            chunks[i]->GetSequence(originalSequenceId, m_buffer);
+            result.insert(result.end(), m_buffer.begin(), m_buffer.end());
         }
-
-        return result;
     }
 };
 

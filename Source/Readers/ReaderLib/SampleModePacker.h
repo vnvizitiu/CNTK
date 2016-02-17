@@ -36,6 +36,7 @@ private:
 
     MBLayoutPtr m_minibatchLayout;
     size_t m_minibatchSize;
+    Sequences m_bufferSequences;
 };
 
 typedef std::shared_ptr<SampleModePacker> SampleModePackerPtr;

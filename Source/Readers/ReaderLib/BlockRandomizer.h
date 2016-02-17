@@ -26,7 +26,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
         virtual void Initialize(TransformerPtr next, const ConfigParameters& readerConfig) override;
         virtual void StartEpoch(const EpochConfiguration& config) override;
-        virtual Sequences GetNextSequences(size_t sampleCount) override;
+        virtual void GetNextSequences(size_t sampleCount, Sequences& sequences) override;
         virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override
         {
             return m_deserializer->GetStreamDescriptions();
@@ -70,6 +70,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         size_t m_numSamples;
         bool m_frameMode;                                 // true iff only single-sample sequences
         std::vector<ChunkInformation> m_chunkInformation; // (includes a sentinel)
+        std::vector<StreamDescriptionPtr> m_streams;
 
         // Per-epoch configuration
         size_t m_workerRank;

@@ -222,7 +222,7 @@ public:
 
 private:
     class HTKChunk;
-    std::vector<SequenceDataPtr> GetSequenceById(size_t id);
+    void GetSequenceById(size_t id, std::vector<SequenceDataPtr>& result);
 };
 
 typedef std::shared_ptr<HTKDataDeserializer> HTKDataDeserializerPtr;

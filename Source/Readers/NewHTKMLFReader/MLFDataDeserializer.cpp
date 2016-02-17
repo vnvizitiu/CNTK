@@ -162,9 +162,9 @@ public:
     MLFChunk(MLFDataDeserializer* parent) : m_parent(parent)
     {}
 
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    virtual void GetSequence(const size_t& sequenceId, std::vector<SequenceDataPtr>& result) override
     {
-        return m_parent->GetSequenceById(sequenceId);
+        m_parent->GetSequenceById(sequenceId, result);
     }
 };
 
@@ -175,7 +175,7 @@ ChunkPtr MLFDataDeserializer::GetChunk(size_t chunkId)
     return std::make_shared<MLFChunk>(this);
 }
 
-std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenceId)
+void MLFDataDeserializer::GetSequenceById(size_t sequenceId, std::vector<SequenceDataPtr>& result)
 {
     auto id = sequenceId;
 
@@ -196,7 +196,8 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
         r->m_data = &oneDouble;
     }
 
-    return std::vector<SequenceDataPtr> { r };
+    result.resize(1);
+    result[0] = r;
 }
 
 const SequenceDescription* MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)

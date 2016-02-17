@@ -110,34 +110,42 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
 
     if (!minibatch.m_data.empty())
     {
-        m_buffer.resize(m_nameToStreamId.size());
+        //m_buffer.resize(m_nameToStreamId.size());
         for (const auto& mx : matrices)
         {
             assert(m_nameToStreamId.find(mx.first) != m_nameToStreamId.end());
             size_t streamId = m_nameToStreamId[mx.first];
 
-            auto& buffer = m_buffer[streamId];
+            //auto& buffer = m_buffer[streamId];
 
             const auto& stream = minibatch.m_data[streamId];
             m_layout->CopyFrom(stream->m_layout);
 
-            buffer.m_columnNumber = m_layout->GetNumCols();
-            buffer.m_rowNumber = m_streams[streamId]->m_sampleLayout->GetNumElements();
-            size_t totalSize = buffer.m_columnNumber * buffer.m_rowNumber;
-            buffer.m_data.resize(totalSize);
-            memcpy(buffer.m_data.data(), stream->m_data, totalSize * sizeof(ElemType));
+            auto columnNumber = m_layout->GetNumCols();
+            auto rowNumber = m_streams[streamId]->m_sampleLayout->GetNumElements();
+            //size_t totalSize = buffer.m_columnNumber * buffer.m_rowNumber;
+            //buffer.m_data.resize(totalSize);
+
+            mx.second->SetValue(
+                rowNumber,
+                columnNumber,
+                mx.second->GetDeviceId(),
+                reinterpret_cast<ElemType*>(stream->m_data),
+                matrixFlagNormal);
+
+            //memcpy(buffer.m_data.data(), stream->m_data, totalSize * sizeof(ElemType));
         }
 
-        if (!minibatch.m_endOfEpoch)
+       /* if (!minibatch.m_endOfEpoch)
         {
             m_prefetchTask = std::async(m_launchType, [this]()
             {
                 return m_reader->ReadMinibatch();
             });
-        }
+        }*/
 
         // Copy returned minibatch to the matrices.
-        for (const auto& mx : matrices)
+        /*for (const auto& mx : matrices)
         {
             size_t streamId = m_nameToStreamId[mx.first];
             auto& buffer = m_buffer[streamId];
@@ -148,10 +156,10 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
                 mx.second->GetDeviceId(),
                 const_cast<ElemType*>(buffer.m_data.data()),
                 matrixFlagNormal);
-        }
+        }*/
     }
-    else
-    {
+    //else
+    //{
         if (!minibatch.m_endOfEpoch)
         {
             m_prefetchTask = std::async(m_launchType, [this]()
@@ -159,7 +167,7 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
                 return m_reader->ReadMinibatch();
             });
         }
-    }
+    //}
 
     return !minibatch.m_data.empty();
 }

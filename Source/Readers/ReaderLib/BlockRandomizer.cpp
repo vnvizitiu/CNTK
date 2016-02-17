@@ -285,6 +285,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
         // Frame mode to the randomizer just means there are only single-sample sequences
         m_frameMode = (maxNumberOfSamples == 1);
+        m_streams = m_deserializer->GetStreamDescriptions();
     }
 
     void BlockRandomizer::Initialize(TransformerPtr next, const ConfigParameters& readerConfig)
@@ -370,11 +371,11 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         return m_epochSize <= m_samplePositionInEpoch;
     }
 
-    Sequences BlockRandomizer::GetNextSequences(size_t sampleCount)
+    void BlockRandomizer::GetNextSequences(size_t sampleCount, Sequences& result)
     {
         assert(m_samplePositionInEpoch != SIZE_MAX); // SetEpochConfiguration() must be called first
 
-        Sequences result;
+        result.m_data.resize(0);
         assert(m_frameMode); // TODO sequence mode not implemented yet
 
         SequenceDescriptions sequenceDescriptions;
@@ -382,7 +383,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
         if (sequenceDescriptions.size() == 0)
         {
-            return result;
+            return;
         }
 
         // TODO implement require and release chunks from the data deserializer, but only for this worker
@@ -391,17 +392,19 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         // TODO: Currenlty simply releasing the chunk. Should preserve them for complete window and release only when they are not needed.
         // For current implementation of image reader it does no matter because chunk = image.
         // We have to reassamble the exposed result from sequences drawn from diffrent chunks.
-        result.m_data.resize(sequenceDescriptions.size());
+        result.m_data.resize(m_streams.size(), std::vector<SequenceDataPtr>(sequenceDescriptions.size()));
 
-        // TODO: Should prefetching be done on a single thread?
-#pragma omp parallel for ordered schedule(static)
+        std::vector<SequenceDataPtr> sequence;
         for (int i = 0; i < sequenceDescriptions.size(); ++i)
         {
             ChunkPtr chunk = m_deserializer->GetChunk(sequenceDescriptions[i]->m_chunkId);
-            result.m_data[i] = chunk->GetSequence(sequenceDescriptions[i]->m_id);
-        }
+            chunk->GetSequence(sequenceDescriptions[i]->m_id, sequence);
 
-        return result;
+            for (int j = 0; j < m_streams.size(); ++j)
+            {
+                result.m_data[j][i] = sequence[j];
+            }
+        }
     };
 
 }}}

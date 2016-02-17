@@ -52,7 +52,7 @@ public:
 
     // Gets next sequences up to a maximum count of samples.
     // The return value can be used until the next call to GetNextSequences.
-    virtual Sequences GetNextSequences(size_t sampleCount) = 0;
+    virtual void GetNextSequences(size_t sampleCount, Sequences& result) = 0;
 
     virtual ~Transformer()
     {

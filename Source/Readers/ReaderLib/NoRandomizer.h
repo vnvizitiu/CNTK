@@ -24,7 +24,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
         virtual void Initialize(TransformerPtr next, const ConfigParameters& readerConfig) override;
         virtual void StartEpoch(const EpochConfiguration& config) override;
-        virtual Sequences GetNextSequences(size_t sampleCount) override;
+        virtual void GetNextSequences(size_t sampleCount, Sequences& result) override;
         virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override
         {
             return m_deserializer->GetStreamDescriptions();

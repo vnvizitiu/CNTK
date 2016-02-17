@@ -73,7 +73,7 @@ class Chunk
 {
 public:
     // Gets sequences by id.
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) = 0;
+    virtual void GetSequence(const size_t& sequenceId, std::vector<SequenceDataPtr>& result) = 0;
     virtual ~Chunk() {};
 
 protected:

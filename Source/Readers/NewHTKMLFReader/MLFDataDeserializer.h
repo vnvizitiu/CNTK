@@ -60,7 +60,7 @@ public:
     const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
 private:
-    std::vector<SequenceDataPtr> GetSequenceById(size_t sequenceId);
+    void GetSequenceById(size_t sequenceId, std::vector<SequenceDataPtr>& result);
 };
 
 typedef std::shared_ptr<MLFDataDeserializer> MLFDataDeserializerPtr;

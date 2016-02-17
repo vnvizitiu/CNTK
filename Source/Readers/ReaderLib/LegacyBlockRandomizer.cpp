@@ -376,20 +376,20 @@ bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<s
     return m_epochSize <= m_samplePositionInEpoch;
 }
 
-Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
+void LegacyBlockRandomizer::GetNextSequences(size_t sampleCount, Sequences& result)
 {
     assert(m_frameMode); // TODO sequence mode not implemented yet
     assert(m_samplePositionInEpoch != SIZE_MAX); // SetEpochConfiguration() must be called first
 
     std::vector<size_t> originalIds;
     std::unordered_set<size_t> originalChunks;
-    Sequences result;
 
     result.m_endOfEpoch = GetNextSequenceIds(sampleCount, originalIds, originalChunks);
 
     if (originalIds.size() == 0)
     {
-        return result;
+        result.m_data.resize(0);
+        return;
     }
 
     // Require and release chunks from the data deserializer
@@ -409,20 +409,13 @@ Sequences LegacyBlockRandomizer::GetNextSequences(size_t sampleCount)
     }
 
     const auto& originalTimeline = m_deserializer->GetSequenceDescriptions();
-    result.m_data.resize(m_streams.size(), std::vector<SequenceDataPtr>(originalIds.size()));
+    result.m_data.resize(originalIds.size());
 
     for (size_t i = 0; i < originalIds.size(); ++i)
     {
         const auto& sequenceDescription = originalTimeline[originalIds[i]];
-        auto sequence = m_chunks[sequenceDescription->m_chunkId]->GetSequence(originalIds[i]);
-
-        for (int j = 0; j < m_streams.size(); ++j)
-        {
-            result.m_data[j][i] = sequence[j];
-        }
+        m_chunks[sequenceDescription->m_chunkId]->GetSequence(originalIds[i], result.m_data[i]);
     }
-
-    return result;
 };
 
 }}}

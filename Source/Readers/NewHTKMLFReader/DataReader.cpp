@@ -14,12 +14,13 @@
 #include "ReaderShim.h"
 #include "HTKMLFReader.h"
 #include "HeapMemoryProvider.h"
+#include <CudaMemoryProvider.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
     auto factory = [](const ConfigParameters& parameters) -> ReaderPtr
     {
-        return std::make_shared<HTKMLFReader>(std::make_shared<HeapMemoryProvider>(), parameters);
+        return std::make_shared<HTKMLFReader>(std::make_shared<CudaMemoryProvider>(0), parameters);
     };
 
     extern "C" DATAREADER_API void GetReaderF(IDataReader<float>** preader)

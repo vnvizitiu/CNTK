@@ -49,36 +49,35 @@ SampleModePacker::SampleModePacker(
 
 Minibatch SampleModePacker::ReadMinibatch()
 {
-    auto sequences = m_transformer->GetNextSequences(m_minibatchSize);
+    m_transformer->GetNextSequences(m_minibatchSize, m_bufferSequences);
 
     Minibatch minibatch;
-    minibatch.m_endOfEpoch = sequences.m_endOfEpoch;
-
-    assert(m_streamBuffers.size() == sequences.m_data.size());
+    minibatch.m_endOfEpoch = m_bufferSequences.m_endOfEpoch;
 
     // For each sequence iterating thru all the streams with this sequence id and copying to the buffer.
-    for (size_t streamIndex = 0; streamIndex < sequences.m_data.size(); streamIndex++)
+    for (size_t sequenceIndex = 0; sequenceIndex < m_bufferSequences.m_data.size(); sequenceIndex++)
     {
-        const auto& streamSequences = sequences.m_data[streamIndex];
+        assert(m_streamBuffers.size() == m_bufferSequences.m_data[sequenceIndex].size());
         // Iterating for sequences inside the batch of sequences.
-        for (size_t sequenceIndex = 0; sequenceIndex < sequences.m_data[streamIndex].size(); ++sequenceIndex)
+        for (size_t streamIndex = 0; streamIndex < m_bufferSequences.m_data[sequenceIndex].size(); ++streamIndex)
         {
-            CopySequenceToBuffer(streamSequences[sequenceIndex], streamIndex, sequenceIndex);
+            CopySequenceToBuffer(m_bufferSequences.m_data[sequenceIndex][streamIndex], streamIndex, sequenceIndex);
         }
     }
 
-    if (sequences.m_data.size() == 0)
+    if (m_bufferSequences.m_data.size() == 0)
     {
         return minibatch;
     }
 
     // Creating output minibatch with shared layout between all streams.
-    m_minibatchLayout->InitAsFrameMode(sequences.m_data.front().size());
+    m_minibatchLayout->InitAsFrameMode(m_bufferSequences.m_data.size());
+    minibatch.m_data.reserve(m_outputStreams.size());
     for (int i = 0; i < m_outputStreams.size(); ++i)
     {
         auto stream = std::make_shared<StreamMinibatch>();
         stream->m_data = m_streamBuffers[i].get();
-        stream->m_dataSize = sequences.m_data[i].size() * GetSampleSize(m_outputStreams[i]);
+        stream->m_dataSize = m_bufferSequences.m_data.size() * GetSampleSize(m_outputStreams[i]);
         stream->m_layout = m_minibatchLayout;
 
         minibatch.m_data.push_back(stream);

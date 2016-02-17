@@ -49,13 +49,13 @@ namespace Microsoft {
                 m_sequencePosition = globalSamplePosition % m_timeline.size();
             };
 
-            Sequences NoRandomizer::GetNextSequences(size_t sampleCount)
+            void NoRandomizer::GetNextSequences(size_t sampleCount, Sequences& result)
             {
-                Sequences result;
+                result.m_data.resize(0);
                 if (m_config.m_totalEpochSizeInSamples <= m_samplePositionInEpoch)
                 {
                     result.m_endOfEpoch = true;
-                    return result;
+                    return;
                 }
 
                 size_t maxSampleCount = std::min(sampleCount, m_config.m_totalEpochSizeInSamples - m_samplePositionInEpoch);
@@ -85,7 +85,7 @@ namespace Microsoft {
 
                 if (sequences.size() == 0)
                 {
-                    return result;
+                    return;
                 }
 
                 // TODO: Currently we preserve chunks not for the complete window, only for minibatch
@@ -112,11 +112,9 @@ namespace Microsoft {
 #pragma omp parallel for ordered schedule(static)
                 for (int i = 0; i < sequences.size(); ++i)
                 {
-                    result.m_data[i] = m_chunks[sequences[i]->m_chunkId]->GetSequence(sequences[i]->m_id);
+                    m_chunks[sequences[i]->m_chunkId]->GetSequence(sequences[i]->m_id, result.m_data[i]);
                 }
-                return result;
             }
-
         }
     }
 }

@@ -203,9 +203,9 @@ public:
     HTKChunk(HTKDataDeserializer* parent, size_t chunkId) : m_parent(parent), m_chunkId(chunkId)
     {}
 
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    virtual void GetSequence(const size_t& sequenceId, std::vector<SequenceDataPtr>& result) override
     {
-        return m_parent->GetSequenceById(sequenceId);
+        return m_parent->GetSequenceById(sequenceId, result);
     }
 };
 
@@ -246,7 +246,7 @@ struct HTKSequenceData : DenseSequenceData
 
 typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 
-std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
+void HTKDataDeserializer::GetSequenceById(size_t id, std::vector<SequenceDataPtr>& result)
 {
     if (m_frameMode)
     {
@@ -300,7 +300,8 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
             r->m_data = doubleBuffer;
         }
 
-        return std::vector<SequenceDataPtr>(1, r); // TODO would std::move help?
+        result.resize(1);
+        result[0] = r;
     }
     else
     {
