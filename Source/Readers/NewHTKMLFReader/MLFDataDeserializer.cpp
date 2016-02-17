@@ -8,7 +8,6 @@
 #include "ConfigHelper.h"
 #include "htkfeatio.h"
 #include "msra_mgram.h"
-#include "ElementTypeUtils.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
