@@ -89,7 +89,7 @@ private:
 
     void RandomizeForGlobalSamplePosition(const size_t samplePosition);
 
-    void RandomizeIfNewSweepIsEntered();
+    bool RandomizeIfNewSweepIsEntered();
 
     std::map<size_t, ChunkPtr> m_chunks; // TODO vector? or unordered_map ?
     bool GetNextSequenceIds(size_t sampleCount, std::vector<size_t>& originalIds, std::unordered_set<size_t>& originalChunks);

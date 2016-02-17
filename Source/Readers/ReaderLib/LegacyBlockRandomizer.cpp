@@ -218,7 +218,7 @@ void LegacyBlockRandomizer::Randomize()
     }
 }
 
-void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
+bool LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
 {
     // Check that StartEpoch() was called
     assert(m_sequencePositionInSweep != SIZE_MAX);
@@ -233,7 +233,10 @@ void LegacyBlockRandomizer::RandomizeIfNewSweepIsEntered()
         Randomize();
         m_sequencePositionInSweep -= m_numSequences;
         assert(m_sequencePositionInSweep < m_numSequences); // cannot jump ahead more than a sweep
+        return true;
     };
+
+    return false;
 }
 
 void LegacyBlockRandomizer::RandomizeForGlobalSamplePosition(const size_t samplePosition)
@@ -352,7 +355,12 @@ bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<s
         while ((m_samplePositionInEpoch < m_epochSize) &&
                (distributedSampleCount < sampleCount))
         {
-            RandomizeIfNewSweepIsEntered();
+            if (RandomizeIfNewSweepIsEntered() && 0 < distributedSampleCount)
+            {
+                // Minibatch ends on sweep boundary.
+                // TODO matches old behavior, consider changing
+                break;
+            }
 
             const auto& seqDesc = m_randomTimeline[m_sequencePositionInSweep];
             if ((seqDesc.m_chunkId % m_numberOfWorkers) == m_workerRank)

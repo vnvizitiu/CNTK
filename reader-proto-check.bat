@@ -25,6 +25,7 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
+    Speech/DNN/DiscriminativePreTraining ^
     Speech/DNN/ParallelNoQuantization ^
     Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
     Speech/QuickE2E ^
@@ -34,7 +35,6 @@ set END2END_TEST_SPEC_1B=^
     Speech/DNN/Parallel1BitQuantization ^
     Speech/DNN/ParallelBufferedAsyncGradientAggregation ^
 
-:: Speech/DNN/DiscriminativePreTraining // epoch spanning sweep, different behavior
 
 :: NO
 ::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
