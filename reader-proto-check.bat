@@ -3,6 +3,7 @@ setlocal
 cd %~dp0
 for %%f in (%*) do set a_%%f=1
 
+if not defined CNTK_ENABLE_1BitSGD echo Enable 1-bit SGD, cf. https://github.com/Microsoft/CNTK/wiki/Enabling-1bit-SGD
 @REM optionally do clean ?
 
 set ACML_FMA=0
@@ -24,15 +25,14 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/HTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
-    Speech/QuickE2E ^
+    Speech/DNN/Parallel1BitQuantization ^
+    Speech/DNN/ParallelBufferedAsyncGradientAggregation ^
     Speech/DNN/ParallelNoQuantization ^
     Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
+    Speech/QuickE2E ^
     Speech/SVD
 
-:: TODO could work:
-:: Speech/DNN/Parallel1BitQuantization
-:: Speech/DNN/ParallelBufferedAsyncGradientAggregation
-:: Speech/DNN/DiscriminativePreTraining
+:: Speech/DNN/DiscriminativePreTraining // epoch spanning sweep, different behavior
 
 :: NO
 ::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
@@ -97,22 +97,30 @@ if not defined a_noe2e (
 if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release -s 1bitsgd %END2END_TEST_SPEC%
+    @REM Running 1-bit SGD build pretending it's a GPU one:
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 
+if not defined a_nocpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d cpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
+)
 )
 
 if not defined a_nodebug (
 if not defined a_nogpu (
+    python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug -s 1bitsgd %END2END_TEST_SPEC%
+    @REM Running 1-bit SGD build pretending it's a GPU one:
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
 
+if not defined a_nocpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d cpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
+)
 )
 )
 )
