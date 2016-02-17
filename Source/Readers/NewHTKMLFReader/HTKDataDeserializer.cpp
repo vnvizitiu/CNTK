@@ -238,7 +238,7 @@ struct HTKSequenceData : DenseSequenceData
         if (m_data != &frame(0, 0))
 
         {
-            delete[] m_data;
+            delete[] reinterpret_cast<double*>(m_data);
             m_data = nullptr;
         }
     }

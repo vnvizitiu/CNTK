@@ -171,7 +171,7 @@ public:
 ChunkPtr MLFDataDeserializer::GetChunk(size_t chunkId)
 {
     assert(chunkId == 0);
-    UNREFERENCED_PARAMETER(chunkId);
+    UNUSED(chunkId);
     return std::make_shared<MLFChunk>(this);
 }
 

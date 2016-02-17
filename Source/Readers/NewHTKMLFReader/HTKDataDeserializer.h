@@ -9,6 +9,7 @@
 #include "Config.h" // for ConfigParameters
 #include "htkfeatio.h"      // for htkfeatreader
 #include "latticesource.h"
+#include "ssematrix.h"
 #include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
