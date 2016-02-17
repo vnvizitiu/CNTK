@@ -136,9 +136,14 @@ void LegacyBlockRandomizer::RandomizeChunks()
     assert(m_sequencePositionToChunkIndex.size() == m_numSequences);
 }
 
+size_t LegacyBlockRandomizer::GetChunkIndexForSequencePosition(size_t sequencePosition) const
+{
+    return m_sequencePositionToChunkIndex[sequencePosition];
+}
+
 bool LegacyBlockRandomizer::IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const
 {
-    const auto& chunk = m_randomizedChunks[m_sequencePositionToChunkIndex[targetPosition]];
+    const auto& chunk = m_randomizedChunks[GetChunkIndexForSequencePosition(targetPosition)];
     return chunk.m_windowBegin <= seqDesc.m_chunkId && seqDesc.m_chunkId < chunk.m_windowEnd;
 }
 
@@ -177,7 +182,7 @@ void LegacyBlockRandomizer::Randomize()
     foreach_index (i, m_randomTimeline)
     {
         // Get valid randomization range, expressed in chunks
-        const size_t chunkId = m_sequencePositionToChunkIndex[i];
+        const size_t chunkId = GetChunkIndexForSequencePosition(i);
         const size_t windowBegin = m_randomizedChunks[chunkId].m_windowBegin;
         const size_t windowEnd = m_randomizedChunks[chunkId].m_windowEnd;
 
@@ -354,8 +359,9 @@ bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<s
                 // Got one, collect it (and its window of chunks)
                 originalIds.push_back(seqDesc.m_id);
 
-                const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowBegin;
-                const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowEnd;
+                const auto & currentChunk = m_randomizedChunks[GetChunkIndexForSequencePosition(seqDesc.m_id)];
+                const size_t windowBegin = currentChunk.m_windowBegin;
+                const size_t windowEnd = currentChunk.m_windowEnd;
 
                 for (size_t chunk = windowBegin; chunk < windowEnd; chunk++)
                 {

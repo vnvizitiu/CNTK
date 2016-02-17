@@ -81,6 +81,8 @@ private:
 
     void RandomizeChunks();
 
+    size_t GetChunkIndexForSequencePosition(size_t sequencePosition) const;
+
     bool IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const;
 
     void Randomize();
