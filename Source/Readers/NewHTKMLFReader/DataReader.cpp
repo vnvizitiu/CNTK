@@ -32,24 +32,4 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         *preader = new ReaderShim<double>(factory);
     }
 
-#ifdef _WIN32
-// Utility function, in ConfigFile.cpp, but NewHTKMLFReader doesn't need that code...
-
-// Trim - trim white space off the start and end of the string
-// str - string to trim
-// NOTE: if the entire string is empty, then the string will be set to an empty string
-void Trim(std::string& str)
-{
-    auto found = str.find_first_not_of(" \t");
-    if (found == npos)
-    {
-        str.erase(0);
-        return;
-    }
-    str.erase(0, found);
-    found = str.find_last_not_of(" \t");
-    if (found != npos)
-        str.erase(found + 1);
-}
-#endif
 } } }
