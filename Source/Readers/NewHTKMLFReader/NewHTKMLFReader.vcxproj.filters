@@ -21,6 +21,12 @@
     <ClCompile Include="MLFDataDeserializer.cpp" />
     <ClCompile Include="HTKDataDeserializer.cpp" />
     <ClCompile Include="HTKMLFReader.cpp" />
+    <ClCompile Include="..\..\Common\Config.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\File.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="biggrowablevectors.h" />
@@ -54,6 +60,9 @@
     <ClInclude Include="MLFDataDeserializer.h" />
     <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="HTKMLFReader.h" />
+    <ClInclude Include="..\..\Common\Include\File.h">
+      <Filter>Common\Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
