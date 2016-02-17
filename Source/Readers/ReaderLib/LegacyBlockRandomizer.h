@@ -72,7 +72,6 @@ private:
     size_t m_sweepStartInSamples; // TODO do we need it?
     size_t m_sequencePositionInSweep;
     std::vector<RandomizedChunk> m_randomizedChunks;    // (includes a sentinel)
-    std::vector<size_t> m_sequencePositionToChunkIndex; // TODO find on m_randomizedChunks instead?
     std::vector<SequenceDescription> m_randomTimeline;
     std::vector<StreamDescriptionPtr> m_streams;
 
@@ -81,6 +80,8 @@ private:
     bool TimelineIsValidForRandomization(const SequenceDescriptions& timeline) const;
 
     void RandomizeChunks();
+
+    size_t GetChunkIndexForSequencePosition(size_t sequencePosition) const;
 
     bool IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const;
 
