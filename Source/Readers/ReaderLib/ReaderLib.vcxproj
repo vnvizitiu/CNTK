@@ -75,6 +75,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bundler.h" />
     <ClInclude Include="DataDeserializerBase.h" />
     <ClInclude Include="LegacyBlockRandomizer.h" />
     <ClInclude Include="TransformerBase.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="Transformer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bundler.cpp" />
     <ClCompile Include="BlockRandomizer.cpp" />
     <ClCompile Include="LegacyBlockRandomizer.cpp" />
     <ClCompile Include="NoRandomizer.cpp" />

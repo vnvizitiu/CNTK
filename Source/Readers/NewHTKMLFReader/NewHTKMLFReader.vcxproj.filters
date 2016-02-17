@@ -20,7 +20,6 @@
     <ClCompile Include="ConfigHelper.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />
     <ClCompile Include="HTKDataDeserializer.cpp" />
-    <ClCompile Include="Bundler.cpp" />
     <ClCompile Include="HTKMLFReader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -53,7 +52,6 @@
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="MLFDataDeserializer.h" />
-    <ClInclude Include="Bundler.h" />
     <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="HTKMLFReader.h" />
   </ItemGroup>

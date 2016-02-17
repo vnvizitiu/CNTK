@@ -8,33 +8,42 @@
 #include <string>
 #include <vector>
 #include "Config.h"
+#include "Reader.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
-    enum class ElementType;
 
+    // Simple config helper - a HtkMlf wrapper around config parameters.
     class ConfigHelper
-{
-public:
-    static std::pair<size_t, size_t> GetContextWindow(const ConfigParameters& config);
-    static size_t GetFeatureDimension(const ConfigParameters& config);
-    static size_t GetLabelDimension(const ConfigParameters& config);
+    {
+    public:
+        ConfigHelper(const ConfigParameters& config) : m_config(config)
+        {}
 
-    static ElementType GetElementType(const ConfigParameters& config);
+        std::pair<size_t, size_t> GetContextWindow();
+        size_t GetFeatureDimension();
+        size_t GetLabelDimension();
 
-    static void CheckFeatureType(const ConfigParameters& config);
-    static void CheckLabelType(const ConfigParameters& config);
+        ElementType GetElementType();
 
-    static void GetDataNamesFromConfig(
-        const ConfigParameters& readerConfig,
-        std::vector<std::wstring>& features,
-        std::vector<std::wstring>& labels,
-        std::vector<std::wstring>& hmms,
-        std::vector<std::wstring>& lattices);
+        void CheckFeatureType();
+        void CheckLabelType();
 
-    static std::vector<std::wstring> GetMlfPaths(const ConfigParameters& config);
-    static std::vector<std::wstring> GetFeaturePaths(const ConfigParameters& config);
+        void GetDataNamesFromConfig(
+            std::vector<std::wstring>& features,
+            std::vector<std::wstring>& labels,
+            std::vector<std::wstring>& hmms,
+            std::vector<std::wstring>& lattices);
 
-    static size_t GetRandomizationWindow(const ConfigParameters& config);
-    static std::wstring GetRandomizer(const ConfigParameters& config);
-};
-} } }
+        std::vector<std::wstring> GetMlfPaths();
+        std::vector<std::wstring> GetFeaturePaths();
+
+        size_t GetRandomizationWindow();
+        std::wstring GetRandomizer();
+
+    private:
+        ConfigHelper& operator=(const ConfigHelper&) = delete;
+
+        const ConfigParameters& m_config;
+    };
+
+}}}
