@@ -41,16 +41,18 @@ public:
     }
 };
 
-MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& label, const std::wstring& name)
+MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& labelConfig, const std::wstring& name)
 {
-    bool frameMode = label.Find("frameMode", "true");
+    bool frameMode = labelConfig.Find("frameMode", "true");
     if (!frameMode)
     {
         LogicError("Currently only reader only supports fram mode. Please check your configuration.");
     }
 
-    ConfigHelper::CheckLabelType(label);
-    size_t dimension = ConfigHelper::GetLabelDimension(label);
+    ConfigHelper config(labelConfig);
+
+    config.CheckLabelType();
+    size_t dimension = config.GetLabelDimension();
 
     // TODO: Similarly to the old reader, currently we assume all Mlfs will have same root name (key)
     // restrict MLF reader to these files--will make stuff much faster without having to use shortened input files
@@ -58,8 +60,8 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
     // TODO: currently we do not use symbol and word tables.
     const msra::lm::CSymbolSet* wordTable = nullptr;
     std::map<string, size_t>* symbolTable = nullptr;
-    std::vector<std::wstring> mlfPaths = ConfigHelper::GetMlfPaths(label);
-    std::wstring stateListPath = static_cast<std::wstring>(label(L"labelMappingFile", L""));
+    std::vector<std::wstring> mlfPaths = config.GetMlfPaths();
+    std::wstring stateListPath = static_cast<std::wstring>(labelConfig(L"labelMappingFile", L""));
     const double htkTimeToFrame = 100000.0; // default is 10ms
     msra::asr::htkmlfreader<msra::asr::htkmlfentry, msra::lattices::lattice::htkmlfwordsequence> labels(mlfPaths, std::set<wstring>(), stateListPath, wordTable, symbolTable, htkTimeToFrame);
 
@@ -70,7 +72,7 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
                                     msra::lattices::lattice::htkmlfwordsequence>>::value,
         "Type 'msra::asr::htkmlfreader' should be move constructible!");
 
-    m_elementType = ConfigHelper::GetElementType(label);
+    m_elementType = config.GetElementType();
 
     MLFUtterance description;
     description.m_isValid = true;

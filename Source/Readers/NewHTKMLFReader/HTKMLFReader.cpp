@@ -20,12 +20,14 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    std::vector<IDataDeserializerPtr> CreateDeserializers(const ConfigParameters& config)
+    std::vector<IDataDeserializerPtr> CreateDeserializers(const ConfigParameters& readerConfig)
     {
         std::vector<std::wstring> featureNames;
         std::vector<std::wstring> labelNames;
         std::vector<std::wstring> notused;
-        ConfigHelper::GetDataNamesFromConfig(config, featureNames, labelNames, notused, notused);
+        ConfigHelper config(readerConfig);
+
+        config.GetDataNamesFromConfig(featureNames, labelNames, notused, notused);
         if (featureNames.size() < 1 || labelNames.size() < 1)
         {
             InvalidArgument("Network needs at least 1 feature and 1 label specified.");
@@ -36,14 +38,14 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>();
         for (const auto& featureName : featureNames)
         {
-            auto deserializer = std::make_shared<HTKDataDeserializer>(corpus, config(featureName), featureName);
+            auto deserializer = std::make_shared<HTKDataDeserializer>(corpus, readerConfig(featureName), featureName);
             featureDeserializers.push_back(deserializer);
         }
         assert(featureDeserializers.size() == 1);
 
         for (const auto& labelName : labelNames)
         {
-            auto deserializer = std::make_shared<MLFDataDeserializer>(corpus, config(labelName), labelName);
+            auto deserializer = std::make_shared<MLFDataDeserializer>(corpus, readerConfig(labelName), labelName);
 
             labelDeserializers.push_back(deserializer);
         }
@@ -57,7 +59,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     }
 
     HTKMLFReader::HTKMLFReader(MemoryProviderPtr provider,
-        const ConfigParameters& config)
+        const ConfigParameters& readerConfig)
         : m_seed(0), m_provider(provider)
     {
         // In the future, deserializers and transformers will be dynamically loaded
@@ -66,25 +68,26 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         // deserializer interface not only in C++ but in scripting languages as well.
 
         assert(config(L"frameMode", true));
+        ConfigHelper config(readerConfig);
 
-        size_t window = ConfigHelper::GetRandomizationWindow(config);
-        auto deserializers = CreateDeserializers(config);
+        size_t window = config.GetRandomizationWindow();
+        auto deserializers = CreateDeserializers(readerConfig);
         assert(deserializers.size() == 2);
 
-        auto bundler = std::make_shared<Bundler>(config, deserializers[0], deserializers);
+        auto bundler = std::make_shared<Bundler>(readerConfig, deserializers[0], deserializers);
 
-        std::wstring readMethod = ConfigHelper::GetRandomizer(config);
+        std::wstring readMethod = config.GetRandomizer();
         if (!AreEqualIgnoreCase(readMethod, std::wstring(L"blockRandomize")))
         {
             RuntimeError("readMethod must be 'blockRandomize'");
         }
 
-        int verbosity = config(L"verbosity", 2);
+        int verbosity = readerConfig(L"verbosity", 2);
         m_randomizer = std::make_shared<LegacyBlockRandomizer>(verbosity, window, bundler);
-        m_randomizer->Initialize(nullptr, config);
+        m_randomizer->Initialize(nullptr, readerConfig);
 
         intargvector numberOfuttsPerMinibatchForAllEpochs =
-            config(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
+            readerConfig(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
         Utils::CheckMinibatchSizes(numberOfuttsPerMinibatchForAllEpochs);
 
         // Create output stream descriptions (all dense)

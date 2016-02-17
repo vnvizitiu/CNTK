@@ -8,15 +8,14 @@
 #include <DataReader.h>
 #include <regex>
 #include "Utils.h"
-#include <ElementTypeUtils.h>
 #include <StringUtil.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-std::pair<size_t, size_t> ConfigHelper::GetContextWindow(const ConfigParameters& config)
+std::pair<size_t, size_t> ConfigHelper::GetContextWindow()
 {
     size_t left = 0, right = 0;
-    intargvector contextWindow = config(L"contextWindow", ConfigParameters::Array(intargvector(vector<int>{1})));
+    intargvector contextWindow = m_config(L"contextWindow", ConfigParameters::Array(intargvector(vector<int>{1})));
 
     if (contextWindow.size() == 1) // symmetric
     {
@@ -45,27 +44,27 @@ std::pair<size_t, size_t> ConfigHelper::GetContextWindow(const ConfigParameters&
     return std::make_pair(left, right);
 }
 
-void ConfigHelper::CheckFeatureType(const ConfigParameters& config)
+void ConfigHelper::CheckFeatureType()
 {
-    std::wstring type = config(L"type", L"real");
+    std::wstring type = m_config(L"type", L"real");
     if (_wcsicmp(type.c_str(), L"real"))
     {
         InvalidArgument("Feature type must be 'real'.");
     }
 }
 
-void ConfigHelper::CheckLabelType(const ConfigParameters& config)
+void ConfigHelper::CheckLabelType()
 {
     std::wstring type;
-    if (config.Exists(L"labelType"))
+    if (m_config.Exists(L"labelType"))
     {
         // let's deprecate this eventually and just use "type"...
-        type = static_cast<const std::wstring&>(config(L"labelType"));
+        type = static_cast<const std::wstring&>(m_config(L"labelType"));
     }
     else
     {
         // outputs should default to category
-        type = static_cast<const std::wstring&>(config(L"type", L"category"));
+        type = static_cast<const std::wstring&>(m_config(L"type", L"category"));
     }
 
     if (_wcsicmp(type.c_str(), L"category"))
@@ -78,17 +77,16 @@ void ConfigHelper::CheckLabelType(const ConfigParameters& config)
 // features - [in,out] a vector of feature name strings
 // labels - [in,out] a vector of label name strings
 void ConfigHelper::GetDataNamesFromConfig(
-    const ConfigParameters& readerConfig,
     std::vector<std::wstring>& features,
     std::vector<std::wstring>& labels,
     std::vector<std::wstring>& hmms,
     std::vector<std::wstring>& lattices)
 {
-    for (const auto& id : readerConfig.GetMemberIds())
+    for (const auto& id : m_config.GetMemberIds())
     {
-        if (!readerConfig.CanBeConfigRecord(id))
+        if (!m_config.CanBeConfigRecord(id))
             continue;
-        const ConfigParameters& temp = readerConfig(id);
+        const ConfigParameters& temp = m_config(id);
         // see if we have a config parameters that contains a "file" element, it's a sub key, use it
         if (temp.ExistsCurrent(L"scpFile"))
         {
@@ -109,9 +107,9 @@ void ConfigHelper::GetDataNamesFromConfig(
     }
 }
 
-ElementType ConfigHelper::GetElementType(const ConfigParameters& config)
+ElementType ConfigHelper::GetElementType()
 {
-    string precision = config.Find("precision", "float");
+    string precision = m_config.Find("precision", "float");
     if (AreEqualIgnoreCase(precision, std::string("float")))
     {
         return ElementType::tfloat;
@@ -125,46 +123,46 @@ ElementType ConfigHelper::GetElementType(const ConfigParameters& config)
     RuntimeError("Not supported precision '%s'. Expected 'double' or 'float'.", precision.c_str());
 }
 
-size_t ConfigHelper::GetFeatureDimension(const ConfigParameters& config)
+size_t ConfigHelper::GetFeatureDimension()
 {
-    if (config.Exists(L"dim"))
+    if (m_config.Exists(L"dim"))
     {
-        return config(L"dim");
+        return m_config(L"dim");
     }
 
     InvalidArgument("features must specify dim");
 }
 
-size_t ConfigHelper::GetLabelDimension(const ConfigParameters& config)
+size_t ConfigHelper::GetLabelDimension()
 {
-    if (config.Exists(L"labelDim"))
+    if (m_config.Exists(L"labelDim"))
     {
-        return config(L"labelDim");
+        return m_config(L"labelDim");
     }
 
-    if (config.Exists(L"dim"))
+    if (m_config.Exists(L"dim"))
     {
-        return config(L"dim");
+        return m_config(L"dim");
     }
 
     InvalidArgument("labels must specify dim or labelDim");
 }
 
-std::vector<std::wstring> ConfigHelper::GetMlfPaths(const ConfigParameters& config)
+std::vector<std::wstring> ConfigHelper::GetMlfPaths()
 {
     std::vector<std::wstring> result;
-    if (config.ExistsCurrent(L"mlfFile"))
+    if (m_config.ExistsCurrent(L"mlfFile"))
     {
-        result.push_back(config(L"mlfFile"));
+        result.push_back(m_config(L"mlfFile"));
     }
     else
     {
-        if (!config.ExistsCurrent(L"mlfFileList"))
+        if (!m_config.ExistsCurrent(L"mlfFileList"))
         {
             InvalidArgument("Either mlfFile or mlfFileList must exist in NewHTKMLFReader");
         }
 
-        wstring list = config(L"mlfFileList");
+        wstring list = m_config(L"mlfFileList");
         for (msra::files::textreader r(list); r;)
         {
             result.push_back(r.wgetline());
@@ -174,13 +172,13 @@ std::vector<std::wstring> ConfigHelper::GetMlfPaths(const ConfigParameters& conf
     return result;
 }
 
-size_t ConfigHelper::GetRandomizationWindow(const ConfigParameters& config)
+size_t ConfigHelper::GetRandomizationWindow()
 {
     size_t result = randomizeAuto;
 
-    if (config.Exists(L"randomize"))
+    if (m_config.Exists(L"randomize"))
     {
-        wstring randomizeString = config.CanBeString(L"randomize") ? config(L"randomize") : wstring();
+        wstring randomizeString = m_config.CanBeString(L"randomize") ? m_config(L"randomize") : wstring();
         if (!_wcsicmp(randomizeString.c_str(), L"none"))
         {
             result = randomizeNone;
@@ -191,19 +189,19 @@ size_t ConfigHelper::GetRandomizationWindow(const ConfigParameters& config)
         }
         else
         {
-            result = config(L"randomize");
+            result = m_config(L"randomize");
         }
     }
 
     return result;
 }
 
-std::wstring ConfigHelper::GetRandomizer(const ConfigParameters& config)
+std::wstring ConfigHelper::GetRandomizer()
 {
     // get the read method, defaults to "blockRandomize" other option is "rollingWindow"
-    std::wstring randomizer(config(L"readMethod", L"blockRandomize"));
+    std::wstring randomizer(m_config(L"readMethod", L"blockRandomize"));
 
-    if (randomizer == L"blockRandomize" && ConfigHelper::GetRandomizationWindow(config) == randomizeNone)
+    if (randomizer == L"blockRandomize" && GetRandomizationWindow() == randomizeNone)
     {
         InvalidArgument("'randomize' cannot be 'none' when 'readMethod' is 'blockRandomize'.");
     }
@@ -211,10 +209,10 @@ std::wstring ConfigHelper::GetRandomizer(const ConfigParameters& config)
     return randomizer;
 }
 
-std::vector<std::wstring> ConfigHelper::GetFeaturePaths(const ConfigParameters& config)
+std::vector<std::wstring> ConfigHelper::GetFeaturePaths()
 {
-    std::wstring scriptPath = config(L"scpFile");
-    std::wstring rootPath = config(L"prefixPathInSCP", L"");
+    std::wstring scriptPath = m_config(L"scpFile");
+    std::wstring rootPath = m_config(L"prefixPathInSCP", L"");
 
     vector<wstring> filelist;
     fprintf(stderr, "reading script file %ls ...", scriptPath.c_str());
