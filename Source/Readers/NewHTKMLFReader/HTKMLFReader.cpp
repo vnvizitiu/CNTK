@@ -31,8 +31,8 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             InvalidArgument("Network needs at least 1 feature and 1 label specified.");
         }
 
-        std::vector<HTKDataDeserializerPtr> featureDeserializers;
-        std::vector<MLFDataDeserializerPtr> labelDeserializers;
+        std::vector<IDataDeserializerPtr> featureDeserializers;
+        std::vector<IDataDeserializerPtr> labelDeserializers;
         CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>();
         for (const auto& featureName : featureNames)
         {
