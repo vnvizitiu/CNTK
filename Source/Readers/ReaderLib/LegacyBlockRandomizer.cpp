@@ -125,15 +125,20 @@ size_t LegacyBlockRandomizer::GetChunkIndexForSequencePosition(size_t sequencePo
 {
     assert(sequencePosition <= m_numSamples);
 
-    for (size_t k = 0; k < m_numChunks; k++)
+    struct PositionConverter
     {
-        if ((m_randomizedChunks[k].m_info.m_sequencePositionStart <= sequencePosition) &&
-            (sequencePosition < m_randomizedChunks[k + 1].m_info.m_sequencePositionStart))
-        {
-            return k;
-        }
-    }
-    RuntimeError("GetChunkIndexForSequencePosition: Invalid sequence position given");
+        size_t m_position;
+        PositionConverter(const RandomizedChunk & chunk) : m_position(chunk.m_info.m_sequencePositionStart) {};
+        PositionConverter(size_t sequencePosition) : m_position(sequencePosition) {};
+    };
+
+    auto result = std::lower_bound(m_randomizedChunks.begin(), m_randomizedChunks.end(), sequencePosition,
+        [](const PositionConverter& a, const PositionConverter& b)
+    {
+        return a.m_position <= b.m_position;
+    });
+
+    return result - m_randomizedChunks.begin() - 1;
 }
 
 bool LegacyBlockRandomizer::IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const
