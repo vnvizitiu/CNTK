@@ -119,26 +119,21 @@ void LegacyBlockRandomizer::RandomizeChunks()
                m_randomizedChunks[chunk.m_windowEnd + 1].m_info.m_samplePositionStart - chunk.m_info.m_samplePositionStart < halfWindowRange)
             chunk.m_windowEnd++; // got more space
     }
-
-    // Compute the randomization range for sequence positions.
-    m_sequencePositionToChunkIndex.clear();
-    m_sequencePositionToChunkIndex.reserve(m_numSequences);
-    for (size_t k = 0; k < m_numChunks; k++)
-    {
-        const size_t numSequences =
-            m_randomizedChunks[k + 1].m_info.m_sequencePositionStart -
-            m_randomizedChunks[k].m_info.m_sequencePositionStart;
-        for (size_t i = 0; i < numSequences; i++)
-        {
-            m_sequencePositionToChunkIndex.push_back(k);
-        }
-    }
-    assert(m_sequencePositionToChunkIndex.size() == m_numSequences);
 }
 
 size_t LegacyBlockRandomizer::GetChunkIndexForSequencePosition(size_t sequencePosition) const
 {
-    return m_sequencePositionToChunkIndex[sequencePosition];
+    assert(sequencePosition <= m_numSamples);
+
+    for (size_t k = 0; k < m_numChunks; k++)
+    {
+        if ((m_randomizedChunks[k].m_info.m_sequencePositionStart <= sequencePosition) &&
+            (sequencePosition < m_randomizedChunks[k + 1].m_info.m_sequencePositionStart))
+        {
+            return k;
+        }
+    }
+    RuntimeError("GetChunkIndexForSequencePosition: Invalid sequence position given");
 }
 
 bool LegacyBlockRandomizer::IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const
