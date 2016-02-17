@@ -138,7 +138,6 @@
     <ClCompile Include="HTKDataDeserializer.cpp" />
     <ClCompile Include="HTKMLFReader.cpp" />
     <ClCompile Include="NewHTKMLFWriter.cpp" />
-    <ClCompile Include="latticearchive.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
