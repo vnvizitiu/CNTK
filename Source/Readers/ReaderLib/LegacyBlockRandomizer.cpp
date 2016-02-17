@@ -119,26 +119,31 @@ void LegacyBlockRandomizer::RandomizeChunks()
                m_randomizedChunks[chunk.m_windowEnd + 1].m_info.m_samplePositionStart - chunk.m_info.m_samplePositionStart < halfWindowRange)
             chunk.m_windowEnd++; // got more space
     }
+}
 
-    // Compute the randomization range for sequence positions.
-    m_sequencePositionToChunkIndex.clear();
-    m_sequencePositionToChunkIndex.reserve(m_numSequences);
-    for (size_t k = 0; k < m_numChunks; k++)
+size_t LegacyBlockRandomizer::GetChunkIndexForSequencePosition(size_t sequencePosition) const
+{
+    assert(sequencePosition <= m_numSamples);
+
+    struct PositionConverter
     {
-        const size_t numSequences =
-            m_randomizedChunks[k + 1].m_info.m_sequencePositionStart -
-            m_randomizedChunks[k].m_info.m_sequencePositionStart;
-        for (size_t i = 0; i < numSequences; i++)
-        {
-            m_sequencePositionToChunkIndex.push_back(k);
-        }
-    }
-    assert(m_sequencePositionToChunkIndex.size() == m_numSequences);
+        size_t m_position;
+        PositionConverter(const RandomizedChunk & chunk) : m_position(chunk.m_info.m_sequencePositionStart) {};
+        PositionConverter(size_t sequencePosition) : m_position(sequencePosition) {};
+    };
+
+    auto result = std::lower_bound(m_randomizedChunks.begin(), m_randomizedChunks.end(), sequencePosition,
+        [](const PositionConverter& a, const PositionConverter& b)
+    {
+        return a.m_position <= b.m_position;
+    });
+
+    return result - m_randomizedChunks.begin() - 1;
 }
 
 bool LegacyBlockRandomizer::IsValidForPosition(size_t targetPosition, const SequenceDescription& seqDesc) const
 {
-    const auto& chunk = m_randomizedChunks[m_sequencePositionToChunkIndex[targetPosition]];
+    const auto& chunk = m_randomizedChunks[GetChunkIndexForSequencePosition(targetPosition)];
     return chunk.m_windowBegin <= seqDesc.m_chunkId && seqDesc.m_chunkId < chunk.m_windowEnd;
 }
 
@@ -177,7 +182,7 @@ void LegacyBlockRandomizer::Randomize()
     foreach_index (i, m_randomTimeline)
     {
         // Get valid randomization range, expressed in chunks
-        const size_t chunkId = m_sequencePositionToChunkIndex[i];
+        const size_t chunkId = GetChunkIndexForSequencePosition(i);
         const size_t windowBegin = m_randomizedChunks[chunkId].m_windowBegin;
         const size_t windowEnd = m_randomizedChunks[chunkId].m_windowEnd;
 
@@ -355,8 +360,9 @@ bool LegacyBlockRandomizer::GetNextSequenceIds(size_t sampleCount, std::vector<s
                 // Got one, collect it (and its window of chunks)
                 originalIds.push_back(seqDesc.m_id);
 
-                const size_t windowBegin = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowBegin;
-                const size_t windowEnd = m_randomizedChunks[m_sequencePositionToChunkIndex[seqDesc.m_id]].m_windowEnd;
+                const auto & currentChunk = m_randomizedChunks[GetChunkIndexForSequencePosition(seqDesc.m_id)];
+                const size_t windowBegin = currentChunk.m_windowBegin;
+                const size_t windowEnd = currentChunk.m_windowEnd;
 
                 for (size_t chunk = windowBegin; chunk < windowEnd; chunk++)
                 {
