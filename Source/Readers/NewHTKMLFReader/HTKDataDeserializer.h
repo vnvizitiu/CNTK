@@ -199,6 +199,8 @@ class HTKDataDeserializer : public IDataDeserializer
     SequenceDescriptions m_sequences;
 
     std::vector<chunkdata> m_chunks;
+    std::vector<std::weak_ptr<Chunk>> m_weakChunks;
+
     size_t m_chunksinram; // (for diagnostics messages)
 
     size_t m_featdim;

@@ -160,6 +160,8 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             m_sequences.push_back(&m_utterances[i]);
         }
     }
+
+    m_weakChunks.resize(m_chunks.size());
 }
 
 const SequenceDescriptions& HTKDataDeserializer::GetSequenceDescriptions() const
@@ -204,31 +206,55 @@ class HTKDataDeserializer::HTKChunk : public Chunk
     size_t m_chunkId;
 public:
     HTKChunk(HTKDataDeserializer* parent, size_t chunkId) : m_parent(parent), m_chunkId(chunkId)
-    {}
-
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
     {
-        return m_parent->GetSequenceById(sequenceId);
-    }
-};
+        auto& chunkdata = m_parent->m_chunks[chunkId];
+        if (chunkdata.isinram())
+        {
+            LogicError("Trying to load the chunk that is already in memory.");
+        }
 
-ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
-{
-    auto& chunkdata = m_chunks[chunkId];
-    if (!chunkdata.isinram())
-    {
-        msra::util::attempt(5, [&]() // (reading from network)
+        // possibly distributed read.
+        msra::util::attempt(5, [&]()
         {
             std::unordered_map<std::string, size_t> empty;
             msra::dbn::latticesource lattices(
                 std::pair<std::vector<std::wstring>, std::vector<std::wstring>>(),
                 empty,
                 std::wstring());
-            chunkdata.requiredata(m_featKind, m_featdim, m_sampperiod, lattices, m_verbosity);
+            chunkdata.requiredata(m_parent->m_featKind, m_parent->m_featdim, m_parent->m_sampperiod, lattices, m_parent->m_verbosity);
         });
+
     }
 
-    return std::make_shared<HTKChunk>(this, chunkId); // TODO creating too many times?
+    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    {
+        return m_parent->GetSequenceById(sequenceId);
+    }
+
+    ~HTKChunk()
+    {
+        auto& chunkdata = m_parent->m_chunks[m_chunkId];
+        if (chunkdata.isinram())
+        {
+            chunkdata.releasedata();
+        }
+        else
+        {
+            LogicError("Trying to unload the chunk that is already unloaded.");
+        }
+    }
+};
+
+ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
+{
+    if (!m_weakChunks[chunkId].expired())
+    {
+        return m_weakChunks[chunkId].lock();
+    }
+
+    auto chunk = std::make_shared<HTKChunk>(this, chunkId);
+    m_weakChunks[chunkId] = chunk;
+    return chunk;
 };
 
 struct HTKSequenceData : DenseSequenceData
@@ -239,7 +265,6 @@ struct HTKSequenceData : DenseSequenceData
     {
         msra::dbn::matrixstripe frame(utterance, 0, utterance.cols());
         if (m_data != &frame(0, 0))
-
         {
             delete[] reinterpret_cast<double*>(m_data);
             m_data = nullptr;
@@ -318,18 +343,5 @@ const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(cons
     size_t index = m_utterances[sequenceId].frameStart + key.minor;
     return m_sequences[index];
 }
-
-/*
-TODO: SHOULD DO RELEASE ON A CHUNK.
-void HTKDataDeserializer::ReleaseChunk(size_t chunkIndex)
-{
-    auto& chunkdata = m_chunks[chunkIndex];
-    if (chunkdata.isinram())
-    {
-        chunkdata.releasedata();
-        m_chunksinram--;
-    }
-}
-*/
 
 } } }

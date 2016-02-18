@@ -8,8 +8,6 @@
 #include "stdafx.h"
 #include "Basics.h"
 
-#include "htkfeatio.h" // for reading HTK features
-
 #define DATAWRITER_EXPORTS
 #include "DataWriter.h"
 #include "NewHTKMLFWriter.h"
