@@ -47,7 +47,7 @@ void Bundler::CreateSequenceDescriptions()
     size_t currentMapping = 0;
     for (int i = 0; i < m_driver->GetSequenceDescriptions().size(); ++i)
     {
-        auto sequenceDescription = m_driver->GetSequenceDescriptions()[i];
+        const auto* sequenceDescription = m_driver->GetSequenceDescriptions()[i];
 
         bool isValid = true;
         for (int j = 1; j < m_deserializers.size(); ++j)
@@ -80,6 +80,9 @@ void Bundler::CreateSequenceDescriptions()
             currentMapping++;
         }
     }
+
+    fprintf(stderr, "Bundler::CreateSequenceDescriptions: dropped %d sequences\n", (int)(m_driver->GetSequenceDescriptions().size() - m_sequenceDescriptions.size()));
+    fprintf(stderr, "Bundler::CreateSequenceDescriptions: total number of sequences is  %d\n", (int)m_sequenceDescriptions.size());
 
     for (int i = 0; i < m_deserializers.size(); ++i)
     {

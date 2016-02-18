@@ -138,6 +138,8 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
         m_sequences.push_back(&m_frames[i]);
     }
 
+    fprintf(stderr, "MLFDataDeserializer::MLFDataDeserializer: read %d sequences\n", (int)m_sequences.size());
+
     StreamDescriptionPtr stream = std::make_shared<StreamDescription>();
     stream->m_id = 0;
     stream->m_name = name;
@@ -184,10 +186,17 @@ std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenc
     return std::vector<SequenceDataPtr> { r };
 }
 
+static SequenceDescription s_InvalidSequence { 0, 0, 0, false };
+
 const SequenceDescription* MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
 {
-    size_t sequenceId = m_keyToSequence[key.major];
-    size_t index = m_utteranceIndex[sequenceId] + key.minor;
+    auto sequenceId = m_keyToSequence.find(key.major);
+    if (sequenceId == m_keyToSequence.end())
+    {
+        return &s_InvalidSequence;
+    }
+
+    size_t index = m_utteranceIndex[sequenceId->second] + key.minor;
     return m_sequences[index];
 }
 
