@@ -25,35 +25,15 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
-    Speech/DNN/DiscriminativePreTraining ^
-    Speech/DNN/ParallelNoQuantization ^
-    Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
-    Speech/QuickE2E ^
-    Speech/SVD
+    Speech/DNN/DiscriminativePreTraining2 ^
+    Speech/DNN/ParallelNoQuantization2 ^
+    Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation2 ^
+    Speech/QuickE2E2 ^
+    Speech/SVD2
 
 set END2END_TEST_SPEC_1B=^
-    Speech/DNN/Parallel1BitQuantization ^
-    Speech/DNN/ParallelBufferedAsyncGradientAggregation ^
-
-
-:: NO
-::   UCIFastReaderSimpleDataLoop_Config.cntk // other reader
-::   HTKMLFReaderSimpleDataLoop3_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop4_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop10_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop12_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop13_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop16_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop17_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop19_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop2_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop20_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop22_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop6_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop7_Config.cntk // rollingWindow
-::   HTKMLFReaderSimpleDataLoop8_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop9_Config.cntk // !frameMode
-::   HTKMLFReaderSimpleDataLoop14_Config.cntk // !frameMode
+    Speech/DNN/Parallel1BitQuantization2 ^
+    Speech/DNN/ParallelBufferedAsyncGradientAggregation2
 
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1

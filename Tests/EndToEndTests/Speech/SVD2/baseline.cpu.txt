@@ -1,0 +1,7 @@
+Dummy file with all required patterns. Will be copied over from original test in ../SVD
+
+COMPLETED
+Starting Epoch 1
+ Epoch[ 2 of 3]-Minibatch[   1-  10 of 80]
+Finished Epoch[ 1 of 3]
+Performing SVD for a   512-by-363

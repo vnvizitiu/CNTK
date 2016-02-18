@@ -34,9 +34,7 @@ speechTrain=[
 ]
 
 reader=[
-    # TODO do not integrate this:
-    readerType = "NewHTKMLFReader"
-    prefetch = true
+    readerType = "HTKMLFReader"
     readMethod=blockRandomize
     miniBatchMode=Partial
     randomize=Auto
