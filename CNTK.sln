@@ -839,6 +839,40 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RNN", "RNN", "{B72C5B0E-38E
 		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\testcases.yml = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\testcases.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelExport", "ModelExport", "{08A05A9A-4E45-42D5-83FA-719E99C04A30}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model0", "Model0", "{715C0E2D-6FF6-4B26-9E49-1C68920CFAF6}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model0\0.cntk = Tests\EndToEndTests\ModelExport\Model0\0.cntk
+		Tests\EndToEndTests\ModelExport\Model0\baseline.txt = Tests\EndToEndTests\ModelExport\Model0\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model0\run-test = Tests\EndToEndTests\ModelExport\Model0\run-test
+		Tests\EndToEndTests\ModelExport\Model0\testcases.yml = Tests\EndToEndTests\ModelExport\Model0\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model1", "Model1", "{48C2A9DE-FB2C-4724-9ADC-744216D79BCF}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model1\1.cntk = Tests\EndToEndTests\ModelExport\Model1\1.cntk
+		Tests\EndToEndTests\ModelExport\Model1\baseline.txt = Tests\EndToEndTests\ModelExport\Model1\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model1\run-test = Tests\EndToEndTests\ModelExport\Model1\run-test
+		Tests\EndToEndTests\ModelExport\Model1\testcases.yml = Tests\EndToEndTests\ModelExport\Model1\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model2", "Model2", "{82E4A6BC-BAA5-4991-B7A7-19EF6F561133}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model2\2.cntk = Tests\EndToEndTests\ModelExport\Model2\2.cntk
+		Tests\EndToEndTests\ModelExport\Model2\baseline.txt = Tests\EndToEndTests\ModelExport\Model2\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model2\run-test = Tests\EndToEndTests\ModelExport\Model2\run-test
+		Tests\EndToEndTests\ModelExport\Model2\testcases.yml = Tests\EndToEndTests\ModelExport\Model2\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model3", "Model3", "{E7860D1F-856F-46C5-A856-6390F931F976}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model3\3.cntk = Tests\EndToEndTests\ModelExport\Model3\3.cntk
+		Tests\EndToEndTests\ModelExport\Model3\baseline.txt = Tests\EndToEndTests\ModelExport\Model3\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model3\run-test = Tests\EndToEndTests\ModelExport\Model3\run-test
+		Tests\EndToEndTests\ModelExport\Model3\testcases.yml = Tests\EndToEndTests\ModelExport\Model3\testcases.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_CpuOnly|x64 = Debug_CpuOnly|x64
@@ -1149,5 +1183,10 @@ Global
 		{9F1F9C7C-2CC3-410C-ACDC-988B12D6AC14} = {AC7BA8D3-B4C8-42A4-8507-B359BB6D49E8}
 		{A3231EF2-DED1-4638-B0A2-5F87C484CA92} = {439BE0E0-FABE-403D-BF2C-A41FB8A60616}
 		{B72C5B0E-38E8-41BF-91FE-0C1012C7C078} = {A3231EF2-DED1-4638-B0A2-5F87C484CA92}
+		{08A05A9A-4E45-42D5-83FA-719E99C04A30} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
+		{715C0E2D-6FF6-4B26-9E49-1C68920CFAF6} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
+		{48C2A9DE-FB2C-4724-9ADC-744216D79BCF} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
+		{82E4A6BC-BAA5-4991-B7A7-19EF6F561133} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
+		{E7860D1F-856F-46C5-A856-6390F931F976} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
 	EndGlobalSection
 EndGlobal
