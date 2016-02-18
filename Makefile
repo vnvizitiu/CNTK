@@ -212,10 +212,11 @@ $(BUILDINFO): $(GENBUILD)
 
 # Define all sources that need to be built
 READER_SRC =\
-	$(SOURCEDIR)/Readers/ReaderLib/SampleModePacker.cpp \
 	$(SOURCEDIR)/Readers/ReaderLib/BlockRandomizer.cpp \
+	$(SOURCEDIR)/Readers/ReaderLib/Bundler.cpp \
 	$(SOURCEDIR)/Readers/ReaderLib/NoRandomizer.cpp \
 	$(SOURCEDIR)/Readers/ReaderLib/ReaderShim.cpp \
+	$(SOURCEDIR)/Readers/ReaderLib/SampleModePacker.cpp \
 
 COMMON_SRC =\
 	$(SOURCEDIR)/Common/Config.cpp \
@@ -316,7 +317,6 @@ $(LIBDIR)/HTKMLFReader.so: $(HTKMLFREADER_OBJ) | $(CNTKMATH_LIB)
 ########################################
 
 NEWHTKMLFREADER_SRC =\
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/Bundler.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/ConfigHelper.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataReader.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataWriter.cpp \

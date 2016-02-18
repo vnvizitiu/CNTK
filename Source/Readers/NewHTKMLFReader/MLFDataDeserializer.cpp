@@ -14,17 +14,6 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 static float s_oneFloat = 1.0;
 static double s_oneDouble = 1.0;
 
-struct MLFDataDeserializer::MLFUtterance : SequenceDescription
-{
-    size_t sequenceStart;
-    size_t frameStart;
-};
-
-struct MLFDataDeserializer::MLFFrame : SequenceDescription
-{
-    size_t index;
-};
-
 // Currently we only have a single mlf chunk that contains a vector of all labels.
 // TODO: This will be changed in the future to work only on a subset of chunks 
 // at each point in time.
