@@ -2,7 +2,7 @@
 
 . $TEST_ROOT_DIR/run-test-common
 
-OriginalTestDir=../QuickE2E
+OriginalTestDir=../../QuickE2E
 ConfigDir=$TEST_DIR/$OriginalTestDir
 
 # cntkrun <CNTK config file name> <additional CNTK args>

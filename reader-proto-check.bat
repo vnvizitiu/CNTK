@@ -25,15 +25,15 @@ set UNIT_TEST_SPEC=^
   -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
-    Speech/DNN/DiscriminativePreTraining2 ^
-    Speech/DNN/ParallelNoQuantization2 ^
-    Speech/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation2 ^
-    Speech/QuickE2E2 ^
-    Speech/SVD2
+    Speech/ExperimentalHtkmlfReader/DNN/DiscriminativePreTraining ^
+    Speech/ExperimentalHtkmlfReader/DNN/ParallelNoQuantization ^
+    Speech/ExperimentalHtkmlfReader/DNN/ParallelNoQuantizationBufferedAsyncGradientAggregation ^
+    Speech/ExperimentalHtkmlfReader/QuickE2E ^
+    Speech/ExperimentalHtkmlfReader/SVD
 
 set END2END_TEST_SPEC_1B=^
-    Speech/DNN/Parallel1BitQuantization2 ^
-    Speech/DNN/ParallelBufferedAsyncGradientAggregation2
+    Speech/ExperimentalHtkmlfReader/DNN/Parallel1BitQuantization ^
+    Speech/ExperimentalHtkmlfReader/DNN/ParallelBufferedAsyncGradientAggregation
 
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 if errorlevel 1 exit /b 1

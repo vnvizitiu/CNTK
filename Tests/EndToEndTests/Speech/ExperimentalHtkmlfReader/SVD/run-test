@@ -2,7 +2,7 @@
 
 . $TEST_ROOT_DIR/run-test-common
 
-OriginalTestDir=../SVD
+OriginalTestDir=../../SVD
 ConfigDir=$TEST_DIR/$OriginalTestDir
 
 # cntkrun <CNTK config file name> <additional CNTK args>

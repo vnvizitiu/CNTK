@@ -1,4 +1,4 @@
-dataDir: ../../Data
+dataDir: ../../../Data
 tags:
      # BUGBUG: Temporarily disabling this test on the CPU since in Jenkins
      # we have some old machines with CPUs without AVX and when this test runs on these

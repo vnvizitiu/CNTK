@@ -2,8 +2,7 @@
 
 . $TEST_ROOT_DIR/run-test-common
 
-OriginalTestDir=../ParallelBufferedAsyncGradientAggregation
-ConfigDir=$TEST_DIR/..
+ConfigDir=$TEST_DIR/../../../DNN
 LogFileName=stderr
 Instances=3
 NumCPUThreads=$(threadsPerInstance $Instances)

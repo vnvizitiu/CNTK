@@ -1,4 +1,4 @@
-dataDir: ../../Data
+dataDir: ../../../Data
 tags:
      # running for 1bitsgd build SKU on every BVT job in 'S' (Speech) leg in Debug-GPU and Release-CPU configurations:
      - bvt-s  (build_sku == '1bitsgd') and ((flavor=='debug') ^ (device=='cpu'))
