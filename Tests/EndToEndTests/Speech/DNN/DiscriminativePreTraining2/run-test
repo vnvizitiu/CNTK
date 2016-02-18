@@ -5,7 +5,5 @@
 OriginalTestDir=../DiscriminativePreTraining
 ConfigDir=$TEST_DIR/$OriginalTestDir
 
-cp -f $TEST_DIR/$OriginalTestDir/baseline* $TEST_DIR
-
 # cntkrun <CNTK config file name> <additional CNTK args>
 cntkrun cntk_dpt.cntk 'reader=[readerType=NewHTKMLFReader] reader=[prefetch=true]' || exit $?

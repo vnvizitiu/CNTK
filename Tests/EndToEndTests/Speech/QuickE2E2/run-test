@@ -5,8 +5,6 @@
 OriginalTestDir=../QuickE2E
 ConfigDir=$TEST_DIR/$OriginalTestDir
 
-cp -f $TEST_DIR/$OriginalTestDir/baseline* $TEST_DIR
-
 # cntkrun <CNTK config file name> <additional CNTK args>
 DeleteModelsAfterTest=0
 cntkrun cntk.cntk 'reader=[readerType=NewHTKMLFReader] reader=[prefetch=true]' || exit $?

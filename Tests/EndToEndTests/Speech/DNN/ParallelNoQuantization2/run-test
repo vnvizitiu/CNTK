@@ -8,8 +8,6 @@ LogFileName=stderr
 Instances=3
 NumCPUThreads=$(threadsPerInstance $Instances)
 
-cp -f $TEST_DIR/$OriginalTestDir/baseline* $TEST_DIR
-
 # cntkmpirun <MPI args> <CNTK config file name> <additional CNTK args>
 cntkmpirun "-n $Instances" cntk.cntk "speechTrain=[reader=[readerType=NewHTKMLFReader]] speechTrain=[reader=[prefetch=true]] numCPUThreads=$NumCPUThreads"
 ExitCode=$?
