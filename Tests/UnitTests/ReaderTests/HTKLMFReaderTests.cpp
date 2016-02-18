@@ -388,6 +388,94 @@ BOOST_AUTO_TEST_CASE(HTKMLFReaderSimpleDataLoop22)
         1);
 };
 
+/// TODO
+
+BOOST_AUTO_TEST_CASE(NewHTKMLFReaderSimpleDataLoop1)
+{
+    HelperRunReaderTest<float>(
+        testDataPath() + "/Config/NewHTKMLFReaderSimpleDataLoop1_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop1_5_11_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop1_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_CASE(NewHTKMLFReaderSimpleDataLoop5)
+{
+    HelperRunReaderTest<float>(
+        testDataPath() + "/Config/NewHTKMLFReaderSimpleDataLoop5_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop1_5_11_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop5_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_CASE(NewHTKMLFReaderSimpleDataLoop11)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/NewHTKMLFReaderSimpleDataLoop11_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop1_5_11_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop11_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_CASE(NewHTKMLFReaderSimpleDataLoop21_0)
+{
+    HelperRunReaderTest<float>(
+        testDataPath() + "/Config/NewHTKMLFReaderSimpleDataLoop21_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop21_0_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop21_0_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        0,
+        2);
+};
+
+BOOST_AUTO_TEST_CASE(NewHTKMLFReaderSimpleDataLoop21_1)
+{
+    HelperRunReaderTest<float>(
+        testDataPath() + "/Config/NewHTKMLFReaderSimpleDataLoop21_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop21_1_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderSimpleDataLoop21_1_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        1,
+        2);
+};
+
 BOOST_AUTO_TEST_SUITE_END()
+
 }
 } } }
