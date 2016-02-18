@@ -25,8 +25,17 @@ public:
 
 private:
     // Inner classes for frames, utterances and chunks.
-    struct MLFUtterance;
-    struct MLFFrame;
+    struct MLFUtterance : SequenceDescription
+    {
+        size_t sequenceStart;
+        size_t frameStart;
+    };
+
+    struct MLFFrame : SequenceDescription
+    {
+        size_t index;
+    };
+
     class MLFChunk;
 
     std::vector<SequenceDataPtr> GetSequenceById(size_t sequenceId);
