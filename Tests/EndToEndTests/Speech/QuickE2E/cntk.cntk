@@ -72,9 +72,7 @@ speechTrain = [
         clippingThresholdPerSample = 1#INF
     ]
     reader = [
-        # TODO don't merge in
-        readerType = "NewHTKMLFReader"
-        prefetch = true
+        readerType = "HTKMLFReader"
         readMethod = "blockRandomize"
         miniBatchMode = "partial"
         randomize = "auto"

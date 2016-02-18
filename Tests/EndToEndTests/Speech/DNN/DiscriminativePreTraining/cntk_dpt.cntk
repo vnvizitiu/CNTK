@@ -84,8 +84,7 @@ speechTrain = [
 ]
 
 reader = [
-    readerType = "NewHTKMLFReader"
-    prefetch = true
+    readerType = "HTKMLFReader"
     readMethod = "blockRandomize"
     miniBatchMode = "partial"
     randomize = "auto"
