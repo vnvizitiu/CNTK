@@ -101,7 +101,6 @@
     <ClInclude Include="..\..\Common\Include\File.h" />
     <ClInclude Include="..\..\Common\Include\ssematrix.h" />
     <ClInclude Include="basetypes.h" />
-    <ClInclude Include="biggrowablevectors.h" />
     <ClInclude Include="..\..\Common\Include\fileutil.h" />
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
     <ClInclude Include="ConfigHelper.h" />
@@ -109,7 +108,6 @@
     <ClInclude Include="HTKDataDeserializer.h" />
     <ClInclude Include="htkfeatio.h" />
     <ClInclude Include="HTKMLFReader.h" />
-    <ClInclude Include="NewHTKMLFWriter.h" />
     <ClInclude Include="minibatchsourcehelpers.h" />
     <ClInclude Include="MLFDataDeserializer.h" />
     <ClInclude Include="stdafx.h" />
@@ -134,7 +132,6 @@
     </ClCompile>
     <ClCompile Include="ConfigHelper.cpp" />
     <ClCompile Include="DataReader.cpp" />
-    <ClCompile Include="DataWriter.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged>false</CompileAsManaged>
       <PrecompiledHeader />
@@ -147,7 +144,6 @@
     </ClCompile>
     <ClCompile Include="HTKDataDeserializer.cpp" />
     <ClCompile Include="HTKMLFReader.cpp" />
-    <ClCompile Include="NewHTKMLFWriter.cpp" />
     <ClCompile Include="MLFDataDeserializer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

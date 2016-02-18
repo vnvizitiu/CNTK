@@ -40,6 +40,11 @@ public:
     {
         throw std::logic_error("Not implemented");
     }
+
+    virtual size_t GetTotalNumberOfChunks() override 
+    {
+        throw std::logic_error("Not implemented");
+    }
 };
 
 BOOST_AUTO_TEST_CASE(BlockRandomizerInstantiate)

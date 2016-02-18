@@ -9,8 +9,7 @@
 #include "Basics.h" // for attempt()
 #include "minibatchsourcehelpers.h"
 #include <numeric>
-#include <StringUtil.h>
-#include <ElementTypeUtils.h>
+#include "ElementTypeUtils.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -343,5 +342,11 @@ const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(cons
     size_t index = m_utterances[sequenceId].frameStart + key.minor;
     return m_sequences[index];
 }
+
+size_t HTKDataDeserializer::GetTotalNumberOfChunks()
+{
+    return m_chunks.size();
+}
+
 
 } } }

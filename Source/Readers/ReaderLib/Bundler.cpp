@@ -35,6 +35,7 @@ void Bundler::CreateSequenceDescriptions()
     m_sequenceToSequence.resize(m_deserializers.size());
     m_sequenceToChunk.resize(m_deserializers.size());
     m_sequenceDescriptions.reserve(m_driver->GetSequenceDescriptions().size());
+    m_chunkOffsets.reserve(m_driver->GetTotalNumberOfChunks() + 1);
 
     size_t maxNumberOfSequences = m_driver->GetSequenceDescriptions().size();
     for (int i = 0; i < m_deserializers.size(); ++i)
@@ -42,6 +43,8 @@ void Bundler::CreateSequenceDescriptions()
         m_sequenceToSequence[i].resize(maxNumberOfSequences);
         m_sequenceToChunk[i].resize(maxNumberOfSequences);
     }
+
+    fprintf(stderr, "Bundler::CreateSequenceDescriptions: auxiliary mapping data for bundler has been allocated.\n");
 
     size_t previousChunk = SIZE_MAX;
     size_t currentMapping = 0;
@@ -86,7 +89,7 @@ void Bundler::CreateSequenceDescriptions()
 
     for (int i = 0; i < m_deserializers.size(); ++i)
     {
-        m_sequenceToSequence.resize(currentMapping);
+        m_sequenceToSequence[i].resize(currentMapping);
     }
 
     // Last
@@ -161,6 +164,11 @@ std::vector<StreamDescriptionPtr> Bundler::GetStreamDescriptions() const
 const SequenceDescription* Bundler::GetSequenceDescriptionByKey(const KeyType&)
 {
     throw std::logic_error("Not implemented");
+}
+
+size_t Bundler::GetTotalNumberOfChunks()
+{
+    return m_chunkOffsets.size();
 }
 
 }}}

@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="DataWriter.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="NewHTKMLFWriter.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="..\..\Common\DebugUtil.cpp">
       <Filter>Duplicates to remove</Filter>
@@ -28,9 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="biggrowablevectors.h" />
     <ClInclude Include="htkfeatio.h" />
-    <ClInclude Include="NewHTKMLFWriter.h" />
     <ClInclude Include="minibatchsourcehelpers.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

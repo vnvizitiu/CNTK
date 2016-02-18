@@ -220,6 +220,8 @@ public:
 
     virtual ChunkPtr GetChunk(size_t) override;
 
+    virtual size_t GetTotalNumberOfChunks() override;
+
     virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
 
 private:

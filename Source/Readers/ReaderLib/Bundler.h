@@ -19,6 +19,7 @@ public:
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
     virtual ChunkPtr GetChunk(size_t) override;
     virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
+    virtual size_t GetTotalNumberOfChunks() override;
 
 private:
     void CreateSequenceDescriptions();
