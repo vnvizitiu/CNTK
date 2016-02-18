@@ -23,6 +23,26 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         return begin + randomNumber % (end - begin);
     }
 
+    // Shuffle a vector into random order by randomly swapping elements.
+    // Use for legacy randomization.
+    template <typename TVector>
+    void RandomShuffle(TVector& v, size_t randomSeed)
+    {
+        if (v.size() > RAND_MAX * static_cast<size_t>(RAND_MAX))
+        {
+            RuntimeError("RandomShuffle: too large set: need to change to different random generator!");
+        }
+
+        srand(static_cast<unsigned int>(randomSeed));
+        foreach_index (currentLocation, v)
+        {
+            // Pick a random location a location and swap with current
+            const size_t randomLocation = rand(0, v.size());
+            std::swap(v[currentLocation], v[randomLocation]);
+        }
+    }
+
+
     bool BlockRandomizer::TimelineIsValidForRandomization(const SequenceDescriptions& timeline) const
     {
         SequenceDescription previous = { SIZE_MAX, 0, 0, true };
@@ -51,9 +71,15 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             randomizedChunkIndices.push_back(i);
         }
 
-        std::mt19937 m_rng(static_cast<int>(m_sweep));
-
-        std::shuffle(randomizedChunkIndices.begin(), randomizedChunkIndices.end(), m_rng);
+        if (m_useLegacyRandomization)
+        {
+            RandomShuffle(randomizedChunkIndices, m_sweep);
+        }
+        else
+        {
+            std::mt19937 m_rng(static_cast<int>(m_sweep));
+            std::shuffle(randomizedChunkIndices.begin(), randomizedChunkIndices.end(), m_rng);
+        }
 
         // Place randomized chunks on global time line
         m_randomizedChunks.clear();
@@ -228,15 +254,20 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     // Public methods
     //
 
-    BlockRandomizer::BlockRandomizer(int verbosity, size_t randomizationRangeInSamples, IDataDeserializerPtr deserializer)
+    BlockRandomizer::BlockRandomizer(int verbosity,
+                                     size_t randomizationRangeInSamples,
+                                     IDataDeserializerPtr deserializer,
+                                     DistributionMode distributionMode,
+                                     bool useLegacyRandomization)
         : m_verbosity(verbosity),
-        m_randomizationRangeInSamples(randomizationRangeInSamples),
-        m_distributionMode(DistributionMode::sequences_strides),
-        m_deserializer(deserializer),
-        m_sweep(SIZE_MAX),
-        m_sequencePositionInSweep(SIZE_MAX),
-        m_samplePositionInEpoch(SIZE_MAX),
-        m_epochSize(SIZE_MAX)
+          m_randomizationRangeInSamples(randomizationRangeInSamples),
+          m_deserializer(deserializer),
+          m_distributionMode(distributionMode),
+          m_useLegacyRandomization(useLegacyRandomization),
+          m_sweep(SIZE_MAX),
+          m_sequencePositionInSweep(SIZE_MAX),
+          m_samplePositionInEpoch(SIZE_MAX),
+          m_epochSize(SIZE_MAX)
     {
         assert(deserializer != nullptr);
         const SequenceDescriptions& timeline = m_deserializer->GetSequenceDescriptions();

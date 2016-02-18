@@ -157,6 +157,44 @@ BOOST_AUTO_TEST_CASE(BlockRandomizerOneEpoch)
                                   actual.begin(), actual.end());
 }
 
+BOOST_AUTO_TEST_CASE(BlockRandomizerOneEpochLegacyRandomization)
+{
+    std::vector<float> data { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
+    auto mockDeserializer = std::make_shared<MockDeserializer>(5, 2, data);
+
+    auto randomizer = std::make_shared<BlockRandomizer>(0,
+                                                        SIZE_MAX,
+                                                        mockDeserializer,
+                                                        BlockRandomizer::DistributionMode::sequences_strides,
+                                                        true);
+
+    EpochConfiguration epochConfiguration;
+    epochConfiguration.m_numberOfWorkers = 1;
+    epochConfiguration.m_workerRank = 0;
+    epochConfiguration.m_minibatchSizeInSamples = 0;
+    epochConfiguration.m_totalEpochSizeInSamples = 10;
+    epochConfiguration.m_epochIndex = 0;
+    randomizer->StartEpoch(epochConfiguration);
+
+    std::vector<float> expected { 9.0, 4.0, 1.0, 2.0, 0.0, 5.0, 3.0, 6.0, 7.0, 8.0 };
+    std::vector<float> actual;
+    for (int i = 0; i < 11; i++)
+    {
+        Sequences sequences = randomizer->GetNextSequences(1);
+        BOOST_CHECK_EQUAL(sequences.m_data.size(), 1 - (i / 10));
+        if (i < 10)
+        {
+            auto data = reinterpret_cast<DenseSequenceData&>(*sequences.m_data[0][0]);
+            BOOST_CHECK_EQUAL(data.m_numberOfSamples, 1);
+            actual.push_back(*((float*)data.m_data));
+
+        }
+        BOOST_CHECK_EQUAL(sequences.m_endOfEpoch, (9 <= i));
+    }
+    BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(),
+                                  actual.begin(), actual.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } } } }
