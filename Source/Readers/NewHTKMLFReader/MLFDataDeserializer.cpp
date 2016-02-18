@@ -7,7 +7,7 @@
 #include "MLFDataDeserializer.h"
 #include "ConfigHelper.h"
 #include "htkfeatio.h"
-#include "msra_mgram.h"
+#include "../HTKMLFReader/msra_mgram.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -48,9 +48,11 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
 
     // TODO: currently we do not use symbol and word tables.
     const msra::lm::CSymbolSet* wordTable = nullptr;
-    std::map<string, size_t>* symbolTable = nullptr;
+    std::unordered_map<const char*, int>* symbolTable = nullptr;
     std::vector<std::wstring> mlfPaths = config.GetMlfPaths();
     std::wstring stateListPath = static_cast<std::wstring>(labelConfig(L"labelMappingFile", L""));
+
+    // TODO: Currently we still use the old IO module. This will be refactored later.
     const double htkTimeToFrame = 100000.0; // default is 10ms
     msra::asr::htkmlfreader<msra::asr::htkmlfentry, msra::lattices::lattice::htkmlfwordsequence> labels(mlfPaths, std::set<wstring>(), stateListPath, wordTable, symbolTable, htkTimeToFrame);
 
@@ -128,6 +130,7 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
     }
 
     fprintf(stderr, "MLFDataDeserializer::MLFDataDeserializer: read %d sequences\n", (int)m_sequences.size());
+    fprintf(stderr, "MLFDataDeserializer::MLFDataDeserializer: read %d utterances\n", (int)m_keyToSequence.size());
 
     StreamDescriptionPtr stream = std::make_shared<StreamDescription>();
     stream->m_id = 0;

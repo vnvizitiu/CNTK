@@ -6,16 +6,11 @@
 #include "stdafx.h"
 #include "HTKMLFReader.h"
 #include "Config.h"
-#include "BlockRandomizer.h"
-#include "NoRandomizer.h"
 #include "HTKDataDeserializer.h"
 #include "MLFDataDeserializer.h"
-#include <omp.h>
 #include "ConfigHelper.h"
-#include <HeapMemoryProvider.h>
 #include "Bundler.h"
-#include <StringUtil.h>
-#include <LegacyBlockRandomizer.h>
+#include "StringUtil.h"
 #include "Utils.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
