@@ -9,7 +9,6 @@
 #include "Basics.h" // for attempt()
 #include "minibatchsourcehelpers.h"
 #include <numeric>
-#include "ElementTypeUtils.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -17,39 +16,39 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         CorpusDescriptorPtr corpus,
         const ConfigParameters& feature,
         const std::wstring& featureName)
-        : m_featdim(0),
-          m_sampperiod(0),
-          m_verbosity(0),
-          m_featureName(featureName)
+        : m_ioFeatureDimension(0),
+          m_samplePeriod(0),
+          m_verbosity(0)
 {
-    m_frameMode = feature.Find("frameMode", "true");
-    assert(m_frameMode);
+    bool frameMode = feature.Find("frameMode", "true");
+    if (!frameMode)
+    {
+        LogicError("Currently only reader only supports fram mode. Please check your configuration.");
+    }
 
     ConfigHelper config(feature);
 
     config.CheckFeatureType();
 
-    m_featureFiles = config.GetFeaturePaths();
+    std::vector<std::wstring> featureFiles;
+    featureFiles = config.GetFeaturePaths();
 
     auto context = config.GetContextWindow();
     m_elementType = config.GetElementType();
-    m_elementSize = GetSizeByType(m_elementType);
 
     m_dimension = config.GetFeatureDimension();
     m_dimension = m_dimension * (1 + context.first + context.second);
 
-    m_layout = std::make_shared<TensorShape>(m_dimension);
-
-    size_t numSequences = m_featureFiles.size();
+    size_t numSequences = featureFiles.size();
 
     m_utterances.reserve(numSequences);
 
-    m_context = config.GetContextWindow();
+    m_augmentationWindow = config.GetContextWindow();
 
     size_t totalFrames = 0;
-    foreach_index (i, m_featureFiles)
+    foreach_index (i, featureFiles)
     {
-        utterancedesc utterance(msra::asr::htkfeatreader::parsedpath(m_featureFiles[i]), 0);
+        utterancedesc utterance(msra::asr::htkfeatreader::parsedpath(featureFiles[i]), 0);
         const size_t uttframes = utterance.numframes(); // will throw if frame bounds not given --required to be given in this mode
 
         Utterance description(std::move(utterance));
@@ -122,19 +121,11 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         totalSize / (double)m_chunks.size());
     // Now utterances are stored exclusively in allchunks[]. They are never referred to by a sequential utterance id at this point, only by chunk/within-chunk index.
 
-    if (m_frameMode)
-    {
-        m_frames.reserve(totalFrames);
-    }
-    else
-    {
-        m_sequences.reserve(m_utterances.size());
-    }
+    m_frames.reserve(totalFrames);
+
 
     foreach_index(i, m_utterances)
     {
-        if (m_frameMode)
-        {
             std::wstring key = m_utterances[i].utterance.key();
             m_utterances[i].frameStart = m_frames.size();
             for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
@@ -152,15 +143,17 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
                 m_sequences.push_back(&m_frames[f.m_id]);
             }
-        }
-        else
-        {
-            assert(false);
-            m_sequences.push_back(&m_utterances[i]);
-        }
     }
 
     m_weakChunks.resize(m_chunks.size());
+
+    StreamDescriptionPtr stream = std::make_shared<StreamDescription>();
+    stream->m_id = 0;
+    stream->m_name = featureName;
+    stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
+    stream->m_elementType = m_elementType;
+    stream->m_storageType = StorageType::dense;
+    m_streams.push_back(stream);
 }
 
 const SequenceDescriptions& HTKDataDeserializer::GetSequenceDescriptions() const
@@ -170,13 +163,7 @@ const SequenceDescriptions& HTKDataDeserializer::GetSequenceDescriptions() const
 
 std::vector<StreamDescriptionPtr> HTKDataDeserializer::GetStreamDescriptions() const
 {
-    StreamDescriptionPtr stream = std::make_shared<StreamDescription>();
-    stream->m_id = 0;
-    stream->m_name = m_featureName;
-    stream->m_sampleLayout = std::make_shared<TensorShape>(m_dimension);
-    stream->m_elementType = m_elementType;
-    stream->m_storageType = StorageType::dense;
-    return std::vector<StreamDescriptionPtr>{stream};
+    return m_streams;
 }
 
 class matrixasvectorofvectors // wrapper around a matrix that views it as a vector of column vectors
@@ -220,7 +207,7 @@ public:
                 std::pair<std::vector<std::wstring>, std::vector<std::wstring>>(),
                 empty,
                 std::wstring());
-            chunkdata.requiredata(m_parent->m_featKind, m_parent->m_featdim, m_parent->m_sampperiod, lattices, m_parent->m_verbosity);
+            chunkdata.requiredata(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, lattices, m_parent->m_verbosity);
         });
 
     }
@@ -275,8 +262,6 @@ typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
-    if (m_frameMode)
-    {
         const auto& frame = m_frames[id];
         Utterance* utterance = frame.u;
 
@@ -290,15 +275,15 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 
         size_t leftextent, rightextent;
         // page in the needed range of frames
-        if (m_context.first == 0 && m_context.second == 0)
+        if (m_augmentationWindow.first == 0 && m_augmentationWindow.second == 0)
         {
             // should this be moved up?
             leftextent = rightextent = msra::dbn::augmentationextent(uttframevectors[0].size(), m_dimension);
         }
         else
         {
-            leftextent = m_context.first;
-            rightextent = m_context.second;
+            leftextent = m_augmentationWindow.first;
+            rightextent = m_augmentationWindow.second;
         }
 
         const std::vector<char> noboundaryflags; // dummy
@@ -328,25 +313,16 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         }
 
         return std::vector<SequenceDataPtr>(1, r); // TODO would std::move help?
-    }
-    else
-    {
-        assert(false);
-        throw std::runtime_error("Not implemented");
-    }
 }
 
-const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key)
+const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType&)
 {
-    size_t sequenceId = m_keyToSequence[key.major];
-    size_t index = m_utterances[sequenceId].frameStart + key.minor;
-    return m_sequences[index];
+    LogicError("HTKDataDeserializer::GetSequenceDescriptionByKey: currently not implemented. Supported only as primary deserializer.");
 }
 
 size_t HTKDataDeserializer::GetTotalNumberOfChunks()
 {
     return m_chunks.size();
 }
-
 
 } } }
