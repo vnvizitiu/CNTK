@@ -88,6 +88,9 @@ private:
     size_t m_sweepStartInSamples; // TODO do we need it?
     size_t m_sequencePositionInSweep;
     std::vector<RandomizedChunk> m_randomizedChunks;    // (includes a sentinel)
+    // TODO optimize footprint:
+    //      (do not require full timeline, i.e., Amit's change in original HTKMLFReader)
+    //      (instead of SequenceDescription, use something smaller)
     std::vector<SequenceDescription> m_randomTimeline;
     std::vector<StreamDescriptionPtr> m_streams;
 
