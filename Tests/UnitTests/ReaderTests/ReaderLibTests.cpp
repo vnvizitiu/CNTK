@@ -33,7 +33,7 @@ public:
         assert(chunkEnd <= data.size());
     }
 
-    std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) override
     {
         assert(m_chunkBegin <= sequenceId);
         assert(sequenceId < m_chunkEnd);

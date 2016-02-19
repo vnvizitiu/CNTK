@@ -130,7 +130,7 @@ public:
         }
     }
 
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    virtual std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) override
     {
         size_t index = sequenceId - m_parent->m_chunkOffsets[m_chunkId];
         const auto& chunks = m_innerChunks[index];
