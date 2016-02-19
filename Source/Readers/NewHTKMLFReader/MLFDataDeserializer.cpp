@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "MLFDataDeserializer.h"
 #include "ConfigHelper.h"
-#include "htkfeatio.h"
+#include "../HTKMLFReader/htkfeatio.h"
 #include "../HTKMLFReader/msra_mgram.h"
 #include "latticearchive.h"
 
