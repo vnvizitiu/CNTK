@@ -44,21 +44,18 @@ public:
 
         const auto &appliedStreamIds = GetAppliedStreamIds();
         const auto &outputStreams = GetOutputStreams();
-        assert(m_inputStreams.size() == outputStreams.size());
 
-#pragma omp parallel for ordered schedule(static)
-        for (int i = 0; i < samples.m_data.size(); ++i)
+        for (int j = 0; j < appliedStreamIds.size(); ++j)
         {
-            auto &sample = samples.m_data[i];
-            assert(sample.size() == m_inputStreams.size());
+            size_t streamId = appliedStreamIds[j];
+            auto& allSamples = samples.m_data[streamId];
 
-            for (int j = 0; j < appliedStreamIds.size(); ++j)
+#pragma omp parallel for ordered schedule(dynamic)
+            for (int i = 0; i < allSamples.size(); ++i)
             {
-                size_t id = appliedStreamIds[j];
-                sample[id] = Apply(sample[id], *m_inputStreams[id], *outputStreams[id]);
+                allSamples[i] = Apply(allSamples[i], *m_inputStreams[streamId], *outputStreams[streamId]);
             }
         }
-
         return samples;
     }
 
