@@ -19,7 +19,17 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     class BlockRandomizer : public Transformer
     {
     public:
-        BlockRandomizer(int verbosity, size_t randomizationRangeInSamples, IDataDeserializerPtr deserializer);
+        enum class DistributionMode {
+            chunk_modulus,
+            sequences_strides
+        };
+
+        BlockRandomizer(int verbosity,
+                        size_t randomizationRangeInSamples,
+                        IDataDeserializerPtr deserializer,
+                        DistributionMode distributionMode = DistributionMode::sequences_strides,
+                        bool useLegacyRandomization = false);
+
         virtual ~BlockRandomizer()
         {
         }
@@ -33,12 +43,6 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         }
 
     private:
-        enum class DistributionMode {
-            // TODO better names, description
-            chunk_modulus,
-            sequences_strides
-        };
-
         // Structure for per-chunk information
         struct ChunkInformation
         {
@@ -59,6 +63,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         };
 
         // General configuration
+        bool m_useLegacyRandomization;
         int m_verbosity;
         size_t m_randomizationRangeInSamples; // full window
         DistributionMode m_distributionMode;

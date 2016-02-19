@@ -12,10 +12,6 @@
 
 #include "DataReader.h"
 
-#ifndef UNREFERENCED_PARAMETER
-#define UNREFERENCED_PARAMETER(P) (P)
-#endif
-
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 static inline size_t rand(const size_t begin, const size_t end)
@@ -314,8 +310,8 @@ LegacyBlockRandomizer::LegacyBlockRandomizer(int verbosity, size_t randomization
 void LegacyBlockRandomizer::Initialize(TransformerPtr next, const ConfigParameters& readerConfig)
 {
     // Not used for the block randomizer.
-    UNREFERENCED_PARAMETER(next);
-    UNREFERENCED_PARAMETER(readerConfig);
+    UNUSED(next);
+    UNUSED(readerConfig);
 }
 
 void LegacyBlockRandomizer::StartEpoch(const EpochConfiguration& config)
