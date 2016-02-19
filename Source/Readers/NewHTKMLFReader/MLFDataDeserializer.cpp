@@ -25,7 +25,7 @@ public:
     MLFChunk(MLFDataDeserializer* parent) : m_parent(parent)
     {}
 
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
+    virtual std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) override
     {
         return m_parent->GetSequenceById(sequenceId);
     }
