@@ -3,9 +3,6 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="..\..\Common\DebugUtil.cpp">
-      <Filter>Duplicates to remove</Filter>
-    </ClCompile>
     <ClCompile Include="DataReader.cpp" />
     <ClCompile Include="..\..\Common\TimerUtility.cpp">
       <Filter>Common</Filter>
@@ -24,13 +21,13 @@
     <ClCompile Include="..\..\Common\File.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\DebugUtil.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="..\..\Common\Include\DebugUtil.h">
-      <Filter>Duplicates to remove</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\Include\DataReader.h">
       <Filter>Common\Include</Filter>
     </ClInclude>
@@ -54,11 +51,11 @@
     </ClInclude>
     <ClInclude Include="UtteranceDescription.h" />
     <ClInclude Include="ChunkDescription.h" />
+    <ClInclude Include="..\..\Common\Include\DebugUtil.h">
+      <Filter>Common\Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Duplicates to remove">
-      <UniqueIdentifier>{9a77edee-47ee-45ec-9b35-d22cc73ea64e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{5e80057c-a54a-4d57-a856-dc1d23a63aea}</UniqueIdentifier>
     </Filter>
