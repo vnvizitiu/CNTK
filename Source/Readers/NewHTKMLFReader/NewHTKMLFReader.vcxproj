@@ -104,9 +104,7 @@
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
-    <ClInclude Include="htkfeatio.h" />
     <ClInclude Include="HTKMLFReader.h" />
-    <ClInclude Include="minibatchsourcehelpers.h" />
     <ClInclude Include="MLFDataDeserializer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

@@ -6,9 +6,15 @@
 #include "stdafx.h"
 #include "HTKDataDeserializer.h"
 #include "ConfigHelper.h"
-#include "Basics.h" // for attempt()
-#include "minibatchsourcehelpers.h"
+#include "Basics.h"
 #include <numeric>
+
+// TODO: This will be removed when dependency on old code is eliminated.
+// Currently this fixes the linking.
+namespace msra { namespace asr {
+    std::unordered_map<std::wstring, unsigned int> htkfeatreader::parsedpath::archivePathStringMap;
+    std::vector<std::wstring> htkfeatreader::parsedpath::archivePathStringVector;
+}}
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
