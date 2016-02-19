@@ -127,6 +127,11 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     m_frames.reserve(totalFrames);
     foreach_index(i, m_utterances)
     {
+        if (!m_utterances[i].m_isValid)
+        {
+            continue;
+        }
+
         std::wstring key = m_utterances[i].GetKey();
         for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
         {
@@ -137,8 +142,6 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             f.m_chunkId = m_utterances[i].m_chunkId;
             f.m_numberOfSamples = 1;
             f.m_frameIndex = k;
-            assert(m_utterances[i].m_isValid); // TODO
-            f.m_isValid = m_utterances[i].m_isValid;
             m_frames.push_back(f);
 
             m_sequences.push_back(&m_frames[f.m_id]);
