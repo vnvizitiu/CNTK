@@ -142,6 +142,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             f.m_chunkId = m_utterances[i].m_chunkId;
             f.m_numberOfSamples = 1;
             f.m_frameIndex = k;
+            f.m_isValid = true;
             m_frames.push_back(f);
 
             m_sequences.push_back(&m_frames[f.m_id]);
