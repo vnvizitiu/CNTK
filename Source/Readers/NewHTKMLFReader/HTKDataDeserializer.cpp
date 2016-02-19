@@ -30,43 +30,37 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
     config.CheckFeatureType();
 
-    std::vector<std::wstring> featureFiles;
-    featureFiles = config.GetFeaturePaths();
+    std::vector<std::wstring> featureFiles = config.GetFeaturePaths();
 
     auto context = config.GetContextWindow();
     m_elementType = config.GetElementType();
-
     m_dimension = config.GetFeatureDimension();
     m_dimension = m_dimension * (1 + context.first + context.second);
 
     size_t numSequences = featureFiles.size();
 
-    m_utterances.reserve(numSequences);
-
     m_augmentationWindow = config.GetContextWindow();
 
+    m_utterances.reserve(numSequences);
     size_t totalFrames = 0;
     foreach_index (i, featureFiles)
     {
-        utterancedesc utterance(msra::asr::htkfeatreader::parsedpath(featureFiles[i]), 0);
-        const size_t uttframes = utterance.numframes(); // will throw if frame bounds not given --required to be given in this mode
-
-        Utterance description(std::move(utterance));
+        UtteranceDescription description(std::move(msra::asr::htkfeatreader::parsedpath(featureFiles[i])));
+        size_t numberOfFrames = description.GetNumberOfFrames();
         description.m_id = i;
-        // description.chunkId, description.key // TODO
 
         // we need at least 2 frames for boundary markers to work
-        if (uttframes < 2)
+        if (numberOfFrames < 2)
         {
-            fprintf(stderr, "minibatchutterancesource: skipping %d-th file (%d frames) because it has less than 2 frames: %ls\n",
-                i, static_cast<int>(uttframes), utterance.key().c_str());
-            description.m_numberOfSamples = 0;
+            fprintf(stderr, "HTKDataDeserializer::HTKDataDeserializer: skipping utterance with %d frames because it has less than 2 frames: %ls\n", 
+                (int)numberOfFrames, description.GetKey().c_str());
             description.m_isValid = false;
+            description.m_numberOfSamples = 0;
         }
         else
         {
-            description.m_numberOfSamples = uttframes;
             description.m_isValid = true;
+            description.m_numberOfSamples = numberOfFrames;
         }
 
         m_utterances.push_back(description);
@@ -77,10 +71,10 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         m_utterances.begin(),
         m_utterances.end(),
         static_cast<size_t>(0),
-        [](size_t sum, const Utterance& s)
-    {
-        return s.m_numberOfSamples + sum;
-    });
+        [](size_t sum, const UtteranceDescription& s)
+        {
+            return s.m_numberOfSamples + sum;
+        });
 
     // distribute them over chunks
     // We simply count off frames until we reach the chunk size.
@@ -108,8 +102,8 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
         // append utterance to last chunk
         chunkdata& currentchunk = m_chunks.back();
-        m_utterances[i].indexInsideChunk = currentchunk.numutterances();
-        currentchunk.push_back(&m_utterances[i].utterance); // move it out from our temp array into the chunk
+        m_utterances[i].SetIndexInsideChunk(currentchunk.numutterances());
+        currentchunk.push_back(&m_utterances[i]); // move it out from our temp array into the chunk
         m_utterances[i].m_chunkId = chunkId;
         // TODO: above push_back does not actually 'move' because the internal push_back does not accept that
     }
@@ -126,8 +120,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
     foreach_index(i, m_utterances)
     {
-            std::wstring key = m_utterances[i].utterance.key();
-            m_utterances[i].frameStart = m_frames.size();
+            std::wstring key = m_utterances[i].GetKey();
             for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
             {
                 Frame f(&m_utterances[i]);
@@ -202,14 +195,8 @@ public:
         // possibly distributed read.
         msra::util::attempt(5, [&]()
         {
-            std::unordered_map<std::string, size_t> empty;
-            msra::dbn::latticesource lattices(
-                std::pair<std::vector<std::wstring>, std::vector<std::wstring>>(),
-                empty,
-                std::wstring());
-            chunkdata.requiredata(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, lattices, m_parent->m_verbosity);
+            chunkdata.requiredata(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, m_parent->m_verbosity);
         });
-
     }
 
     virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) override
@@ -263,14 +250,14 @@ typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
         const auto& frame = m_frames[id];
-        Utterance* utterance = frame.u;
+        UtteranceDescription* utterance = frame.u;
 
         HTKSequenceDataPtr r = std::make_shared<HTKSequenceData>();
         r->utterance.resize(m_dimension, 1);
 
         const auto& chunkdata = m_chunks[utterance->m_chunkId];
 
-        auto uttframes = chunkdata.getutteranceframes(utterance->indexInsideChunk);
+        auto uttframes = chunkdata.getutteranceframes(utterance->GetIndexInsideChunk());
         matrixasvectorofvectors uttframevectors(uttframes); // (wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors())
 
         size_t leftextent, rightextent;

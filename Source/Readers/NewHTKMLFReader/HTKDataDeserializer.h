@@ -8,46 +8,54 @@
 #include "DataDeserializer.h"
 #include "Config.h"
 #include "htkfeatio.h"
-#include "latticesource.h"
 #include "ssematrix.h"
 #include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 // data store (incl. paging in/out of features and lattices)
-struct utterancedesc // data descriptor for one utterance
+class UtteranceDescription : public SequenceDescription // data descriptor for one utterance
 {
-    msra::asr::htkfeatreader::parsedpath parsedpath; // archive filename and frame range in that file
-    size_t classidsbegin;                            // index into allclassids[] array (first frame)
+    // archive filename and frame range in that file
+    msra::asr::htkfeatreader::parsedpath m_path;
+    size_t m_indexInsideChunk;
 
-    utterancedesc(msra::asr::htkfeatreader::parsedpath&& ppath, size_t classidsbegin)
-        : parsedpath(std::move(ppath)), classidsbegin(classidsbegin)
+public:
+    UtteranceDescription(msra::asr::htkfeatreader::parsedpath&& path)
+        : m_path(std::move(path))
     {
     }
 
-    const wstring& logicalpath() const
+    const msra::asr::htkfeatreader::parsedpath& GetPath() const
     {
-        return parsedpath; /*type cast will return logical path*/
+        return m_path;
     }
-    size_t numframes() const
+
+    size_t GetNumberOfFrames() const
     {
-        return parsedpath.numframes();
+        return m_path.numframes();
     }
-    wstring key() const // key used for looking up lattice (not stored to save space)
+
+    wstring GetKey() const
     {
-#ifdef _MSC_VER
-        static const wstring emptywstring;
-        static const wregex deleteextensionre(L"\\.[^\\.\\\\/:]*$");
-        return regex_replace(logicalpath(), deleteextensionre, emptywstring); // delete extension (or not if none)
-#else
-        return msra::dbn::removeExtension(logicalpath());
-#endif
+        std::wstring filename(m_path);
+        return filename.substr(0, filename.find_last_of(L"."));
+    }
+
+    size_t GetIndexInsideChunk() const
+    {
+        return m_indexInsideChunk;
+    }
+
+    void SetIndexInsideChunk(size_t indexInsideChunk)
+    {
+        m_indexInsideChunk = indexInsideChunk;
     }
 };
 
 struct chunkdata // data for a chunk of utterances
 {
-    std::vector<utterancedesc*> utteranceset; // utterances in this set
+    std::vector<UtteranceDescription*> utteranceset; // utterances in this set
     size_t numutterances() const
     {
         return utteranceset.size();
@@ -56,31 +64,28 @@ struct chunkdata // data for a chunk of utterances
     std::vector<size_t> firstframes;                                                       // [utteranceindex] first frame for given utterance
     mutable msra::dbn::matrix frames;                                                      // stores all frames consecutively (mutable since this is a cache)
     size_t totalframes;                                                                    // total #frames for all utterances in this chunk
-    mutable std::vector<shared_ptr<const msra::dbn::latticesource::latticepair>> lattices; // (may be empty if none)
 
     // construction
     chunkdata()
         : totalframes(0)
     {
     }
-    void push_back(utterancedesc* utt)
+
+    void push_back(UtteranceDescription* utt)
     {
         if (isinram())
             LogicError("utterancechunkdata: frames already paged into RAM--too late to add data");
         firstframes.push_back(totalframes);
-        totalframes += utt->numframes();
+        totalframes += utt->GetNumberOfFrames();
         utteranceset.push_back(utt);
     }
 
     // accessors to an utterance's data
     size_t numframes(size_t i) const
     {
-        return utteranceset[i]->numframes();
+        return utteranceset[i]->GetNumberOfFrames();
     }
-    size_t getclassidsbegin(size_t i) const
-    {
-        return utteranceset[i]->classidsbegin;
-    }
+
     msra::dbn::matrixstripe getutteranceframes(size_t i) const // return the frame set for a given utterance
     {
         if (!isinram())
@@ -88,12 +93,6 @@ struct chunkdata // data for a chunk of utterances
         const size_t ts = firstframes[i];
         const size_t n = numframes(i);
         return msra::dbn::matrixstripe(frames, ts, n);
-    }
-    shared_ptr<const msra::dbn::latticesource::latticepair> getutterancelattice(size_t i) const // return the frame set for a given utterance
-    {
-        if (!isinram())
-            LogicError("getutterancelattice: called when data have not been paged in");
-        return lattices[i];
     }
 
     // paging
@@ -104,7 +103,7 @@ struct chunkdata // data for a chunk of utterances
     }
     // page in data for this chunk
     // We pass in the feature info variables by ref which will be filled lazily upon first read
-    void requiredata(string& featkind, size_t& featdim, unsigned int& sampperiod, const msra::dbn::latticesource& latticesource, int verbosity = 0) const
+    void requiredata(string& featkind, size_t& featdim, unsigned int& sampperiod, int verbosity = 0) const
     {
         if (numutterances() == 0)
             LogicError("requiredata: cannot page in virgin block");
@@ -116,25 +115,21 @@ struct chunkdata // data for a chunk of utterances
             // if this is the first feature read ever, we explicitly open the first file to get the information such as feature dimension
             if (featdim == 0)
             {
-                reader.getinfo(utteranceset[0]->parsedpath, featkind, featdim, sampperiod);
+                reader.getinfo(utteranceset[0]->GetPath(), featkind, featdim, sampperiod);
                 fprintf(stderr, "requiredata: determined feature kind as %d-dimensional '%s' with frame shift %.1f ms\n",
                         static_cast<int>(featdim), featkind.c_str(), sampperiod / 1e4);
             }
             // read all utterances; if they are in the same archive, htkfeatreader will be efficient in not closing the file
             frames.resize(featdim, totalframes);
-            if (!latticesource.empty())
-                lattices.resize(utteranceset.size());
             foreach_index (i, utteranceset)
             {
                 //fprintf (stderr, ".");
                 // read features for this file
                 auto uttframes = getutteranceframes(i);                                                    // matrix stripe for this utterance (currently unfilled)
-                reader.read(utteranceset[i]->parsedpath, (const string&) featkind, sampperiod, uttframes); // note: file info here used for checkuing only
+                reader.read(utteranceset[i]->GetPath(), (const string&)featkind, sampperiod, uttframes); // note: file info here used for checkuing only
                 // page in lattice data
-                if (!latticesource.empty())
-                    latticesource.getlattices(utteranceset[i]->key(), lattices[i], uttframes.cols());
             }
-            //fprintf (stderr, "\n");
+
             if (verbosity)
                 fprintf(stderr, "requiredata: %d utterances read\n", (int) utteranceset.size());
         }
@@ -144,6 +139,7 @@ struct chunkdata // data for a chunk of utterances
             throw;
         }
     }
+
     // page out data for this chunk
     void releasedata() const
     {
@@ -154,31 +150,16 @@ struct chunkdata // data for a chunk of utterances
         // release frames
         frames.resize(0, 0);
         // release lattice data
-        lattices.clear();
     }
 };
 
-struct Utterance : public SequenceDescription
-{
-    Utterance(utterancedesc&& u)
-        : utterance(u)
-    {
-    }
-
-    utterancedesc utterance;
-    size_t indexInsideChunk;
-    size_t frameStart;
-};
-
-// Should not this be splitted to different deserializers?
 struct Frame : public SequenceDescription
 {
-    Frame(Utterance* u)
-        : u(u)
+    Frame(UtteranceDescription* u) : u(u)
     {
     }
 
-    Utterance* u;
+    UtteranceDescription* u;
     size_t frameIndexInUtterance;
 };
 
@@ -198,7 +179,7 @@ private:
     std::vector<SequenceDataPtr> GetSequenceById(size_t id);
 
     size_t m_dimension;
-    std::vector<Utterance> m_utterances;
+    std::vector<UtteranceDescription> m_utterances;
     std::vector<Frame> m_frames;
 
     ElementType m_elementType;

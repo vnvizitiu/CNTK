@@ -28,9 +28,12 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             InvalidArgument("Network needs at least 1 feature and 1 label specified.");
         }
 
+        std::vector<std::wstring> sequences = ConfigHelper(readerConfig(featureNames.front())).GetFeaturePaths();
+        CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>(std::move(sequences));
+
         std::vector<IDataDeserializerPtr> featureDeserializers;
         std::vector<IDataDeserializerPtr> labelDeserializers;
-        CorpusDescriptorPtr corpus = std::make_shared<CorpusDescriptor>();
+        
         for (const auto& featureName : featureNames)
         {
             auto deserializer = std::make_shared<HTKDataDeserializer>(corpus, readerConfig(featureName), featureName);

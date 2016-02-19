@@ -8,6 +8,7 @@
 #include "ConfigHelper.h"
 #include "htkfeatio.h"
 #include "../HTKMLFReader/msra_mgram.h"
+#include "latticearchive.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 

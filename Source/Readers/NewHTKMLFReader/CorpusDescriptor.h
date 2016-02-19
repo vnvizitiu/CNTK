@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include "ConfigHelper.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -14,13 +15,17 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     class CorpusDescriptor
     {
     public:
-        CorpusDescriptor()
-        {}
+        CorpusDescriptor(std::vector<std::wstring>&& sequences) : m_sequences(sequences)
+        {
+        }
 
         bool IsIncluded(const std::wstring&)
         {
             return true;
         }
+
+    private:
+        std::vector<std::wstring> m_sequences;
     };
 
     typedef std::shared_ptr<CorpusDescriptor> CorpusDescriptorPtr;
