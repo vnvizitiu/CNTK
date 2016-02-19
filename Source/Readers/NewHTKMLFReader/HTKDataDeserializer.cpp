@@ -247,52 +247,52 @@ typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
-        const auto& frame = m_frames[id];
-        UtteranceDescription* utterance = frame.m_utterence;
+    const auto& frame = m_frames[id];
+    UtteranceDescription* utterance = frame.m_utterence;
 
-        const auto& chunkDescription = m_chunks[utterance->m_chunkId];
-        auto utteranceFrames = chunkDescription.GetUtteranceFrames(utterance->GetIndexInsideChunk());
+    const auto& chunkDescription = m_chunks[utterance->m_chunkId];
+    auto utteranceFrames = chunkDescription.GetUtteranceFrames(utterance->GetIndexInsideChunk());
 
-        // wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors()
-        matrixasvectorofvectors utteranceFramesWrapper(utteranceFrames); 
+    // wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors()
+    matrixasvectorofvectors utteranceFramesWrapper(utteranceFrames);
 
-        size_t leftExtent = m_augmentationWindow.first;
-        size_t rightExtent = m_augmentationWindow.second;
+    size_t leftExtent = m_augmentationWindow.first;
+    size_t rightExtent = m_augmentationWindow.second;
 
-        // page in the needed range of frames
-        if (leftExtent == 0 && rightExtent == 0)
+    // page in the needed range of frames
+    if (leftExtent == 0 && rightExtent == 0)
+    {
+        leftExtent = rightExtent = msra::dbn::augmentationextent(utteranceFramesWrapper[0].size(), m_dimension);
+    }
+
+    HTKSequenceDataPtr result = std::make_shared<HTKSequenceData>();
+    result->m_buffer.resize(m_dimension, 1);
+    const std::vector<char> noBoundaryFlags; // dummy
+    msra::dbn::augmentneighbors(utteranceFramesWrapper, noBoundaryFlags, frame.m_frameIndex, leftExtent, rightExtent, result->m_buffer, 0);
+
+    result->m_numberOfSamples = frame.m_numberOfSamples;
+    msra::dbn::matrixstripe stripe(result->m_buffer, 0, result->m_buffer.cols());
+    const size_t dimensions = stripe.rows();
+
+    if (m_elementType == ElementType::tfloat)
+    {
+        result->m_data = &stripe(0, 0);
+    }
+    else
+    {
+        assert(m_elementType == ElementType::tdouble);
+        double *doubleBuffer = new double[dimensions];
+        const float *floatBuffer = &stripe(0, 0);
+
+        for (size_t i = 0; i < dimensions; i++)
         {
-            leftExtent = rightExtent = msra::dbn::augmentationextent(utteranceFramesWrapper[0].size(), m_dimension);
+            doubleBuffer[i] = floatBuffer[i];
         }
 
-        HTKSequenceDataPtr result = std::make_shared<HTKSequenceData>();
-        result->m_buffer.resize(m_dimension, 1);
-        const std::vector<char> noBoundaryFlags; // dummy
-        msra::dbn::augmentneighbors(utteranceFramesWrapper, noBoundaryFlags, frame.m_frameIndex, leftExtent, rightExtent, result->m_buffer, 0);
+        result->m_data = doubleBuffer;
+    }
 
-        result->m_numberOfSamples = frame.m_numberOfSamples;
-        msra::dbn::matrixstripe stripe(result->m_buffer, 0, result->m_buffer.cols());
-        const size_t dimensions = stripe.rows();
-
-        if (m_elementType == ElementType::tfloat)
-        {
-            result->m_data = &stripe(0, 0);
-        }
-        else 
-        {
-            assert(m_elementType == ElementType::tdouble);
-            double *doubleBuffer = new double[dimensions];
-            const float *floatBuffer = &stripe(0, 0);
-
-            for (size_t i = 0; i < dimensions; i++)
-            {
-                doubleBuffer[i] = floatBuffer[i];
-            }
-
-            result->m_data = doubleBuffer;
-        }
-
-        return std::vector<SequenceDataPtr>(1, result);
+    return std::vector<SequenceDataPtr>(1, result);
 }
 
 const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType&)

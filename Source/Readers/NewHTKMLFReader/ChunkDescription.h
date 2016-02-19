@@ -15,9 +15,9 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         // utterances in this set
         std::vector<UtteranceDescription*> m_utteranceSet;
 
-        std::vector<size_t> m_firstFrames;                                                       // [utteranceindex] first frame for given utterance
-        mutable msra::dbn::matrix m_frames;                                                      // stores all frames consecutively (mutable since this is a cache)
-        size_t m_totalFrames;                                                                    // total #frames for all utterances in this chunk
+        std::vector<size_t> m_firstFrames;    // [utteranceindex] first frame for given utterance
+        mutable msra::dbn::matrix m_frames;   // stores all frames consecutively (mutable since this is a cache)
+        size_t m_totalFrames;                 // total #frames for all utterances in this chunk
 
     public:
         ChunkDescription() : m_totalFrames(0)
