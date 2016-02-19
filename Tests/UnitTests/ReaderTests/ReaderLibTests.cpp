@@ -57,13 +57,15 @@ private:
     size_t m_numSequencesPerChunk;
     std::vector<SequenceDescription> m_descriptions;
     std::vector<float>& m_data;
-
     SequenceDescriptions m_sequenceDescriptions;
+    std::vector<StreamDescriptionPtr> m_streams;
+    TensorShapePtr m_sampleLayout;
 
 public:
     MockDeserializer(size_t numChunks, size_t numSequencesPerChunks, std::vector<float>& data)
         : m_numChunks(numChunks),
           m_numSequencesPerChunk(numSequencesPerChunks),
+          m_sampleLayout(std::make_shared<TensorShape>(1)),
           m_data(data)
     {
         size_t numSequences = numChunks * numSequencesPerChunks;
@@ -82,12 +84,21 @@ public:
             });
             m_sequenceDescriptions.push_back(&m_descriptions[i]);
         }
+
+        std::vector<StreamDescriptionPtr> result;
+
+        m_streams.push_back(std::make_shared<StreamDescription>(StreamDescription{
+            L"input",
+            0,
+            StorageType::dense,
+            ElementType::tfloat,
+            m_sampleLayout
+        }));
     };
 
     std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override
     {
-        std::vector<StreamDescriptionPtr> result;
-        return result;
+        return m_streams;
     }
 
     const SequenceDescriptions& GetSequenceDescriptions() const override
@@ -110,7 +121,7 @@ public:
         throw std::logic_error("Not implemented");
     }
 
-    virtual size_t GetTotalNumberOfChunks() override 
+    virtual size_t GetTotalNumberOfChunks() override
     {
         throw std::logic_error("Not implemented");
     }

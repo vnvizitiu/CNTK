@@ -81,7 +81,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         }
 
         int verbosity = readerConfig(L"verbosity", 2);
-        m_randomizer = std::make_shared<LegacyBlockRandomizer>(verbosity, window, bundler);
+        m_randomizer = std::make_shared<BlockRandomizer>(verbosity, window, bundler, BlockRandomizer::DistributionMode::chunk_modulus, true /* useLegacyRandomization */);
         m_randomizer->Initialize(nullptr, readerConfig);
 
         intargvector numberOfuttsPerMinibatchForAllEpochs =
