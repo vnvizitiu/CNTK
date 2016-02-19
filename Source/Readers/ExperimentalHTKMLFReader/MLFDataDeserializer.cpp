@@ -16,7 +16,7 @@ static float s_oneFloat = 1.0;
 static double s_oneDouble = 1.0;
 
 // Currently we only have a single mlf chunk that contains a vector of all labels.
-// TODO: This will be changed in the future to work only on a subset of chunks 
+// TODO: This will be changed in the future to work only on a subset of chunks
 // at each point in time.
 class MLFDataDeserializer::MLFChunk : public Chunk
 {

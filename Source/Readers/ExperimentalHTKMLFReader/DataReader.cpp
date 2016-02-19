@@ -17,19 +17,19 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    auto factory = [](const ConfigParameters& parameters) -> ReaderPtr
-    {
-        return std::make_shared<HTKMLFReader>(std::make_shared<HeapMemoryProvider>(), parameters);
-    };
+auto factory = [](const ConfigParameters& parameters) -> ReaderPtr
+{
+    return std::make_shared<HTKMLFReader>(std::make_shared<HeapMemoryProvider>(), parameters);
+};
 
-    extern "C" DATAREADER_API void GetReaderF(IDataReader<float>** preader)
-    {
-        *preader = new ReaderShim<float>(factory);
-    }
+extern "C" DATAREADER_API void GetReaderF(IDataReader<float>** preader)
+{
+    *preader = new ReaderShim<float>(factory);
+}
 
-    extern "C" DATAREADER_API void GetReaderD(IDataReader<double>** preader)
-    {
-        *preader = new ReaderShim<double>(factory);
-    }
+extern "C" DATAREADER_API void GetReaderD(IDataReader<double>** preader)
+{
+    *preader = new ReaderShim<double>(factory);
+}
 
-} } }
+}}}
