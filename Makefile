@@ -324,7 +324,6 @@ NEWHTKMLFREADER_SRC =\
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKDataDeserializer.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKMLFReader.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/MLFDataDeserializer.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/Utils.cpp \
 
 NEWHTKMLFREADER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(NEWHTKMLFREADER_SRC))
 

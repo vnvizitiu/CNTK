@@ -7,7 +7,6 @@
 #include <Config.h>
 #include <DataReader.h>
 #include <regex>
-#include "Utils.h"
 #include <StringUtil.h>
 
 namespace Microsoft { namespace MSR { namespace CNTK {
@@ -281,10 +280,47 @@ std::vector<std::wstring> ConfigHelper::GetFeaturePaths()
         std::wstring scpDirCached;
         for (auto& entry : filelist)
         {
-            Utils::ExpandDotDotDot(entry, scriptPath, scpDirCached);
+            ExpandDotDotDot(entry, scriptPath, scpDirCached);
         }
     }
 
     return filelist;
 }
-} } }
+
+intargvector ConfigHelper::GetNumberOfUtterancesPerMinibatchForAllEppochs()
+{
+    intargvector numberOfUtterances = m_config(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
+    for (int i = 0; i < numberOfUtterances.size(); i++)
+    {
+        if (numberOfUtterances[i] < 1)
+        {
+            LogicError("nbrUttsInEachRecurrentIter cannot be less than 1.");
+        }
+    }
+
+    return numberOfUtterances;
+}
+
+void ConfigHelper::ExpandDotDotDot(std::wstring& featPath, const std::wstring& scpPath, std::wstring& scpDirCached)
+{
+    wstring delim = L"/\\";
+
+    if (scpDirCached.empty())
+    {
+        scpDirCached = scpPath;
+        wstring tail;
+        auto pos = scpDirCached.find_last_of(delim);
+        if (pos != wstring::npos)
+        {
+            tail = scpDirCached.substr(pos + 1);
+            scpDirCached.resize(pos);
+        }
+        if (tail.empty()) // nothing was split off: no dir given, 'dir' contains the filename
+            scpDirCached.swap(tail);
+    }
+    size_t pos = featPath.find(L"...");
+    if (pos != featPath.npos)
+        featPath = featPath.substr(0, pos) + scpDirCached + featPath.substr(pos + 3);
+}
+
+}}}

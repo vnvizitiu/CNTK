@@ -11,7 +11,6 @@
 #include "ConfigHelper.h"
 #include "Bundler.h"
 #include "StringUtil.h"
-#include "Utils.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -83,10 +82,6 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         int verbosity = readerConfig(L"verbosity", 2);
         m_randomizer = std::make_shared<BlockRandomizer>(verbosity, window, bundler, BlockRandomizer::DistributionMode::chunk_modulus, true /* useLegacyRandomization */);
         m_randomizer->Initialize(nullptr, readerConfig);
-
-        intargvector numberOfuttsPerMinibatchForAllEpochs =
-            readerConfig(L"nbruttsineachrecurrentiter", ConfigParameters::Array(intargvector(vector<int>{1})));
-        Utils::CheckMinibatchSizes(numberOfuttsPerMinibatchForAllEpochs);
 
         // Create output stream descriptions (all dense)
         for (auto d : deserializers)

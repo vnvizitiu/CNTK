@@ -40,8 +40,12 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         size_t GetRandomizationWindow();
         std::wstring GetRandomizer();
 
+        intargvector GetNumberOfUtterancesPerMinibatchForAllEppochs();
+
     private:
-        ConfigHelper& operator=(const ConfigHelper&) = delete;
+        DISABLE_COPY_AND_MOVE(ConfigHelper);
+
+        void ExpandDotDotDot(std::wstring& featPath, const std::wstring& scpPath, std::wstring& scpDirCached);
 
         const ConfigParameters& m_config;
     };
