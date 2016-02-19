@@ -97,7 +97,6 @@
     <ClInclude Include="..\..\Common\Include\DataWriter.h" />
     <ClInclude Include="..\..\Common\Include\File.h" />
     <ClInclude Include="..\..\Common\Include\ssematrix.h" />
-    <ClInclude Include="basetypes.h" />
     <ClInclude Include="..\..\Common\Include\fileutil.h" />
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
     <ClInclude Include="ChunkDescription.h" />

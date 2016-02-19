@@ -28,9 +28,6 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="basetypes.h">
-      <Filter>Duplicates to remove</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\Include\DebugUtil.h">
       <Filter>Duplicates to remove</Filter>
     </ClInclude>
