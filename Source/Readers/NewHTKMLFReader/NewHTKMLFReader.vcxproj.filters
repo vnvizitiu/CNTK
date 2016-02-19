@@ -61,9 +61,6 @@
     <ClInclude Include="ChunkDescription.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Duplicates to remove">
       <UniqueIdentifier>{9a77edee-47ee-45ec-9b35-d22cc73ea64e}</UniqueIdentifier>
     </Filter>
