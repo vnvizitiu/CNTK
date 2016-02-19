@@ -4,12 +4,11 @@ DataDir = $RootDir$
 # deviceId = -1 for CPU, >= 0 for GPU devices
 deviceId = -1
 
-precision = "float"
+precision = "double"
 
 Simple_Test = [
     reader = [
-        # TODO don't merge:
-        readerType = "NewHTKMLFReader"
+        readerType = "ExperimentalHTKMLFReader"
         readMethod = "blockRandomize"
         miniBatchMode = "partial"
         randomize = "auto"

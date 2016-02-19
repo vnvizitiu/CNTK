@@ -313,25 +313,25 @@ $(LIBDIR)/HTKMLFReader.so: $(HTKMLFREADER_OBJ) | $(CNTKMATH_LIB)
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%, $(LIBDIR) $(LIBPATH)) $(patsubst %,$(RPATH)%, $(ORIGINDIR) $(LIBPATH)) -o $@ $^ -l$(CNTKMATH)
 
 ########################################
-# NewHTKMLFReader plugin
+# ExperimentalHTKMLFReader plugin
 ########################################
 
-NEWHTKMLFREADER_SRC =\
+EXPERIMENTALHTKMLFREADER_SRC =\
 	$(SOURCEDIR)/Readers/HTKMLFReader/DataWriter.cpp \
 	$(SOURCEDIR)/Readers/HTKMLFReader/HTKMLFWriter.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/ConfigHelper.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataReader.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKDataDeserializer.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKMLFReader.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/MLFDataDeserializer.cpp \
+	$(SOURCEDIR)/Readers/ExperimentalHTKMLFReader/ConfigHelper.cp \
+	$(SOURCEDIR)/Readers/ExperimentalHTKMLFReader/DataReader.cpp \
+	$(SOURCEDIR)/Readers/ExperimentalHTKMLFReader/HTKDataDeserializer.cpp \
+	$(SOURCEDIR)/Readers/ExperimentalHTKMLFReader/HTKMLFReader.cpp \
+	$(SOURCEDIR)/Readers/ExperimentalHTKMLFReader/MLFDataDeserializer.cpp \
 
-NEWHTKMLFREADER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(NEWHTKMLFREADER_SRC))
+EXPERIMENTALHTKMLFREADER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(EXPERIMENTALHTKMLFREADER_SRC))
 
-NEWHTKMLFREADER:=$(LIBDIR)/NewHTKMLFReader.so
-ALL+=$(NEWHTKMLFREADER)
-SRC+=$(NEWHTKMLFREADER_SRC)
+EXPERIMENTALHTKMLFREADER:=$(LIBDIR)/ExperimentalHTKMLFReader.so
+ALL+=$(EXPERIMENTALHTKMLFREADER)
+SRC+=$(EXPERIMENTALHTKMLFREADER_SRC)
 
-$(LIBDIR)/NewHTKMLFReader.so: $(NEWHTKMLFREADER_OBJ) | $(CNTKMATH_LIB)
+$(LIBDIR)/ExperimentalHTKMLFReader.so: $(EXPERIMENTALHTKMLFREADER_OBJ) | $(CNTKMATH_LIB)
 	@echo $(SEPARATOR)
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%, $(LIBDIR) $(LIBPATH)) $(patsubst %,$(RPATH)%, $(ORIGINDIR) $(LIBPATH)) -o $@ $^ -l$(CNTKMATH)
 

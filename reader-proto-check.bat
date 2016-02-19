@@ -18,11 +18,11 @@ if not exist %CYGWIN_BIN% (
 echo on
 
 set UNIT_TEST_SPEC=^
-  -t ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop1 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop5 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop11 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_0 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_1
+  -t ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop1 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop5 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop11 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop21_0 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
     Speech/ExperimentalHtkmlfReader/DNN/DiscriminativePreTraining ^

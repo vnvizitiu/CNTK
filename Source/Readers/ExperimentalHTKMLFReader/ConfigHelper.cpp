@@ -158,7 +158,7 @@ std::vector<std::wstring> ConfigHelper::GetMlfPaths()
     {
         if (!m_config.ExistsCurrent(L"mlfFileList"))
         {
-            InvalidArgument("Either mlfFile or mlfFileList must exist in NewHTKMLFReader");
+            InvalidArgument("Either mlfFile or mlfFileList must exist in ExperimentalHTKMLFReader");
         }
 
         wstring list = m_config(L"mlfFileList");
