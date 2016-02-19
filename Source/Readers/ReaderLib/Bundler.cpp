@@ -109,6 +109,8 @@ class BundlingChunk : public Chunk
     size_t m_chunkId;
     std::vector<std::vector<ChunkPtr>> m_innerChunks;
 
+    DISABLE_COPY_AND_MOVE(BundlingChunk);
+
 public:
     BundlingChunk(size_t numberOfInputs, Bundler* parent, size_t chunkId)
         : m_numberOfInputs(numberOfInputs), m_parent(parent), m_chunkId(chunkId)

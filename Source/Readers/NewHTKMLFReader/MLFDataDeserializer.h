@@ -26,6 +26,8 @@ public:
     virtual ChunkPtr GetChunk(size_t) override;
 
 private:
+    DISABLE_COPY_AND_MOVE(MLFDataDeserializer);
+
     // Inner classes for frames, utterances and chunks.
     struct MLFUtterance : SequenceDescription
     {
@@ -48,9 +50,8 @@ private:
     msra::dbn::biggrowablevector<msra::dbn::CLASSIDTYPE> m_classIds;
     msra::dbn::biggrowablevector<size_t> m_utteranceIndex;
 
-    // All sequences = frames, this deserializer provides.
-    // This interface will be changed when the randomizer asks
-    // timeline in sequences.
+    // TODO: All sequences(currently frames), this deserializer provides.
+    // This interface has to change when the randomizer asks timeline in chunks.
     msra::dbn::biggrowablevector<MLFFrame> m_frames;
     SequenceDescriptions m_sequences;
 

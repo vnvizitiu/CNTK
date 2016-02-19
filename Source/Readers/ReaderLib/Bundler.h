@@ -22,9 +22,9 @@ public:
     virtual size_t GetTotalNumberOfChunks() override;
 
 private:
-    void CreateSequenceDescriptions();
+    DISABLE_COPY_AND_MOVE(Bundler);
 
-    void operator=(const Bundler& other);
+    void CreateSequenceDescriptions();
 
     std::vector<StreamDescriptionPtr> m_streams;
     std::vector<IDataDeserializerPtr> m_deserializers;
