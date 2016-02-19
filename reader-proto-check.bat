@@ -80,6 +80,7 @@ if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release -s 1bitsgd %END2END_TEST_SPEC_1B%
+    if errorlevel 1 exit /b 1
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
@@ -93,6 +94,7 @@ if not defined a_nocpu (
 if not defined a_nodebug (
 if not defined a_nogpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug -s 1bitsgd %END2END_TEST_SPEC_1B%
+    if errorlevel 1 exit /b 1
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
