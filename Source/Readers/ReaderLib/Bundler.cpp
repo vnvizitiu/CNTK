@@ -40,6 +40,7 @@ void Bundler::CreateSequenceDescriptions()
     size_t maxNumberOfSequences = m_driver->GetSequenceDescriptions().size();
     for (int i = 0; i < m_deserializers.size(); ++i)
     {
+        // TODO use reserve(), .push_back() ? also elsewhere
         m_sequenceToSequence[i].resize(maxNumberOfSequences);
         m_sequenceToChunk[i].resize(maxNumberOfSequences);
     }

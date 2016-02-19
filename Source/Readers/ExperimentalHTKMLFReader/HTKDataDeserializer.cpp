@@ -12,19 +12,21 @@
 // TODO: This will be removed when dependency on old code is eliminated.
 // Currently this fixes the linking.
 namespace msra { namespace asr {
-    std::unordered_map<std::wstring, unsigned int> htkfeatreader::parsedpath::archivePathStringMap;
-    std::vector<std::wstring> htkfeatreader::parsedpath::archivePathStringVector;
+
+std::unordered_map<std::wstring, unsigned int> htkfeatreader::parsedpath::archivePathStringMap;
+std::vector<std::wstring> htkfeatreader::parsedpath::archivePathStringVector;
+
 }}
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-    HTKDataDeserializer::HTKDataDeserializer(
-        CorpusDescriptorPtr corpus,
-        const ConfigParameters& feature,
-        const std::wstring& featureName)
-        : m_ioFeatureDimension(0),
-          m_samplePeriod(0),
-          m_verbosity(0)
+HTKDataDeserializer::HTKDataDeserializer(
+    CorpusDescriptorPtr corpus,
+    const ConfigParameters& feature,
+    const std::wstring& featureName)
+    : m_ioFeatureDimension(0),
+      m_samplePeriod(0),
+      m_verbosity(0)
 {
     bool frameMode = feature.Find("frameMode", "true");
     if (!frameMode)
@@ -58,7 +60,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
         // we need at least 2 frames for boundary markers to work
         if (numberOfFrames < 2)
         {
-            fprintf(stderr, "HTKDataDeserializer::HTKDataDeserializer: skipping utterance with %d frames because it has less than 2 frames: %ls\n", 
+            fprintf(stderr, "HTKDataDeserializer::HTKDataDeserializer: skipping utterance with %d frames because it has less than 2 frames: %ls\n",
                 (int)numberOfFrames, description.GetKey().c_str());
             description.m_isValid = false;
             description.m_numberOfSamples = 0;

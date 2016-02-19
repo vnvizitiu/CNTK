@@ -105,6 +105,7 @@ public:
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const = 0;
 
     // Retrieves description of all sequences this data deserializer can produce.
+    // TODO for huge corpuses, footprint will be too big; need interface to request timeline in chunks
     virtual const SequenceDescriptions& GetSequenceDescriptions() const = 0;
 
     // Retrieves description of a single sequence given its key.
