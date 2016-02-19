@@ -317,13 +317,13 @@ $(LIBDIR)/HTKMLFReader.so: $(HTKMLFREADER_OBJ) | $(CNTKMATH_LIB)
 ########################################
 
 NEWHTKMLFREADER_SRC =\
+	$(SOURCEDIR)/Readers/HTKMLFReader/DataWriter.cpp \
+	$(SOURCEDIR)/Readers/HTKMLFReader/HTKMLFWriter.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/ConfigHelper.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataReader.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/DataWriter.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKDataDeserializer.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/HTKMLFReader.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/MLFDataDeserializer.cpp \
-	$(SOURCEDIR)/Readers/NewHTKMLFReader/NewHTKMLFWriter.cpp \
 	$(SOURCEDIR)/Readers/NewHTKMLFReader/Utils.cpp \
 
 NEWHTKMLFREADER_OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(NEWHTKMLFREADER_SRC))
