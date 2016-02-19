@@ -57,6 +57,8 @@
     <ClInclude Include="..\..\Common\Include\File.h">
       <Filter>Common\Include</Filter>
     </ClInclude>
+    <ClInclude Include="UtteranceDescription.h" />
+    <ClInclude Include="ChunkDescription.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

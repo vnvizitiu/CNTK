@@ -103,6 +103,7 @@
     <ClInclude Include="basetypes.h" />
     <ClInclude Include="..\..\Common\Include\fileutil.h" />
     <ClInclude Include="..\..\Common\Include\DebugUtil.h" />
+    <ClInclude Include="ChunkDescription.h" />
     <ClInclude Include="ConfigHelper.h" />
     <ClInclude Include="CorpusDescriptor.h" />
     <ClInclude Include="HTKDataDeserializer.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="UtteranceDescription.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\Config.cpp">

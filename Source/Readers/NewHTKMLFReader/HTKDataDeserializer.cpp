@@ -93,49 +93,50 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     {
         // if exceeding current entry--create a new one
         // I.e. our chunks are a little larger than wanted (on av. half the av. utterance length).
-        if (m_chunks.empty() || m_chunks.back().totalframes > chunkframes || m_chunks.back().numutterances() >= 65535)
+        if (m_chunks.empty() || m_chunks.back().GetTotatlFrames() > chunkframes || m_chunks.back().GetNumberOfUtteracens() >= 65535)
         {
             // TODO > instead of >= ? if (thisallchunks.empty() || thisallchunks.back().totalframes > chunkframes || thisallchunks.back().numutterances() >= frameref::maxutterancesperchunk)
-            m_chunks.push_back(chunkdata());
+            m_chunks.push_back(ChunkDescription());
             chunkId++;
         }
 
         // append utterance to last chunk
-        chunkdata& currentchunk = m_chunks.back();
-        m_utterances[i].SetIndexInsideChunk(currentchunk.numutterances());
-        currentchunk.push_back(&m_utterances[i]); // move it out from our temp array into the chunk
+        ChunkDescription& currentchunk = m_chunks.back();
+        m_utterances[i].SetIndexInsideChunk(currentchunk.GetNumberOfUtteracens());
+        currentchunk.Add(&m_utterances[i]); // move it out from our temp array into the chunk
         m_utterances[i].m_chunkId = chunkId;
-        // TODO: above push_back does not actually 'move' because the internal push_back does not accept that
     }
 
-    fprintf(stderr, "minibatchutterancesource: %d utterances grouped into %d chunks, av. chunk size: %.1f utterances, %.1f frames\n",
-        static_cast<int>(m_utterances.size()),
-        static_cast<int>(m_chunks.size()),
+    fprintf(stderr,
+        "HTKDataDeserializer::HTKDataDeserializer: %d utterances grouped into %d chunks, av. chunk size: %.1f utterances, %.1f frames\n",
+        (int)m_utterances.size(),
+        (int)m_chunks.size(),
         m_utterances.size() / (double)m_chunks.size(),
         totalSize / (double)m_chunks.size());
-    // Now utterances are stored exclusively in allchunks[]. They are never referred to by a sequential utterance id at this point, only by chunk/within-chunk index.
+
+    // TODO: Currently we have global sequence id.
+    // After changing the timeline interface they must never referred to by a sequential id, only by chunk/within-chunk index
+    // because they are asked on the chunk anyway.
 
     m_frames.reserve(totalFrames);
-
-
     foreach_index(i, m_utterances)
     {
-            std::wstring key = m_utterances[i].GetKey();
-            for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
-            {
-                Frame f(&m_utterances[i]);
-                f.m_key.major = key;
-                f.m_key.minor = k;
-                f.m_id = m_frames.size();
-                f.m_chunkId = m_utterances[i].m_chunkId;
-                f.m_numberOfSamples = 1;
-                f.frameIndexInUtterance = k;
-                assert(m_utterances[i].m_isValid); // TODO
-                f.m_isValid = m_utterances[i].m_isValid;
-                m_frames.push_back(f);
+        std::wstring key = m_utterances[i].GetKey();
+        for (size_t k = 0; k < m_utterances[i].m_numberOfSamples; ++k)
+        {
+            Frame f(&m_utterances[i]);
+            f.m_key.major = key;
+            f.m_key.minor = k;
+            f.m_id = m_frames.size();
+            f.m_chunkId = m_utterances[i].m_chunkId;
+            f.m_numberOfSamples = 1;
+            f.m_frameIndex = k;
+            assert(m_utterances[i].m_isValid); // TODO
+            f.m_isValid = m_utterances[i].m_isValid;
+            m_frames.push_back(f);
 
-                m_sequences.push_back(&m_frames[f.m_id]);
-            }
+            m_sequences.push_back(&m_frames[f.m_id]);
+        }
     }
 
     m_weakChunks.resize(m_chunks.size());
@@ -147,6 +148,14 @@ namespace Microsoft { namespace MSR { namespace CNTK {
     stream->m_elementType = m_elementType;
     stream->m_storageType = StorageType::dense;
     m_streams.push_back(stream);
+
+    msra::util::attempt(5, [&]()
+    {
+        msra::asr::htkfeatreader reader;
+        reader.getinfo(m_utterances[0].GetPath(), m_featureKind, m_ioFeatureDimension, m_samplePeriod);
+        fprintf(stderr, "HTKDataDeserializer::HTKDataDeserializer: determined feature kind as %d-dimensional '%s' with frame shift %.1f ms\n",
+            (int)m_dimension, m_featureKind.c_str(), m_samplePeriod / 1e4);
+    });
 }
 
 const SequenceDescriptions& HTKDataDeserializer::GetSequenceDescriptions() const
@@ -187,15 +196,11 @@ public:
     HTKChunk(HTKDataDeserializer* parent, size_t chunkId) : m_parent(parent), m_chunkId(chunkId)
     {
         auto& chunkdata = m_parent->m_chunks[chunkId];
-        if (chunkdata.isinram())
-        {
-            LogicError("Trying to load the chunk that is already in memory.");
-        }
 
         // possibly distributed read.
         msra::util::attempt(5, [&]()
         {
-            chunkdata.requiredata(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, m_parent->m_verbosity);
+            chunkdata.RequireData(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, m_parent->m_verbosity);
         });
     }
 
@@ -207,14 +212,7 @@ public:
     ~HTKChunk()
     {
         auto& chunkdata = m_parent->m_chunks[m_chunkId];
-        if (chunkdata.isinram())
-        {
-            chunkdata.releasedata();
-        }
-        else
-        {
-            LogicError("Trying to unload the chunk that is already unloaded.");
-        }
+        chunkdata.ReleaseData();
     }
 };
 
@@ -232,11 +230,11 @@ ChunkPtr HTKDataDeserializer::GetChunk(size_t chunkId)
 
 struct HTKSequenceData : DenseSequenceData
 {
-    msra::dbn::matrix utterance;
+    msra::dbn::matrix m_buffer;
 
     ~HTKSequenceData()
     {
-        msra::dbn::matrixstripe frame(utterance, 0, utterance.cols());
+        msra::dbn::matrixstripe frame(m_buffer, 0, m_buffer.cols());
         if (m_data != &frame(0, 0))
         {
             delete[] reinterpret_cast<double*>(m_data);
@@ -250,56 +248,51 @@ typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
         const auto& frame = m_frames[id];
-        UtteranceDescription* utterance = frame.u;
+        UtteranceDescription* utterance = frame.m_utterence;
 
-        HTKSequenceDataPtr r = std::make_shared<HTKSequenceData>();
-        r->utterance.resize(m_dimension, 1);
+        const auto& chunkDescription = m_chunks[utterance->m_chunkId];
+        auto utteranceFrames = chunkDescription.GetUtteranceFrames(utterance->GetIndexInsideChunk());
 
-        const auto& chunkdata = m_chunks[utterance->m_chunkId];
+        // wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors()
+        matrixasvectorofvectors utteranceFramesWrapper(utteranceFrames); 
 
-        auto uttframes = chunkdata.getutteranceframes(utterance->GetIndexInsideChunk());
-        matrixasvectorofvectors uttframevectors(uttframes); // (wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors())
+        size_t leftExtent = m_augmentationWindow.first;
+        size_t rightExtent = m_augmentationWindow.second;
 
-        size_t leftextent, rightextent;
         // page in the needed range of frames
-        if (m_augmentationWindow.first == 0 && m_augmentationWindow.second == 0)
+        if (leftExtent == 0 && rightExtent == 0)
         {
-            // should this be moved up?
-            leftextent = rightextent = msra::dbn::augmentationextent(uttframevectors[0].size(), m_dimension);
-        }
-        else
-        {
-            leftextent = m_augmentationWindow.first;
-            rightextent = m_augmentationWindow.second;
+            leftExtent = rightExtent = msra::dbn::augmentationextent(utteranceFramesWrapper[0].size(), m_dimension);
         }
 
-        const std::vector<char> noboundaryflags; // dummy
-        msra::dbn::augmentneighbors(uttframevectors, noboundaryflags, frame.frameIndexInUtterance, leftextent, rightextent, r->utterance, 0);
+        HTKSequenceDataPtr result = std::make_shared<HTKSequenceData>();
+        result->m_buffer.resize(m_dimension, 1);
+        const std::vector<char> noBoundaryFlags; // dummy
+        msra::dbn::augmentneighbors(utteranceFramesWrapper, noBoundaryFlags, frame.m_frameIndex, leftExtent, rightExtent, result->m_buffer, 0);
 
-        r->m_numberOfSamples = frame.m_numberOfSamples;
-        msra::dbn::matrixstripe featOr(r->utterance, 0, r->utterance.cols());
-        const size_t dimensions = featOr.rows();
+        result->m_numberOfSamples = frame.m_numberOfSamples;
+        msra::dbn::matrixstripe stripe(result->m_buffer, 0, result->m_buffer.cols());
+        const size_t dimensions = stripe.rows();
 
         if (m_elementType == ElementType::tfloat)
         {
-            r->m_data = &featOr(0, 0);
+            result->m_data = &stripe(0, 0);
         }
         else 
         {
-            // TODO allocate double, convert in-place from end to start instead
             assert(m_elementType == ElementType::tdouble);
             double *doubleBuffer = new double[dimensions];
-            const float *floatBuffer = &featOr(0, 0);
+            const float *floatBuffer = &stripe(0, 0);
 
             for (size_t i = 0; i < dimensions; i++)
             {
                 doubleBuffer[i] = floatBuffer[i];
             }
 
-            r->m_data = doubleBuffer;
+            result->m_data = doubleBuffer;
         }
 
-        return std::vector<SequenceDataPtr>(1, r); // TODO would std::move help?
+        return std::vector<SequenceDataPtr>(1, result);
 }
 
 const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType&)
