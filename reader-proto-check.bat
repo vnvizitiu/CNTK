@@ -18,11 +18,11 @@ if not exist %CYGWIN_BIN% (
 echo on
 
 set UNIT_TEST_SPEC=^
-  -t ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop1 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop5 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop11 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_0 ^
-  -t +ReaderTestSuite/NewHTKMLFReaderSimpleDataLoop21_1
+  -t ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop1 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop5 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop11 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop21_0 ^
+  -t +ReaderTestSuite/ExperimentalHTKMLFReaderSimpleDataLoop21_1
 
 set END2END_TEST_SPEC=^
     Speech/ExperimentalHtkmlfReader/DNN/DiscriminativePreTraining ^
@@ -80,6 +80,7 @@ if not defined a_notests (
 if not defined a_norelease (
 if not defined a_nogpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release -s 1bitsgd %END2END_TEST_SPEC_1B%
+    if errorlevel 1 exit /b 1
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f release %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
@@ -93,6 +94,7 @@ if not defined a_nocpu (
 if not defined a_nodebug (
 if not defined a_nogpu (
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug -s 1bitsgd %END2END_TEST_SPEC_1B%
+    if errorlevel 1 exit /b 1
     python2.7.exe Tests/EndToEndTests/TestDriver.py run -t nightly -d gpu -f debug %END2END_TEST_SPEC%
     if errorlevel 1 exit /b 1
 )
