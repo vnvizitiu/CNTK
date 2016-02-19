@@ -130,7 +130,7 @@ namespace Microsoft { namespace MSR { namespace CNTK {
             f.m_id = m_frames.size();
             f.m_chunkId = m_utterances[i].m_chunkId;
             f.m_numberOfSamples = 1;
-            f.frameIndexInUtterance = k;
+            f.m_frameIndex = k;
             assert(m_utterances[i].m_isValid); // TODO
             f.m_isValid = m_utterances[i].m_isValid;
             m_frames.push_back(f);
@@ -248,7 +248,7 @@ typedef std::shared_ptr<HTKSequenceData> HTKSequenceDataPtr;
 std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 {
         const auto& frame = m_frames[id];
-        UtteranceDescription* utterance = frame.u;
+        UtteranceDescription* utterance = frame.m_utterence;
 
         const auto& chunkDescription = m_chunks[utterance->m_chunkId];
         auto utteranceFrames = chunkDescription.GetUtteranceFrames(utterance->GetIndexInsideChunk());
@@ -268,7 +268,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
         HTKSequenceDataPtr result = std::make_shared<HTKSequenceData>();
         result->m_buffer.resize(m_dimension, 1);
         const std::vector<char> noBoundaryFlags; // dummy
-        msra::dbn::augmentneighbors(utteranceFramesWrapper, noBoundaryFlags, frame.frameIndexInUtterance, leftExtent, rightExtent, result->m_buffer, 0);
+        msra::dbn::augmentneighbors(utteranceFramesWrapper, noBoundaryFlags, frame.m_frameIndex, leftExtent, rightExtent, result->m_buffer, 0);
 
         result->m_numberOfSamples = frame.m_numberOfSamples;
         msra::dbn::matrixstripe stripe(result->m_buffer, 0, result->m_buffer.cols());

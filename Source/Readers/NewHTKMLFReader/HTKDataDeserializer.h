@@ -7,8 +7,6 @@
 
 #include "DataDeserializer.h"
 #include "Config.h"
-#include "htkfeatio.h"
-#include "ssematrix.h"
 #include "CorpusDescriptor.h"
 #include "UtteranceDescription.h"
 #include "ChunkDescription.h"
@@ -17,12 +15,12 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 
 struct Frame : public SequenceDescription
 {
-    Frame(UtteranceDescription* u) : u(u)
+    Frame(UtteranceDescription* u) : m_utterence(u), m_frameIndex(0)
     {
     }
 
-    UtteranceDescription* u;
-    size_t frameIndexInUtterance;
+    UtteranceDescription* m_utterence;
+    size_t m_frameIndex;
 };
 
 class HTKDataDeserializer : public IDataDeserializer
