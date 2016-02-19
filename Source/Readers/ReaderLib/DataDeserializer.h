@@ -107,6 +107,8 @@ public:
     // Retrieves description of a single sequence given its key.
     virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) = 0;
 
+    virtual size_t GetTotalNumberOfChunks() = 0;
+
     // Gets a chunk.
     virtual ChunkPtr GetChunk(size_t chunkId) = 0;
 

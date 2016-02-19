@@ -7,7 +7,7 @@
 
 #include "DataDeserializer.h"
 #include "HTKDataDeserializer.h"
-#include "biggrowablevectors.h"
+#include "../HTKMLFReader/biggrowablevectors.h"
 #include "CorpusDescriptor.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
@@ -20,6 +20,8 @@ public:
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
     virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
     const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
+
+    virtual size_t GetTotalNumberOfChunks() override;
 
     virtual ChunkPtr GetChunk(size_t) override;
 

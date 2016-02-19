@@ -151,6 +151,12 @@ std::vector<StreamDescriptionPtr> MLFDataDeserializer::GetStreamDescriptions() c
     return m_streams;
 }
 
+size_t MLFDataDeserializer::GetTotalNumberOfChunks()
+{
+    // Currently all mlf data is in memory.
+    return 1;
+}
+
 ChunkPtr MLFDataDeserializer::GetChunk(size_t chunkId)
 {
     UNUSED(chunkId);
