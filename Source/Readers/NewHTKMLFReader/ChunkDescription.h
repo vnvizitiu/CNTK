@@ -5,6 +5,7 @@
 
 #include "DataDeserializer.h"
 #include "../HTKMLFReader/htkfeatio.h"
+#include "ssematrix.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 

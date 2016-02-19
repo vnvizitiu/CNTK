@@ -2,7 +2,7 @@ dataDir: ../../../Data
 tags:
      # running for 1bitsgd build SKU on every BVT job in 'S' (Speech) leg in Debug-GPU and Release-CPU configurations:
      - bvt-s  (build_sku == '1bitsgd') and ((flavor=='debug') ^ (device=='cpu'))
-     # running for 1bitsgd build SKU  on every Nightly job in 'S' leg
+     # running for 1bitsgd build SKU on every Nightly job in 'S' leg
      - nightly-s (build_sku == '1bitsgd')
 
 testCases:
@@ -19,7 +19,7 @@ testCases:
       - Finished Epoch[{{integer}} of {{integer}}]
       - TrainLossPerSample = {{float,tolerance=0%}}
       - EvalErrPerSample = {{float,tolerance=0%}}
-      - AvgLearningRatePerSample = {{float,tolerance=0.001%}}
+      - AvgLearningRatePerSample = {{float,tolerance=0%}}
 
   Per-minibatch training results must match for each MPI Rank:
     patterns:
@@ -38,3 +38,4 @@ testCases:
       - NumNodes = 3
       - NumGradientBits = 1
       - distributed reading is ENABLED
+      - BufferedAsyncGradientAggregation is ENABLED
