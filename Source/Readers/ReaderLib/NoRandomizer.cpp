@@ -50,7 +50,7 @@ void NoRandomizer::StartEpoch(const EpochConfiguration& config)
 Sequences NoRandomizer::GetNextSequences(size_t sampleCount)
 {
     Sequences result;
-    if(m_config.m_totalEpochSizeInSamples <= m_samplePositionInEpoch)
+    if (m_config.m_totalEpochSizeInSamples <= m_samplePositionInEpoch)
     {
         result.m_endOfEpoch = true;
         return result;
@@ -115,4 +115,4 @@ Sequences NoRandomizer::GetNextSequences(size_t sampleCount)
     return result;
 }
 
-}}}
+} } }

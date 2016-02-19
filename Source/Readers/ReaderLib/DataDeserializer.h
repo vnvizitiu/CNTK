@@ -10,23 +10,13 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-struct SequenceDataBase;
-typedef std::shared_ptr<SequenceDataBase> SequenceDataPtr;
-
-class Chunk
+struct KeyType
 {
-public:
-    // Gets sequences by id.
-    virtual std::vector<SequenceDataPtr> GetSequence(const size_t& sequenceId) = 0;
-    virtual ~Chunk() = default;
-
-    Chunk(const Chunk&) = delete;
-    Chunk(Chunk&&) = delete;
-    Chunk& operator=(const Chunk&) = delete;
-
-protected:
-    Chunk() {}
+    std::wstring major;
+    size_t minor;
 };
+
+class Chunk;
 typedef std::shared_ptr<Chunk> ChunkPtr;
 
 // Defines main properties of a sequence.
@@ -40,6 +30,7 @@ struct SequenceDescription
                               // particular data deserializer (or bundler). The randomizer guarantees to request
                               // sequences from only limited subset of chunks at any moment in time.
     bool m_isValid;           // Indicates whether the sequence is valid.
+    KeyType m_key;            // Sequence key, used for correlations between sequences of different deserializers.
 };
 typedef std::vector<const SequenceDescription*> SequenceDescriptions;
 
@@ -82,11 +73,27 @@ struct SparseSequenceData : SequenceDataBase
 };
 typedef std::shared_ptr<SparseSequenceData> SparseSequenceDataPtr;
 
+// Represents a chunk of sequences.
+class Chunk
+{
+public:
+    // Gets sequences by id.
+    virtual std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) = 0;
+    virtual ~Chunk() {};
+
+protected:
+    Chunk() {}
+
+private:
+    Chunk(const Chunk&) = delete;
+    Chunk& operator=(const Chunk&) = delete;
+};
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Interface all data deserializers should implement.
-// Data deserializers are intimately familiar with a particular input formats and responsible for bringing 
+// Data deserializers are intimately familiar with a particular input formats and responsible for bringing
 // the serialized data into sequences in memory. Very often data for different streams (i.e. features/lattices)
-// reside in the same physical storage (file), so the data deserializer can expose not a single but several 
+// reside in the same physical storage (file), so the data deserializer can expose not a single but several
 // streams. Examples of data include image data deserializer or htkmlf data deserializer.
 // TODO: This interface will become ABI and deserializers can be implemented in different languages, i.e. Python.
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,10 +107,15 @@ public:
     // Retrieves description of all sequences this data deserializer can produce.
     virtual const SequenceDescriptions& GetSequenceDescriptions() const = 0;
 
+    // Retrieves description of a single sequence given its key.
+    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) = 0;
+
+    virtual size_t GetTotalNumberOfChunks() = 0;
+
     // Gets a chunk.
     virtual ChunkPtr GetChunk(size_t chunkId) = 0;
 
-    virtual ~IDataDeserializer() = default;
+    virtual ~IDataDeserializer() {};
 };
 
 typedef std::shared_ptr<IDataDeserializer> IDataDeserializerPtr;
