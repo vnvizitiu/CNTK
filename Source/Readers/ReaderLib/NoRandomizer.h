@@ -37,6 +37,9 @@ private:
     // Initial timeline.
     SequenceDescriptions m_timeline;
 
+    // Stream descriptions
+    std::vector<StreamDescriptionPtr> m_streams;
+
     // Epoch configuration
     EpochConfiguration m_config;
     size_t m_samplePositionInEpoch;
