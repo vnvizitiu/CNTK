@@ -180,24 +180,27 @@ std::vector<StreamDescriptionPtr> HTKDataDeserializer::GetStreamDescriptions() c
     return m_streams;
 }
 
-class matrixasvectorofvectors // wrapper around a matrix that views it as a vector of column vectors
+class MatrixAsVectorOfVectors // wrapper around a matrix that views it as a vector of column vectors
 {
-    void operator=(const matrixasvectorofvectors&); // non-assignable
-    msra::dbn::matrixbase& m;
-
 public:
-    matrixasvectorofvectors(msra::dbn::matrixbase& m)
-        : m(m)
+    MatrixAsVectorOfVectors(msra::dbn::matrixbase& m)
+        : m_matrix(m)
     {
     }
+
     size_t size() const
     {
-        return m.cols();
+        return m_matrix.cols();
     }
+
     const_array_ref<float> operator[](size_t j) const
     {
-        return array_ref<float>(&m(0, j), m.rows());
+        return array_ref<float>(&m_matrix(0, j), m_matrix.rows());
     }
+
+private:
+    DISABLE_COPY_AND_MOVE(MatrixAsVectorOfVectors);
+    msra::dbn::matrixbase& m_matrix;
 };
 
 class HTKDataDeserializer::HTKChunk : public Chunk
@@ -207,12 +210,13 @@ class HTKDataDeserializer::HTKChunk : public Chunk
 public:
     HTKChunk(HTKDataDeserializer* parent, size_t chunkId) : m_parent(parent), m_chunkId(chunkId)
     {
-        auto& chunkdata = m_parent->m_chunks[chunkId];
+        auto& chunkDescription = m_parent->m_chunks[chunkId];
 
-        // possibly distributed read.
+        // possibly distributed read
+        // making several attempts
         msra::util::attempt(5, [&]()
         {
-            chunkdata.RequireData(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, m_parent->m_verbosity);
+            chunkDescription.RequireData(m_parent->m_featureKind, m_parent->m_ioFeatureDimension, m_parent->m_samplePeriod, m_parent->m_verbosity);
         });
     }
 
@@ -223,8 +227,8 @@ public:
 
     ~HTKChunk()
     {
-        auto& chunkdata = m_parent->m_chunks[m_chunkId];
-        chunkdata.ReleaseData();
+        auto& chunkDescription = m_parent->m_chunks[m_chunkId];
+        chunkDescription.ReleaseData();
     }
 };
 
@@ -266,7 +270,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
     auto utteranceFrames = chunkDescription.GetUtteranceFrames(utterance->GetIndexInsideChunk());
 
     // wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors()
-    matrixasvectorofvectors utteranceFramesWrapper(utteranceFrames);
+    MatrixAsVectorOfVectors utteranceFramesWrapper(utteranceFrames);
 
     size_t leftExtent = m_augmentationWindow.first;
     size_t rightExtent = m_augmentationWindow.second;
