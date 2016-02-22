@@ -54,6 +54,11 @@ Minibatch SampleModePacker::ReadMinibatch()
     Minibatch minibatch;
     minibatch.m_endOfEpoch = sequences.m_endOfEpoch;
 
+    if (sequences.m_data.empty())
+    {
+        return minibatch;
+    }
+
     assert(m_streamBuffers.size() == sequences.m_data.size());
 
     // For each sequence iterating thru all the streams with this sequence id and copying to the buffer.
@@ -65,11 +70,6 @@ Minibatch SampleModePacker::ReadMinibatch()
         {
             CopySequenceToBuffer(streamSequences[sequenceIndex], streamIndex, sequenceIndex);
         }
-    }
-
-    if (sequences.m_data.size() == 0)
-    {
-        return minibatch;
     }
 
     // Creating output minibatch with shared layout between all streams.
