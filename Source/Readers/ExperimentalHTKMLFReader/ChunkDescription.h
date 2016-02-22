@@ -41,7 +41,7 @@ public:
         m_utteranceSet.push_back(utterance);
     }
 
-    size_t GetTotatlFrames() const
+    size_t GetTotalFrames() const
     {
         return m_totalFrames;
     }

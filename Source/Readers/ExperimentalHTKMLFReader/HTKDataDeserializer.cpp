@@ -101,7 +101,7 @@ HTKDataDeserializer::HTKDataDeserializer(
     {
         // if exceeding current entry--create a new one
         // I.e. our chunks are a little larger than wanted (on av. half the av. utterance length).
-        if (m_chunks.empty() || m_chunks.back().GetTotatlFrames() > chunkframes || m_chunks.back().GetNumberOfUtterances() >= 65535)
+        if (m_chunks.empty() || m_chunks.back().GetTotalFrames() > chunkframes || m_chunks.back().GetNumberOfUtterances() >= 65535)
         {
             // TODO > instead of >= ? if (thisallchunks.empty() || thisallchunks.back().totalframes > chunkframes || thisallchunks.back().numutterances() >= frameref::maxutterancesperchunk)
             m_chunks.push_back(ChunkDescription());
