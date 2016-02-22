@@ -24,7 +24,7 @@ public:
     {
     }
 
-    size_t GetNumberOfUtteracens() const
+    size_t GetNumberOfUtterances() const
     {
         return m_utteranceSet.size();
     }
@@ -72,10 +72,10 @@ public:
 
     // page in data for this chunk
     // We pass in the feature info variables by ref which will be filled lazily upon first read
-    // this function supports retrying since we read from the unrealible network, i.e. do not return in a broken state
+    // this function supports retrying since we read from the unreliable network, i.e. do not return in a broken state
     void RequireData(const string& featureKind, size_t featureDimension, unsigned int samplePeriod, int verbosity = 0) const
     {
-        if (GetNumberOfUtteracens() == 0)
+        if (GetNumberOfUtterances() == 0)
         {
             LogicError("requiredata: cannot page in virgin block");
         }
@@ -113,7 +113,7 @@ public:
     // page out data for this chunk
     void ReleaseData() const
     {
-        if (GetNumberOfUtteracens() == 0)
+        if (GetNumberOfUtterances() == 0)
         {
             LogicError("releasedata: cannot page out virgin block");
         }

@@ -31,7 +31,7 @@ HTKDataDeserializer::HTKDataDeserializer(
     bool frameMode = feature.Find("frameMode", "true");
     if (!frameMode)
     {
-        LogicError("Currently only reader only supports fram mode. Please check your configuration.");
+        LogicError("Currently only reader only supports frame mode. Please check your configuration.");
     }
 
     ConfigHelper config(feature);
@@ -101,7 +101,7 @@ HTKDataDeserializer::HTKDataDeserializer(
     {
         // if exceeding current entry--create a new one
         // I.e. our chunks are a little larger than wanted (on av. half the av. utterance length).
-        if (m_chunks.empty() || m_chunks.back().GetTotatlFrames() > chunkframes || m_chunks.back().GetNumberOfUtteracens() >= 65535)
+        if (m_chunks.empty() || m_chunks.back().GetTotatlFrames() > chunkframes || m_chunks.back().GetNumberOfUtterances() >= 65535)
         {
             // TODO > instead of >= ? if (thisallchunks.empty() || thisallchunks.back().totalframes > chunkframes || thisallchunks.back().numutterances() >= frameref::maxutterancesperchunk)
             m_chunks.push_back(ChunkDescription());
@@ -110,7 +110,7 @@ HTKDataDeserializer::HTKDataDeserializer(
 
         // append utterance to last chunk
         ChunkDescription& currentchunk = m_chunks.back();
-        m_utterances[i].SetIndexInsideChunk(currentchunk.GetNumberOfUtteracens());
+        m_utterances[i].SetIndexInsideChunk(currentchunk.GetNumberOfUtterances());
         currentchunk.Add(&m_utterances[i]); // move it out from our temp array into the chunk
         m_utterances[i].m_chunkId = chunkId;
     }
