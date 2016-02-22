@@ -11,9 +11,11 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-// Implementation of the HTKMLF reader.
-// Currently represents a factory for connecting the packer,
-// transformers and deserializer together.
+// The class represents a factory for connecting the packer,
+// transformers and HTK and MLF deserializers together.
+// TODO: The Packer and Randomizer will be moved to the network,
+// TODO: Combination of deserializers(transformers) will be done in a generic way based on configuration,
+// TODO: Deserializers/transformers will be loaded dynamically.
 class HTKMLFReader : public Reader
 {
 public:

@@ -8,7 +8,8 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
-// This class is a data descriptor for a single utterance.
+// This class represents a descriptor for a single utterance.
+// It is only used internally by the HTK deserializer.
 class UtteranceDescription : public SequenceDescription
 {
     // Archive filename and frame range in that file.

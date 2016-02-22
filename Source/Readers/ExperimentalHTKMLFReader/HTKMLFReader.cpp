@@ -59,10 +59,8 @@ HTKMLFReader::HTKMLFReader(MemoryProviderPtr provider,
     const ConfigParameters& readerConfig)
     : m_seed(0), m_provider(provider)
 {
-    // In the future, deserializers and transformers will be dynamically loaded
+    // TODO: deserializers and transformers will be dynamically loaded
     // from external libraries based on the configuration/brain script.
-    // We will provide ability to implement the transformer and
-    // deserializer interface not only in C++ but in scripting languages as well.
 
     assert(readerConfig(L"frameMode", true));
     ConfigHelper config(readerConfig);

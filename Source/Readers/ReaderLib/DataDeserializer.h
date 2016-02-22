@@ -10,6 +10,8 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
+// Sequence key, used for correlations between sequences of different deserializers.
+// Both strings and integers are supported.
 struct KeyType
 {
     std::wstring major;
@@ -85,8 +87,7 @@ protected:
     Chunk() {}
 
 private:
-    Chunk(const Chunk&) = delete;
-    Chunk& operator=(const Chunk&) = delete;
+    DISABLE_COPY_AND_MOVE(Chunk);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,9 +112,10 @@ public:
     // Retrieves description of a single sequence given its key.
     virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) = 0;
 
+    // Retrieves total number of chunks this deserializer can produce.
     virtual size_t GetTotalNumberOfChunks() = 0;
 
-    // Gets a chunk.
+    // Retrieves a chunk with data.
     virtual ChunkPtr GetChunk(size_t chunkId) = 0;
 
     virtual ~IDataDeserializer() {};

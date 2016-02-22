@@ -3,11 +3,10 @@
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 //
 #include "stdafx.h"
-#include "ConfigHelper.h"
-#include <Config.h>
-#include <DataReader.h>
 #include <regex>
-#include <StringUtil.h>
+#include "ConfigHelper.h"
+#include "DataReader.h"
+#include "StringUtil.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
@@ -21,7 +20,7 @@ std::pair<size_t, size_t> ConfigHelper::GetContextWindow()
         size_t windowFrames = contextWindow[0];
         if (windowFrames % 2 == 0)
         {
-            InvalidArgument("augmentationextent: neighbor expansion of input features to %lu not symmetrical", windowFrames);
+            InvalidArgument("Neighbor expansion of input features to %d is not symmetrical.", (int)windowFrames);
         }
 
         // extend each side by this
@@ -37,7 +36,7 @@ std::pair<size_t, size_t> ConfigHelper::GetContextWindow()
     }
     else
     {
-        InvalidArgument("contextFrames must have 1 or 2 values specified, found %lu", contextWindow.size());
+        InvalidArgument("contextWindow must have 1 or 2 values specified, found %d.", (int)contextWindow.size());
     }
 
     return std::make_pair(left, right);
@@ -48,7 +47,7 @@ void ConfigHelper::CheckFeatureType()
     std::wstring type = m_config(L"type", L"real");
     if (_wcsicmp(type.c_str(), L"real"))
     {
-        InvalidArgument("Feature type must be 'real'.");
+        InvalidArgument("Feature type must be of type 'real'.");
     }
 }
 
@@ -57,7 +56,7 @@ void ConfigHelper::CheckLabelType()
     std::wstring type;
     if (m_config.Exists(L"labelType"))
     {
-        // let's deprecate this eventually and just use "type"...
+        // TODO: let's deprecate this eventually and just use "type"...
         type = static_cast<const std::wstring&>(m_config(L"labelType"));
     }
     else
@@ -68,7 +67,7 @@ void ConfigHelper::CheckLabelType()
 
     if (_wcsicmp(type.c_str(), L"category"))
     {
-        InvalidArgument("label type must be 'category'");
+        InvalidArgument("Label type must be of type 'category'.");
     }
 }
 
@@ -109,12 +108,12 @@ void ConfigHelper::GetDataNamesFromConfig(
 ElementType ConfigHelper::GetElementType()
 {
     string precision = m_config.Find("precision", "float");
-    if (AreEqualIgnoreCase(precision, std::string("float")))
+    if (AreEqualIgnoreCase(precision, "float"))
     {
         return ElementType::tfloat;
     }
 
-    if (AreEqualIgnoreCase(precision, std::string("double")))
+    if (AreEqualIgnoreCase(precision, "double"))
     {
         return ElementType::tdouble;
     }
@@ -129,7 +128,7 @@ size_t ConfigHelper::GetFeatureDimension()
         return m_config(L"dim");
     }
 
-    InvalidArgument("features must specify dim");
+    InvalidArgument("Features must specify dimension: 'dim' property is missing.");
 }
 
 size_t ConfigHelper::GetLabelDimension()
@@ -144,7 +143,7 @@ size_t ConfigHelper::GetLabelDimension()
         return m_config(L"dim");
     }
 
-    InvalidArgument("labels must specify dim or labelDim");
+    InvalidArgument("Labels must specify dimension: 'dim/labelDim' property is missing.");
 }
 
 std::vector<std::wstring> ConfigHelper::GetMlfPaths()
@@ -158,7 +157,7 @@ std::vector<std::wstring> ConfigHelper::GetMlfPaths()
     {
         if (!m_config.ExistsCurrent(L"mlfFileList"))
         {
-            InvalidArgument("Either mlfFile or mlfFileList must exist in ExperimentalHTKMLFReader");
+            InvalidArgument("Either mlfFile or mlfFileList must exist in the reader configuration.");
         }
 
         wstring list = m_config(L"mlfFileList");
@@ -197,7 +196,7 @@ size_t ConfigHelper::GetRandomizationWindow()
 
 std::wstring ConfigHelper::GetRandomizer()
 {
-    // get the read method, defaults to "blockRandomize" other option is "rollingWindow"
+    // get the read method, defaults to "blockRandomize"
     std::wstring randomizer(m_config(L"readMethod", L"blockRandomize"));
 
     if (randomizer == L"blockRandomize" && GetRandomizationWindow() == randomizeNone)
@@ -214,7 +213,7 @@ std::vector<std::wstring> ConfigHelper::GetFeaturePaths()
     std::wstring rootPath = m_config(L"prefixPathInSCP", L"");
 
     vector<wstring> filelist;
-    fprintf(stderr, "reading script file %ls ...", scriptPath.c_str());
+    fprintf(stderr, "Reading script file %ls ...", scriptPath.c_str());
 
     size_t n = 0;
     for (msra::files::textreader reader(scriptPath); reader;)

@@ -30,6 +30,8 @@ Bundler::Bundler(
     CreateSequenceDescriptions();
 }
 
+// Creates additional structures for fast indexing between chunks/deseriazliers.
+// TODO: This must be changed when we introduce chunking of the timeline.
 void Bundler::CreateSequenceDescriptions()
 {
     m_sequenceToSequence.resize(m_deserializers.size());
@@ -103,6 +105,7 @@ void Bundler::CreateSequenceDescriptions()
     }
 }
 
+// Represents a chunk that has poibters to the underlying deserialzer chunks.
 class BundlingChunk : public Chunk
 {
     size_t m_numberOfInputs;

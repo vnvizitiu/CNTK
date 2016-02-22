@@ -841,6 +841,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExperimentalHTKMLFReader", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageReader", "Source\Readers\ImageReader\ImageReader.vcxproj", "{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

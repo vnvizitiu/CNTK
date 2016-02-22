@@ -31,6 +31,12 @@ public:
     }
 };
 
+// Inner class for an utterance.
+struct MLFUtterance : SequenceDescription
+{
+    size_t m_sequenceStart;
+};
+
 MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& labelConfig, const std::wstring& name)
 {
     bool frameMode = labelConfig.Find("frameMode", "true");
@@ -74,7 +80,7 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
     {
         description.m_key.major = l.first;
         const auto& utterance = l.second;
-        description.sequenceStart = m_classIds.size();
+        description.m_sequenceStart = m_classIds.size();
         description.m_isValid = true;
         size_t numberOfFrames = 0;
 
@@ -118,7 +124,7 @@ MLFDataDeserializer::MLFDataDeserializer(CorpusDescriptorPtr corpus, const Confi
         {
             f.m_id = m_frames.size();
             f.m_key.minor = k;
-            f.index = description.sequenceStart + k;
+            f.m_index = description.m_sequenceStart + k;
             m_frames.push_back(f);
             m_sequences.push_back(&m_frames[f.m_id]);
         }
@@ -167,7 +173,7 @@ ChunkPtr MLFDataDeserializer::GetChunk(size_t chunkId)
 
 std::vector<SequenceDataPtr> MLFDataDeserializer::GetSequenceById(size_t sequenceId)
 {
-    size_t label = m_classIds[m_frames[sequenceId].index];
+    size_t label = m_classIds[m_frames[sequenceId].m_index];
     SparseSequenceDataPtr r = std::make_shared<SparseSequenceData>();
     r->m_indices.resize(1);
     r->m_indices[0] = std::vector<size_t>{ label };

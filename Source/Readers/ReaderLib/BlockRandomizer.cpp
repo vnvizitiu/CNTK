@@ -15,16 +15,17 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
+// TODO: This is an old code, used for legacy randomization to make sure to preserve the same behavior for the tests.
 static inline size_t rand(const size_t begin, const size_t end)
 {
-    // eldak: this has already been changed by Alexey(alrezni)
     // still only covers 32-bit range
     const size_t randomNumber = ::rand() * RAND_MAX + ::rand();
     return begin + randomNumber % (end - begin);
 }
 
+// TODO: This is an old code, used for legacy randomization to make sure to preserve the same behavior for the tests.
+// TODO: Will be removed after more testing of the new functionality is done, currently the set of tests is limited.
 // Shuffle a vector into random order by randomly swapping elements.
-// Use for legacy randomization.
 template <typename TVector>
 void RandomShuffle(TVector& v, size_t randomSeed)
 {
@@ -470,9 +471,11 @@ Sequences BlockRandomizer::GetNextSequences(size_t sampleCount)
     const auto& originalTimeline = m_deserializer->GetSequenceDescriptions();
     result.m_data.resize(m_streams.size(), std::vector<SequenceDataPtr>(originalIds.size()));
 
-    // TODO #pragma omp parallel for ordered schedule(static)
-    // TODO need to change image reader randomizer parameters
-    for (size_t i = 0; i < originalIds.size(); ++i)
+    // TODO: This will be changed, when we move transformers under the randomizer.
+    // TODO: Randomizer won't should not deal with multithreading.
+
+    #pragma omp parallel for ordered schedule(dynamic)
+    for (int i = 0; i < originalIds.size(); ++i)
     {
         const auto& sequenceDescription = originalTimeline[originalIds[i]];
         auto sequence = m_chunks[sequenceDescription->m_chunkId]->GetSequence(originalIds[i]);

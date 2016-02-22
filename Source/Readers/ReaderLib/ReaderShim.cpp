@@ -110,6 +110,8 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
 
     if (!minibatch.m_data.empty())
     {
+        // Copy the minibacth to preallocated buffers.
+        // TODO: use alternating pinned buffer here, do not copy anything, but pack into the alternating buffer.
         m_buffer.resize(m_nameToStreamId.size());
         for (const auto& mx : matrices)
         {
@@ -128,6 +130,7 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
             memcpy(buffer.m_data.data(), stream->m_data, totalSize * sizeof(ElemType));
         }
 
+        // Start fetching the next minibatch asynchronously even before we copied the data to the GPU.
         if (!minibatch.m_endOfEpoch)
         {
             m_prefetchTask = std::async(m_launchType, [this]()
@@ -136,7 +139,7 @@ bool ReaderShim<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*
             });
         }
 
-        // Copy returned minibatch to the matrices.
+        // Copy from the buffer to the GPU.
         for (const auto& mx : matrices)
         {
             size_t streamId = m_nameToStreamId[mx.first];

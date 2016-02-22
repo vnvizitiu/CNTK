@@ -17,6 +17,8 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
+// Factory methods for the reader.
+// TODO: Must be removed when SGD is moved to an untyped matrix.
 auto factory = [](const ConfigParameters& parameters) -> ReaderPtr
 {
     return std::make_shared<HTKMLFReader>(std::make_shared<HeapMemoryProvider>(), parameters);

@@ -84,6 +84,7 @@ HTKDataDeserializer::HTKDataDeserializer(
             return s.m_numberOfSamples + sum;
         });
 
+    const size_t MaxUtterancesPerChunk = 65535;
     // distribute them over chunks
     // We simply count off frames until we reach the chunk size.
     // Note that we first randomize the chunks, i.e. when used, chunks are non-consecutive and thus cause the disk head to seek for each chunk.
@@ -101,9 +102,8 @@ HTKDataDeserializer::HTKDataDeserializer(
     {
         // if exceeding current entry--create a new one
         // I.e. our chunks are a little larger than wanted (on av. half the av. utterance length).
-        if (m_chunks.empty() || m_chunks.back().GetTotalFrames() > chunkframes || m_chunks.back().GetNumberOfUtterances() >= 65535)
+        if (m_chunks.empty() || m_chunks.back().GetTotalFrames() > chunkframes || m_chunks.back().GetNumberOfUtterances() >= MaxUtterancesPerChunk)
         {
-            // TODO > instead of >= ? if (thisallchunks.empty() || thisallchunks.back().totalframes > chunkframes || thisallchunks.back().numutterances() >= frameref::maxutterancesperchunk)
             m_chunks.push_back(ChunkDescription());
             chunkId++;
         }
@@ -180,7 +180,9 @@ std::vector<StreamDescriptionPtr> HTKDataDeserializer::GetStreamDescriptions() c
     return m_streams;
 }
 
-class MatrixAsVectorOfVectors // wrapper around a matrix that views it as a vector of column vectors
+// A wrapper around a matrix that views it as a vector of column vectors.
+// Does not have any memory associated.
+class MatrixAsVectorOfVectors 
 {
 public:
     MatrixAsVectorOfVectors(msra::dbn::matrixbase& m)
@@ -203,6 +205,9 @@ private:
     msra::dbn::matrixbase& m_matrix;
 };
 
+
+// Represets a chunk data in memory. Given up to the randomizer.
+// It is up to the randomizer to decide when to release a particular chunk.
 class HTKDataDeserializer::HTKChunk : public Chunk
 {
     HTKDataDeserializer* m_parent;
@@ -313,7 +318,7 @@ std::vector<SequenceDataPtr> HTKDataDeserializer::GetSequenceById(size_t id)
 
 const SequenceDescription* HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType&)
 {
-    LogicError("HTKDataDeserializer::GetSequenceDescriptionByKey: currently not implemented. Supported only as primary deserializer.");
+    LogicError("HTKDataDeserializer::GetSequenceDescriptionByKey: currently not implemented. Supported only as a primary deserializer.");
 }
 
 size_t HTKDataDeserializer::GetTotalNumberOfChunks()

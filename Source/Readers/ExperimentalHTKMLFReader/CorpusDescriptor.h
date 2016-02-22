@@ -7,11 +7,14 @@
 
 #include <string>
 #include <memory>
-#include "ConfigHelper.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 // Represents a full corpus.
+// Defines which sequences should participate in the reading.
+// TODO: Currently it is only a skeleton class.
+// TODO: For HtkMlf it will be based on the set of sequences from the SCP file.
+// TODO: Extract an interface.
 class CorpusDescriptor
 {
 public:
@@ -19,8 +22,10 @@ public:
     {
     }
 
-    bool IsIncluded(const std::wstring&)
+    // Checks if the specified sequence should be used for reading.
+    bool IsIncluded(const std::wstring& sequenceKey)
     {
+        UNUSED(sequenceKey);
         return true;
     }
 
