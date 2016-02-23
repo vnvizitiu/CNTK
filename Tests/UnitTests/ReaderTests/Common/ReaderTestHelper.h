@@ -35,7 +35,7 @@ struct ReaderFixture
         BOOST_TEST_MESSAGE("Setting test data path to: " + m_testDataPath);
         fprintf(stderr, "Test path: %s\n", m_testDataPath.c_str());
 
-        string newCurrentPath;
+        boost::filesystem::path newCurrentPath;
 
         // Determine if a subpath has been specified and it is not a relative path
         if (subPath.length())
@@ -75,11 +75,11 @@ struct ReaderFixture
             }
             else
             {
-                newCurrentPath = m_testDataPath + subPath;
+                newCurrentPath = boost::filesystem::path(m_testDataPath) / subPath;
             }
         }
 
-        BOOST_TEST_MESSAGE("Setting current path to: " + newCurrentPath);
+        BOOST_TEST_MESSAGE("Setting current path to: " + newCurrentPath.string());
         fprintf(stderr, "Set current path to: %s\n", newCurrentPath.c_str());
         boost::filesystem::current_path(newCurrentPath);
 
@@ -257,12 +257,11 @@ struct ReaderFixture
         std::ifstream ifstream1(controlDataFilePath);
         std::ifstream ifstream2(testDataFilePath);
 
-        std::istream_iterator<char> beginStream1(ifstream1);
-        std::istream_iterator<char> endStream1;
-        std::istream_iterator<char> beginStream2(ifstream2);
-        std::istream_iterator<char> endStream2;
+        std::istreambuf_iterator<char> beginStream1(ifstream1);
+        std::istreambuf_iterator<char> beginStream2(ifstream2);
+        std::istreambuf_iterator<char> end;
 
-        BOOST_CHECK_EQUAL_COLLECTIONS(beginStream1, endStream1, beginStream2, endStream2);
+        BOOST_CHECK_EQUAL_COLLECTIONS(beginStream1, end, beginStream2, end);
     }
 
     // Helper function to run a Reader test and catch an expected exception.
