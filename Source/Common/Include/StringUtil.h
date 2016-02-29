@@ -22,22 +22,20 @@ inline bool AreEqualIgnoreCase(
     });
 }
 
-template<class TElement>
+template<class TString>
 inline bool AreEqualIgnoreCase(
-    const std::basic_string<TElement, char_traits<TElement>, allocator<TElement>>& s1,
-    const TElement* s2pointer)
+    const TString& s1,
+    const typename TString::value_type* s2pointer)
 {
-    std::basic_string<TElement, char_traits<TElement>, allocator<TElement>> s2(s2pointer);
-    return AreEqualIgnoreCase(s1, s2);
+    return AreEqualIgnoreCase(s1, TString(s2pointer));
 }
 
-template<class TElement>
+template<class TString>
 inline bool AreEqualIgnoreCase(
-    const TElement* s1pointer,
-    const std::basic_string<TElement, char_traits<TElement>, allocator<TElement>>& s2)
+    const typename TString::value_type* s1pointer,
+    const TString& s2)
 {
-    std::basic_string<TElement, char_traits<TElement>, allocator<TElement>> s1(s1pointer);
-    return AreEqualIgnoreCase(s1, s2);
+    return AreEqualIgnoreCase(TString(s1pointer), s2);
 }
 
 }}}

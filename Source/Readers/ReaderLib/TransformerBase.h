@@ -50,6 +50,7 @@ public:
         const auto &appliedStreamIds = GetAppliedStreamIds();
         const auto &outputStreams = GetOutputStreams();
 
+        // TODO: Move parallelization on the outer loop with collapse.
         for (int j = 0; j < appliedStreamIds.size(); ++j)
         {
             size_t streamId = appliedStreamIds[j];

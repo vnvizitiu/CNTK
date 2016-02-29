@@ -75,12 +75,28 @@ struct SparseSequenceData : SequenceDataBase
 };
 typedef std::shared_ptr<SparseSequenceData> SparseSequenceDataPtr;
 
-// Represents a chunk of sequences.
+// A chunk represents a set of sequences.
+// In order to enable efficient IO, the deserializer is asked to load a complete chunk in memory.
+// Which chunks to load are controlled by the randomizer. The randomizer guarantees that at any point in time
+// only a limited number of chunks is requested from the deserializer and uses for randomization only sequences
+// from these chunks.
+//
+// In case when several deserializers provide data, the chunking of the "primary" deserializer defines
+// which chunks are requested by the randomizer. Thus, if the deserializers are "aligned" as how they see chunks,
+// the randomizer will access only a limited set. If the data between different randomizers is not aligned - this
+// could lead to memory pressure caused by randomly accessed sequences in different chunks in secondary deserializers.
+//
+// The lifetime of chunk is controlled by the randomizer - when all sequences of the chunk are consumed, the randomizer
+// releases the shared pointer to the chunk by that freeing the associated memory.
+// Sequences are only pointers to the real data which is allocated on chunk basis.
 class Chunk
 {
 public:
-    // Gets sequences by id.
+    // Gets a sequence per input by its identifier.
+    // The sequence has a reference to the corresponding chunk. The chunk is not
+    // deallocated till all its sequences are released.
     virtual std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) = 0;
+
     virtual ~Chunk() {};
 
 protected:

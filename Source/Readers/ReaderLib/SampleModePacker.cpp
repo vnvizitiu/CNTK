@@ -51,9 +51,7 @@ Minibatch SampleModePacker::ReadMinibatch()
 {
     auto sequences = m_transformer->GetNextSequences(m_minibatchSize);
 
-    Minibatch minibatch;
-    minibatch.m_endOfEpoch = sequences.m_endOfEpoch;
-
+    Minibatch minibatch(sequences.m_endOfEpoch);
     if (sequences.m_data.empty())
     {
         return minibatch;

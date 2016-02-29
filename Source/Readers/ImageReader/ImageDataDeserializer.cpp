@@ -179,7 +179,7 @@ void ImageDataDeserializer::CreateSequenceDescriptions(std::string mapPath, size
 
 size_t ImageDataDeserializer::GetTotalNumberOfChunks()
 {
-    // Currently we use chunk per image.
+    // Currently we use one chunk per image.
     return m_imageSequences.size();
 }
 

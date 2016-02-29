@@ -34,7 +34,7 @@ void RandomShuffle(TVector& v, size_t randomSeed)
         RuntimeError("RandomShuffle: too large set: need to change to different random generator!");
     }
 
-    srand(static_cast<unsigned int>(randomSeed));
+    srand((unsigned int)randomSeed);
     foreach_index (currentLocation, v)
     {
         // Pick a random location a location and swap with current
@@ -78,7 +78,7 @@ void BlockRandomizer::RandomizeChunks()
     }
     else
     {
-        std::mt19937 m_rng(static_cast<int>(m_sweep));
+        std::mt19937 m_rng((int)m_sweep);
         std::shuffle(randomizedChunkIndices.begin(), randomizedChunkIndices.end(), m_rng);
     }
 
@@ -128,6 +128,8 @@ void BlockRandomizer::RandomizeChunks()
     }
 }
 
+// TODO: Profile and eliminate PositionConverter, better convert sequencePosition to RandomizedChunk
+// once.
 size_t BlockRandomizer::GetChunkIndexForSequencePosition(size_t sequencePosition) const
 {
     assert(sequencePosition <= m_numSamples);
@@ -185,7 +187,7 @@ void BlockRandomizer::Randomize()
 
     // Now randomly shuffle m_randomTimeline, while considering the
     // constraints of what chunk range needs to be in memory.
-    srand(static_cast<unsigned int>(m_sweep + 1));
+    srand((unsigned int)(m_sweep + 1));
     foreach_index (i, m_randomTimeline)
     {
         // Get valid randomization range, expressed in chunks
@@ -225,6 +227,9 @@ void BlockRandomizer::Randomize()
     }
 }
 
+// Randomizes if new sweep of the data is needed.
+// Returns true in case when randomization happend and false if the end of the current
+// sweep has not yet been reached (no randomization took place).
 bool BlockRandomizer::RandomizeIfNewSweepIsEntered()
 {
     // Check that StartEpoch() was called
@@ -267,16 +272,16 @@ BlockRandomizer::BlockRandomizer(int verbosity,
                                  size_t randomizationRangeInSamples,
                                  IDataDeserializerPtr deserializer,
                                  DistributionMode distributionMode,
-                                 bool useLegacyRandomization)
-    : m_verbosity(verbosity),
-      m_randomizationRangeInSamples(randomizationRangeInSamples),
-      m_deserializer(deserializer),
-      m_distributionMode(distributionMode),
-      m_useLegacyRandomization(useLegacyRandomization),
-      m_sweep(SIZE_MAX),
-      m_sequencePositionInSweep(SIZE_MAX),
-      m_samplePositionInEpoch(SIZE_MAX),
-      m_epochSize(SIZE_MAX)
+                                 bool useLegacyRandomization) :
+    m_verbosity(verbosity),
+    m_randomizationRangeInSamples(randomizationRangeInSamples),
+    m_deserializer(deserializer),
+    m_distributionMode(distributionMode),
+    m_useLegacyRandomization(useLegacyRandomization),
+    m_sweep(SIZE_MAX),
+    m_sequencePositionInSweep(SIZE_MAX),
+    m_samplePositionInEpoch(SIZE_MAX),
+    m_epochSize(SIZE_MAX)
 {
     assert(deserializer != nullptr);
     const SequenceDescriptions& timeline = m_deserializer->GetSequenceDescriptions();
