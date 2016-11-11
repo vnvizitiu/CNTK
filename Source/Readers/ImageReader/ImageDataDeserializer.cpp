@@ -4,16 +4,26 @@
 //
 
 #include "stdafx.h"
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <opencv2/opencv.hpp>
+#include <numeric>
+#include <limits>
 #include "ImageDataDeserializer.h"
 #include "ImageConfigHelper.h"
+#include "StringUtil.h"
+#include "ConfigUtil.h"
+#include "TimerUtility.h"
+#include "ImageTransformers.h"
+#include "SequenceData.h"
+#include "ImageUtil.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 class ImageDataDeserializer::LabelGenerator
 {
 public:
-    virtual void CreateLabelFor(size_t classId, SparseSequenceData& data) = 0;
+    virtual void CreateLabelFor(size_t classId, CategorySequenceData& data) = 0;
     virtual ~LabelGenerator() { }
 };
 
@@ -26,25 +36,28 @@ template <class TElement>
 class TypedLabelGenerator : public ImageDataDeserializer::LabelGenerator
 {
 public:
-    TypedLabelGenerator() : m_value(1)
+    TypedLabelGenerator(size_t labelDimension) : m_value(1), m_indices(labelDimension)
     {
+        if (labelDimension > numeric_limits<IndexType>::max())
+        {
+            RuntimeError("Label dimension (%" PRIu64 ") exceeds the maximum allowed "
+                "value (%" PRIu64 ")\n", labelDimension, (size_t)numeric_limits<IndexType>::max());
+        }
+        iota(m_indices.begin(), m_indices.end(), 0);
     }
 
-    virtual void CreateLabelFor(size_t classId, SparseSequenceData& data) override
+    virtual void CreateLabelFor(size_t classId, CategorySequenceData& data) override
     {
-        data.m_indices.resize(1);
-        data.m_indices[0] = std::vector<size_t>{ classId };
+        data.m_nnzCounts.resize(1);
+        data.m_nnzCounts[0] = 1;
+        data.m_totalNnzCount = 1;
         data.m_data = &m_value;
+        data.m_indices = &(m_indices[classId]);
     }
 
 private:
     TElement m_value;
-};
-
-// Used to keep track of the image. Accessed only using DenseSequenceData interface.
-struct DeserializedImage : DenseSequenceData
-{
-    cv::Mat m_image;
+    vector<IndexType> m_indices;
 };
 
 // For image, chunks correspond to a single image.
@@ -59,54 +72,125 @@ public:
     {
     }
 
-    virtual std::vector<SequenceDataPtr> GetSequence(size_t sequenceId) override
+    virtual void GetSequence(size_t sequenceId, std::vector<SequenceDataPtr>& result) override
     {
         assert(sequenceId == m_description.m_id);
-        UNUSED(sequenceId);
         const auto& imageSequence = m_description;
 
-        auto image = std::make_shared<DeserializedImage>();
-        image->m_image = std::move(m_parent.ReadImage(m_description.m_id, imageSequence.m_path));
+        auto image = std::make_shared<ImageSequenceData>();
+        image->m_image = std::move(m_parent.ReadImage(m_description.m_id, imageSequence.m_path, m_parent.m_grayscale));
         auto& cvImage = image->m_image;
-
         if (!cvImage.data)
-        {
             RuntimeError("Cannot open file '%s'", imageSequence.m_path.c_str());
-        }
 
         // Convert element type.
-        int dataType = m_parent.m_featureElementType == ElementType::tfloat ? CV_32F : CV_64F;
-        if (cvImage.type() != CV_MAKETYPE(dataType, cvImage.channels()))
-        {
-            cvImage.convertTo(cvImage, dataType);
-        }
-
+        ElementType dataType = ConvertImageToSupportedDataType(cvImage);
         if (!cvImage.isContinuous())
-        {
             cvImage = cvImage.clone();
-        }
         assert(cvImage.isContinuous());
 
-        image->m_data = image->m_image.data;
         ImageDimensions dimensions(cvImage.cols, cvImage.rows, cvImage.channels());
         image->m_sampleLayout = std::make_shared<TensorShape>(dimensions.AsTensorShape(HWC));
+        image->m_id = sequenceId;
         image->m_numberOfSamples = 1;
         image->m_chunk = shared_from_this();
+        image->m_elementType = dataType;
+        result.push_back(image);
 
-        SparseSequenceDataPtr label = std::make_shared<SparseSequenceData>();
+        auto label = std::make_shared<CategorySequenceData>();
         label->m_chunk = shared_from_this();
         m_parent.m_labelGenerator->CreateLabelFor(imageSequence.m_classId, *label);
-        return std::vector<SequenceDataPtr> { image, label };
+        label->m_numberOfSamples = 1;
+        result.push_back(label);
+    }
+
+private:
+    ElementType ConvertImageToSupportedDataType(cv::Mat& image)
+    {
+        ElementType resultType;
+        if (!IdentifyElementTypeFromOpenCVType(image.depth(), resultType))
+        {
+            // Could not identify element type.
+            // Natively unsupported image type. Let's convert it to required precision.
+            int requiredType = m_parent.m_precision == ElementType::tfloat ? CV_32F : CV_64F;
+            image.convertTo(image, requiredType);
+            resultType = m_parent.m_precision;
+        }
+        return resultType;
     }
 };
 
+// A new constructor to support new compositional configuration,
+// that allows composition of deserializers and transforms on inputs.
+ImageDataDeserializer::ImageDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& config)
+{
+    ConfigParameters inputs = config("input");
+    std::vector<std::string> featureNames = GetSectionsWithParameter("ImageDataDeserializer", inputs, "transforms");
+    std::vector<std::string> labelNames = GetSectionsWithParameter("ImageDataDeserializer", inputs, "labelDim");
+
+    // TODO: currently support only one feature and label section.
+    if (featureNames.size() != 1 || labelNames.size() != 1)
+    {
+        RuntimeError(
+            "ImageReader currently supports a single feature and label stream. '%d' features , '%d' labels found.",
+            static_cast<int>(featureNames.size()),
+            static_cast<int>(labelNames.size()));
+    }
+
+    string precision = (ConfigValue)config("precision", "float");
+    m_precision = AreEqualIgnoreCase(precision, "float") ? ElementType::tfloat : ElementType::tdouble;
+
+    m_verbosity = config(L"verbosity", 0);
+
+    // Feature stream.
+    ConfigParameters featureSection = inputs(featureNames[0]);
+    auto features = std::make_shared<StreamDescription>();
+    features->m_id = 0;
+    features->m_name = msra::strfun::utf16(featureSection.ConfigName());
+    features->m_storageType = StorageType::dense;
+
+    // Due to performance, now we support images of different types.
+    features->m_elementType = ElementType::tvariant;
+    m_streams.push_back(features);
+
+    // Label stream.
+    ConfigParameters label = inputs(labelNames[0]);
+    size_t labelDimension = label("labelDim");
+    auto labels = std::make_shared<StreamDescription>();
+    labels->m_id = 1;
+    labels->m_name = msra::strfun::utf16(label.ConfigName());
+    labels->m_sampleLayout = std::make_shared<TensorShape>(labelDimension);
+    labels->m_storageType = StorageType::sparse_csc;
+    labels->m_elementType = m_precision;
+    m_streams.push_back(labels);
+
+    m_labelGenerator = labels->m_elementType == ElementType::tfloat ?
+        (LabelGeneratorPtr)std::make_shared<TypedLabelGenerator<float>>(labelDimension) :
+        std::make_shared<TypedLabelGenerator<double>>(labelDimension);
+
+    m_grayscale = config(L"grayscale", false);
+
+    // TODO: multiview should be done on the level of randomizer/transformers - it is responsiblity of the
+    // TODO: randomizer to collect how many copies each transform needs and request same sequence several times.
+    bool multiViewCrop = config(L"multiViewCrop", false);
+    CreateSequenceDescriptions(corpus, config(L"file"), labelDimension, multiViewCrop);
+}
+
+// TODO: Should be removed at some point.
+// Supports old type of ImageReader configuration.
 ImageDataDeserializer::ImageDataDeserializer(const ConfigParameters& config)
 {
     ImageConfigHelper configHelper(config);
     m_streams = configHelper.GetStreams();
     assert(m_streams.size() == 2);
+    m_grayscale = configHelper.UseGrayscale();
     const auto& label = m_streams[configHelper.GetLabelStreamId()];
     const auto& feature = m_streams[configHelper.GetFeatureStreamId()];
+
+    m_verbosity = config(L"verbosity", 0);
+
+    string precision = (ConfigValue)config("precision", "float");
+    m_precision = AreEqualIgnoreCase(precision, "float") ? ElementType::tfloat : ElementType::tdouble;
 
     // Expect data in HWC.
     ImageDimensions dimensions(*feature->m_sampleLayout, configHelper.GetDataFormat());
@@ -115,103 +199,153 @@ ImageDataDeserializer::ImageDataDeserializer(const ConfigParameters& config)
     label->m_storageType = StorageType::sparse_csc;
     feature->m_storageType = StorageType::dense;
 
-    m_featureElementType = feature->m_elementType;
+    // Due to performance, now we support images of different types.
+    feature->m_elementType = ElementType::tvariant;
+
     size_t labelDimension = label->m_sampleLayout->GetDim(0);
 
     if (label->m_elementType == ElementType::tfloat)
     {
-        m_labelGenerator = std::make_shared<TypedLabelGenerator<float>>();
+        m_labelGenerator = std::make_shared<TypedLabelGenerator<float>>(labelDimension);
     }
     else if (label->m_elementType == ElementType::tdouble)
     {
-        m_labelGenerator = std::make_shared<TypedLabelGenerator<double>>();
+        m_labelGenerator = std::make_shared<TypedLabelGenerator<double>>(labelDimension);
     }
     else
     {
         RuntimeError("Unsupported label element type '%d'.", (int)label->m_elementType);
     }
 
-    CreateSequenceDescriptions(configHelper.GetMapPath(), labelDimension);
+    CreateSequenceDescriptions(std::make_shared<CorpusDescriptor>(), configHelper.GetMapPath(), labelDimension, configHelper.IsMultiViewCrop());
 }
 
-void ImageDataDeserializer::CreateSequenceDescriptions(std::string mapPath, size_t labelDimension)
+// Descriptions of chunks exposed by the image reader.
+ChunkDescriptions ImageDataDeserializer::GetChunkDescriptions()
 {
-    UNUSED(labelDimension);
+    ChunkDescriptions result;
+    result.reserve(m_imageSequences.size());
+    for (auto const& s : m_imageSequences)
+    {
+        auto chunk = std::make_shared<ChunkDescription>();
+        chunk->m_id = s.m_chunkId;
+        chunk->m_numberOfSamples = 1;
+        chunk->m_numberOfSequences = 1;
+        result.push_back(chunk);
+    }
 
+    return result;
+}
+
+void ImageDataDeserializer::GetSequencesForChunk(ChunkIdType chunkId, std::vector<SequenceDescription>& result)
+{
+    // Currently a single sequence per chunk.
+    result.push_back(m_imageSequences[chunkId]);
+}
+
+void ImageDataDeserializer::CreateSequenceDescriptions(CorpusDescriptorPtr corpus, std::string mapPath, size_t labelDimension, bool isMultiCrop)
+{
     std::ifstream mapFile(mapPath);
     if (!mapFile)
     {
         RuntimeError("Could not open %s for reading.", mapPath.c_str());
     }
 
+    // Creating the default reader with expanded directory to the map file.
+    auto mapFileDirectory = ExtractDirectory(mapPath);
+    m_defaultReader = make_unique<FileByteReader>(mapFileDirectory);
+
+    size_t itemsPerLine = isMultiCrop ? 10 : 1;
+    size_t curId = 0;
     std::string line;
+    PathReaderMap knownReaders;
+    ReaderSequenceMap readerSequences;
     ImageSequenceDescription description;
     description.m_numberOfSamples = 1;
-    description.m_isValid = true;
-    PathReaderMap knownReaders;
+
+    Timer timer;
+    timer.Start();
+
+    auto& stringRegistry = corpus->GetStringRegistry();
     for (size_t lineIndex = 0; std::getline(mapFile, line); ++lineIndex)
     {
         std::stringstream ss(line);
-        std::string imagePath;
-        std::string classId;
-        if (!std::getline(ss, imagePath, '\t') || !std::getline(ss, classId, '\t'))
+        std::string imagePath, classId, sequenceKey;
+        // Try to parse sequence id, file path and label.
+        if (!std::getline(ss, sequenceKey, '\t') || !std::getline(ss, imagePath, '\t') || !std::getline(ss, classId, '\t'))
         {
-            RuntimeError("Invalid map file format, must contain 2 tab-delimited columns: %s, line: %d.",
-                         mapPath.c_str(),
-                         static_cast<int>(lineIndex));
+            // In case when the sequence key is not specified we set it to the line number inside the mapping file.
+            // Assume that only image path and class label is given (old format).
+            classId = imagePath;
+            imagePath = sequenceKey;
+            sequenceKey = std::to_string(lineIndex);
+
+            if (classId.empty() || imagePath.empty())
+                RuntimeError("Invalid map file format, must contain 2 or 3 tab-delimited columns, line %" PRIu64 " in file %s.", lineIndex, mapPath.c_str());
         }
 
-        description.m_id = lineIndex;
-        description.m_chunkId = lineIndex;
-        description.m_path = imagePath;
-        description.m_classId = std::stoi(classId);
+        // Skipping sequences that are not included in corpus.
+        if (!corpus->IsIncluded(sequenceKey))
+        {
+            continue;
+        }
 
-        if (description.m_classId >= labelDimension)
+        char* eptr;
+        errno = 0;
+        size_t cid = strtoull(classId.c_str(), &eptr, 10);
+        if (classId.c_str() == eptr || errno == ERANGE)
+            RuntimeError("Cannot parse label value on line %" PRIu64 ", second column, in file %s.", lineIndex, mapPath.c_str());
+
+        if (cid >= labelDimension)
         {
             RuntimeError(
-                "Image '%s' has invalid class id '%d'. Expected label dimension is '%d'.",
-                mapPath.c_str(),
-                static_cast<int>(description.m_classId),
-                static_cast<int>(labelDimension));
+                "Image '%s' has invalid class id '%" PRIu64 "'. It is exceeding the label dimension of '%" PRIu64 "'. Line %" PRIu64 " in file %s.",
+                imagePath.c_str(), cid, labelDimension, lineIndex, mapPath.c_str());
         }
-        m_imageSequences.push_back(description);
-        RegisterByteReader(description.m_id, description.m_path, knownReaders);
+
+        if (CHUNKID_MAX < curId + itemsPerLine)
+        {
+            RuntimeError("Maximum number of chunks exceeded.");
+        }
+
+        for (size_t start = curId; curId < start + itemsPerLine; curId++)
+        {
+            description.m_id = curId;
+            description.m_chunkId = (ChunkIdType)curId;
+            description.m_path = imagePath;
+            description.m_classId = cid;
+            description.m_key.m_sequence = stringRegistry[sequenceKey];
+            description.m_key.m_sample = 0;
+
+            m_keyToSequence[description.m_key.m_sequence] = m_imageSequences.size();
+            m_imageSequences.push_back(description);
+            RegisterByteReader(description.m_id, description.m_path, knownReaders, readerSequences, mapFileDirectory);
+        }
+    }
+
+    for (auto& reader : knownReaders)
+    {
+        reader.second->Register(readerSequences[reader.first]);
+    }
+
+    timer.Stop();
+    if (m_verbosity > 1)
+    {
+        fprintf(stderr, "ImageDeserializer: Read information about %d images in %.6g seconds\n", (int)m_imageSequences.size(), timer.ElapsedSeconds());
     }
 }
 
-size_t ImageDataDeserializer::GetTotalNumberOfChunks()
-{
-    // Currently we use one chunk per image.
-    return m_imageSequences.size();
-}
-
-std::vector<StreamDescriptionPtr> ImageDataDeserializer::GetStreamDescriptions() const
-{
-    return m_streams;
-}
-
-void ImageDataDeserializer::FillSequenceDescriptions(SequenceDescriptions& timeline) const
-{
-    timeline.resize(m_imageSequences.size());
-    std::transform(
-        m_imageSequences.begin(),
-        m_imageSequences.end(),
-        timeline.begin(),
-        [](const ImageSequenceDescription& desc)
-        {
-            return &desc;
-        });
-}
-
-ChunkPtr ImageDataDeserializer::GetChunk(size_t chunkId)
+ChunkPtr ImageDataDeserializer::GetChunk(ChunkIdType chunkId)
 {
     auto sequenceDescription = m_imageSequences[chunkId];
     return std::make_shared<ImageChunk>(sequenceDescription, *this);
 }
 
-void ImageDataDeserializer::RegisterByteReader(size_t seqId, const std::string& path, PathReaderMap& knownReaders)
+void ImageDataDeserializer::RegisterByteReader(size_t seqId, const std::string& seqPath, PathReaderMap& knownReaders, ReaderSequenceMap& readerSequences, const std::string& expandDirectory)
 {
-    assert(!path.empty());
+    assert(!seqPath.empty());
+
+    auto path = Expand3Dots(seqPath, expandDirectory);
 
     auto atPos = path.find_first_of('@');
     // Is it container or plain image file?
@@ -232,34 +366,52 @@ void ImageDataDeserializer::RegisterByteReader(size_t seqId, const std::string& 
     {
         reader = std::make_shared<ZipByteReader>(containerPath);
         knownReaders[containerPath] = reader;
+        readerSequences[containerPath] = std::map<std::string, size_t>();
     }
     else
     {
         reader = (*r).second;
     }
-    reader->Register(seqId, itemPath);
+
+    readerSequences[containerPath][itemPath] = seqId;
     m_readers[seqId] = reader;
 #else
     UNUSED(seqId);
     UNUSED(knownReaders);
+    UNUSED(readerSequences);
     RuntimeError("The code is built without zip container support. Only plain image files are supported.");
 #endif
 }
 
-cv::Mat ImageDataDeserializer::ReadImage(size_t seqId, const std::string& path)
+cv::Mat ImageDataDeserializer::ReadImage(size_t seqId, const std::string& path, bool grayscale)
 {
     assert(!path.empty());
 
     ImageDataDeserializer::SeqReaderMap::const_iterator r;
     if (m_readers.empty() || (r = m_readers.find(seqId)) == m_readers.end())
-        return m_defaultReader.Read(seqId, path);
-    return (*r).second->Read(seqId, path);
+        return m_defaultReader->Read(seqId, path, grayscale);
+    return (*r).second->Read(seqId, path, grayscale);
 }
 
-cv::Mat FileByteReader::Read(size_t, const std::string& path)
+cv::Mat FileByteReader::Read(size_t, const std::string& seqPath, bool grayscale)
 {
-    assert(!path.empty());
+    assert(!seqPath.empty());
+    auto path = Expand3Dots(seqPath, m_expandDirectory);
 
-    return cv::imread(path, cv::IMREAD_COLOR);
+    return cv::imread(path, grayscale ? cv::IMREAD_GRAYSCALE : cv::IMREAD_COLOR);
 }
+
+bool ImageDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& result)
+{
+    auto index = m_keyToSequence.find(key.m_sequence);
+    // Checks whether it is a known sequence for us.
+    if (key.m_sample != 0 || index == m_keyToSequence.end())
+    {
+        return false;
+    }
+
+    result = m_imageSequences[index->second];
+    return true;
+}
+
 }}}

@@ -16,65 +16,18 @@
 #include <stdexcept>
 #include <fstream>
 #include <cstdio>
+#include "ProgressTracing.h"
+#include "ComputationNetworkBuilder.h"
 
 using namespace std;
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
+
 template <class ElemType>
 class SimpleOutputWriter
 {
     typedef shared_ptr<ComputationNode<ElemType>> ComputationNodePtr;
-
-private:
-    std::vector<ComputationNodeBasePtr> DetermineOutputNodes(const std::vector<std::wstring>& outputNodeNames)
-    {
-        std::vector<ComputationNodeBasePtr> outputNodes;
-
-        if (outputNodeNames.size() == 0)
-        {
-            if (m_verbosity > 0)
-                fprintf(stderr, "OutputNodeNames are not specified, using the default outputnodes.\n");
-            if (m_net->OutputNodes().size() == 0)
-                LogicError("There is no default output node specified in the network.");
-
-            outputNodes = m_net->OutputNodes();
-        }
-        else
-        {
-            for (int i = 0; i < outputNodeNames.size(); i++)
-                outputNodes.push_back(m_net->GetNodeFromName(outputNodeNames[i]));
-        }
-
-        return outputNodes;
-    }
-
-    std::vector<ComputationNodeBasePtr> DetermineInputNodes(const std::vector<ComputationNodeBasePtr>& outputNodes)
-    {
-        //use map to remove duplicated items
-        std::set<ComputationNodeBasePtr> inputNodesMap;
-        for (auto& onode : outputNodes)
-        {
-            for (auto& inode : m_net->InputNodes(onode))
-                inputNodesMap.insert(inode);
-        }
-
-        std::vector<ComputationNodeBasePtr> inputNodes;
-        for (auto& inode : inputNodesMap)
-            inputNodes.push_back(inode);
-
-        return inputNodes;
-    }
-
-    std::map<std::wstring, Matrix<ElemType>*> RetrieveInputMatrices(const std::vector<ComputationNodeBasePtr>& inputNodes)
-    {
-        std::map<std::wstring, Matrix<ElemType>*> inputMatrices;
-
-        for (auto& inode : inputNodes)
-            inputMatrices[inode->NodeName()] = &dynamic_pointer_cast<ComputationNode<ElemType>>(inode)->Value();
-
-        return inputMatrices;
-    }
 
 public:
     SimpleOutputWriter(ComputationNetworkPtr net, int verbosity = 0)
@@ -82,18 +35,23 @@ public:
     {
     }
 
-    void WriteOutput(IDataReader<ElemType>& dataReader, size_t mbSize, IDataWriter<ElemType>& dataWriter, const std::vector<std::wstring>& outputNodeNames, size_t numOutputSamples = requestDataSize, bool doUnitTest = false)
+    void WriteOutput(IDataReader& dataReader, size_t mbSize, IDataWriter& dataWriter, const std::vector<std::wstring>& outputNodeNames, size_t numOutputSamples = requestDataSize, bool doWriterUnitTest = false)
     {
-        std::vector<ComputationNodeBasePtr> outputNodes = DetermineOutputNodes(outputNodeNames);
-        std::vector<ComputationNodeBasePtr> inputNodes = DetermineInputNodes(outputNodes);
+        ScopedNetworkOperationMode modeGuard(m_net, NetworkOperationMode::inferring);
+
+        if (outputNodeNames.size() == 0 && m_verbosity > 0)
+            fprintf(stderr, "OutputNodeNames are not specified, using the default outputnodes.\n");
+
+        std::vector<ComputationNodeBasePtr> outputNodes = m_net->OutputNodesByName(outputNodeNames);
+        std::vector<ComputationNodeBasePtr> inputNodes  = m_net->InputNodesForOutputs(outputNodeNames);
 
         // allocate memory for forward computation
         m_net->AllocateAllMatrices({}, outputNodes, nullptr);
 
-        std::map<std::wstring, Matrix<ElemType>*> inputMatrices = RetrieveInputMatrices(inputNodes);
+        StreamMinibatchInputs inputMatrices = DataReaderHelpers::RetrieveInputMatrices(inputNodes);
 
         // evaluate with minibatches
-        dataReader.StartMinibatchLoop(mbSize, 0, numOutputSamples);
+        dataReader.StartMinibatchLoop(mbSize, 0, inputMatrices.GetStreamDescriptions(), numOutputSamples);
         if (!dataWriter.SupportMultiUtterances())
             dataReader.SetNumParallelSequences(1);
         m_net->StartEvaluateMinibatchLoop(outputNodes);
@@ -101,8 +59,10 @@ public:
         size_t totalEpochSamples = 0;
         std::map<std::wstring, void*, nocase_compare> outputMatrices;
 
+        const size_t numIterationsBeforePrintingProgress = 100;
+        size_t numItersSinceLastPrintOfProgress = 0;
         size_t actualMBSize;
-        while (DataReaderHelpers::GetMinibatchIntoNetwork(dataReader, m_net, nullptr, false, false, inputMatrices, actualMBSize))
+        while (DataReaderHelpers::GetMinibatchIntoNetwork<ElemType>(dataReader, m_net, nullptr, false, false, inputMatrices, actualMBSize, nullptr))
         {
             ComputationNetwork::BumpEvalTimeStamp(inputNodes);
 
@@ -112,17 +72,19 @@ public:
                 outputMatrices[outputNodes[i]->NodeName()] = (void*) (&dynamic_pointer_cast<ComputationNode<ElemType>>(outputNodes[i])->Value());
             }
 
-            if (doUnitTest)
+            if (doWriterUnitTest)
             {
                 std::map<std::wstring, void*, nocase_compare> inputMatricesUnitTest;
-                for (auto iter = inputMatrices.begin(); iter != inputMatrices.end(); iter++)
-                    inputMatricesUnitTest[iter->first] = (void*) (iter->second);
+                for (auto& iter : inputMatrices)
+                    inputMatricesUnitTest[iter.first] = (void*) iter.second.matrix.get();  // BUGBUG: void* are evil
                 dataWriter.SaveData(0, inputMatricesUnitTest, actualMBSize, actualMBSize, 0);
             }
             else
                 dataWriter.SaveData(0, outputMatrices, actualMBSize, actualMBSize, 0);
 
             totalEpochSamples += actualMBSize;
+
+            numItersSinceLastPrintOfProgress = ProgressTracing::TraceFakeProgress(numIterationsBeforePrintingProgress, numItersSinceLastPrintOfProgress);
 
             // call DataEnd function in dataReader to do
             // reader specific process if sentence ending is reached
@@ -135,62 +97,116 @@ public:
         // clean up
     }
 
-    // pass this to WriteOutput() (to file-path, below) to specify how the output should be formatted
-    struct WriteFormattingOptions
+    // Perform a single forward pass to obtain the output values from a network
+    void WriteOutput(IDataWriter& dataWriter, const std::vector<std::wstring>& outputNodeNames, size_t numOutputSamples = requestDataSize, bool doUnitTest = false)
     {
-        // How to interpret the data:
-        bool isCategoryLabel;          // true: find max value in column and output the index instead of the entire vector
-        std::wstring labelMappingFile; // optional dictionary for pretty-printing category labels
-        bool transpose;                // true: one line per sample, each sample (column vector) forms one line; false: one column per sample
-        // The following strings are interspersed with the data:
-        // overall
-        std::string prologue; // print this at the start (e.g. a global header or opening bracket)
-        std::string epilogue; // and this at the end
-        // sequences
-        std::string sequenceSeparator; // print this between sequences (i.e. before all sequences but the first)
-        std::string sequencePrologue;  // print this before each sequence (after sequenceSeparator)
-        std::string sequenceEpilogue;  // and this after each sequence
-        // elements
-        std::string elementSeparator;  // print this between elements on a row
-        std::string sampleSeparator;   // and this between rows
-        // Optional printf precision parameter:
-        std::string precisionFormat;        // printf precision, e.g. ".2" to get a "%.2f"
-
-        WriteFormattingOptions() :
-            isCategoryLabel(false), transpose(true), sequenceEpilogue("\n"), elementSeparator(" "), sampleSeparator("\n")
-        { }
-
-        // Process -- replace newlines and all %s by the given string
-        static std::string Processed(const std::wstring& nodeName, std::string fragment)
-        {
-            fragment = msra::strfun::ReplaceAll<std::string>(fragment, "\\n", "\n");
-            fragment = msra::strfun::ReplaceAll<std::string>(fragment, "\\t", "\t");
-            if (fragment.find("%s") != fragment.npos)
-                fragment = msra::strfun::ReplaceAll<std::string>(fragment, "%s", msra::strfun::utf8(nodeName));
-            return fragment;
-        }
-    };
-
-    // TODO: Remove code dup with above function by creating a fake Writer object and then calling the other function.
-    void WriteOutput(IDataReader<ElemType>& dataReader, size_t mbSize, std::wstring outputPath, const std::vector<std::wstring>& outputNodeNames, const WriteFormattingOptions & formattingOptions, size_t numOutputSamples = requestDataSize)
-    {
-        std::vector<ComputationNodeBasePtr> outputNodes = DetermineOutputNodes(outputNodeNames);
-        std::vector<ComputationNodeBasePtr> inputNodes = DetermineInputNodes(outputNodes);
+        std::vector<ComputationNodeBasePtr> outputNodes = m_net->OutputNodesByName(outputNodeNames);
 
         // allocate memory for forward computation
         m_net->AllocateAllMatrices({}, outputNodes, nullptr);
 
-        std::map<std::wstring, Matrix<ElemType>*> inputMatrices = RetrieveInputMatrices(inputNodes);
+        m_net->StartEvaluateMinibatchLoop(outputNodes);
 
+        std::map<std::wstring, void*, nocase_compare> outputMatrices;
+
+        for (int i = 0; i < outputNodes.size(); i++)
+        {
+            m_net->ForwardProp(outputNodes[i]);
+            outputMatrices[outputNodes[i]->NodeName()] = (void*)(&dynamic_pointer_cast<ComputationNode<ElemType>>(outputNodes[i])->Value());
+        }
+
+        // TODO: What should the data size be?
+        dataWriter.SaveData(0, outputMatrices, 1, 1, 0);
+    }
+
+    void WriteMinibatch(FILE* f, ComputationNodePtr node, 
+        const WriteFormattingOptions & formattingOptions, char formatChar, std::string valueFormatString, std::vector<std::string>& labelMapping,
+        size_t numMBsRun, bool gradient)
+    {
+        const auto sequenceSeparator = formattingOptions.Processed(node->NodeName(), formattingOptions.sequenceSeparator, numMBsRun);
+        const auto sequencePrologue =  formattingOptions.Processed(node->NodeName(), formattingOptions.sequencePrologue,  numMBsRun);
+        const auto sequenceEpilogue =  formattingOptions.Processed(node->NodeName(), formattingOptions.sequenceEpilogue,  numMBsRun);
+        const auto elementSeparator =  formattingOptions.Processed(node->NodeName(), formattingOptions.elementSeparator,  numMBsRun);
+        const auto sampleSeparator =   formattingOptions.Processed(node->NodeName(), formattingOptions.sampleSeparator,   numMBsRun);
+
+        node->WriteMinibatchWithFormatting(f, FrameRange(), SIZE_MAX, SIZE_MAX, formattingOptions.transpose, formattingOptions.isCategoryLabel, formattingOptions.isSparse, labelMapping,
+            sequenceSeparator, sequencePrologue, sequenceEpilogue, elementSeparator, sampleSeparator,
+            valueFormatString, gradient);
+    }
+
+    void InsertNode(std::vector<ComputationNodeBasePtr>& allNodes, ComputationNodeBasePtr parent, ComputationNodeBasePtr newNode)
+    {
+        newNode->SetInput(0, parent);
+        for (auto node : allNodes)
+        {
+            size_t i = 0;
+            for (auto n : node->GetInputs())
+            {
+                if (n == parent)
+                    node->SetInput(i, newNode);
+                ++i;
+            }
+        }
+    }
+
+    // TODO: Remove code dup with above function by creating a fake Writer object and then calling the other function.
+    void WriteOutput(IDataReader& dataReader, size_t mbSize, std::wstring outputPath, const std::vector<std::wstring>& outputNodeNames, const WriteFormattingOptions& formattingOptions, size_t numOutputSamples = requestDataSize, bool nodeUnitTest = false)
+    {
+        // In case of unit test, make sure backprop works
+        ScopedNetworkOperationMode modeGuard(m_net, nodeUnitTest ? NetworkOperationMode::training : NetworkOperationMode::inferring);
+
+        std::vector<ComputationNodeBasePtr> outputNodes = m_net->OutputNodesByName(outputNodeNames);
+        std::vector<ComputationNodeBasePtr> inputNodes = m_net->InputNodesForOutputs(outputNodeNames);
+        std::vector<ComputationNodePtr> gradientNodes;
+        std::vector<ComputationNodeBasePtr> allOutputNodes = outputNodes;
+
+        if (!nodeUnitTest)                                        // regular operation
+        {
+            m_net->AllocateAllMatrices({}, outputNodes, nullptr); // don't allocate for backward pass
+        }
+        else                                                      // we mis-appropriate this code for unit testing of the back-prop path
+        {
+            // Unit test only makes sense for one output node.
+            if (outputNodes.size() != 1)
+                RuntimeError("Expected exactly 1 output node for unit test, got %d.", (int)outputNodes.size());
+
+            // Set up machinery to output gradients alongside forward pass output
+            // Gradients are not passed on to inputs. Need to hook an identity function in between.
+            ComputationNetworkBuilder<ElemType> builder(*m_net);
+            auto allInputs = inputNodes;
+            auto allParameters = m_net->LearnableParameterNodes(outputNodes[0]);
+            allInputs.insert(allInputs.end(), allParameters.begin(), allParameters.end());
+            auto allNodes = m_net->GetAllNodes();
+
+            for (auto inputNode : allInputs)
+            {
+                auto parent = dynamic_pointer_cast<ComputationNode<ElemType>>(inputNode);
+                auto newNode = builder.Pass(parent, inputNode->NodeName() + L".grad");
+                newNode->SetLearningRateMultiplier(1.0); // Forces gradient update. Otherwise, backprop might get pruned from this path.
+                InsertNode(allNodes, parent, newNode);
+                gradientNodes.push_back(dynamic_pointer_cast<ComputationNode<ElemType>>(newNode));
+                allOutputNodes.push_back(newNode);
+            }
+
+            // Update the evaluation order, and other things.
+            m_net->CompileNetwork();
+            
+            // Allocate memory for forward and backward computation. In case of unit test, treat the output node
+            // like a criterion node. Submitting a node as parameter 3 here will allocate the gradients.
+            m_net->AllocateAllMatrices({}, outputNodes, outputNodes[0]);
+        }
+
+        StreamMinibatchInputs inputMatrices = DataReaderHelpers::RetrieveInputMatrices(inputNodes);
+        
         // load a label mapping if requested
         std::vector<std::string> labelMapping;
-        if (formattingOptions.isCategoryLabel && !formattingOptions.labelMappingFile.empty())
+        if ((formattingOptions.isCategoryLabel || formattingOptions.isSparse) && !formattingOptions.labelMappingFile.empty())
             File::LoadLabelFile(formattingOptions.labelMappingFile, labelMapping);
 
         // open output files
         File::MakeIntermediateDirs(outputPath);
         std::map<ComputationNodeBasePtr, shared_ptr<File>> outputStreams; // TODO: why does unique_ptr not work here? Complains about non-existent default_delete()
-        for (auto & onode : outputNodes)
+        for (auto & onode : allOutputNodes)
         {
             std::wstring nodeOutputPath = outputPath;
             if (nodeOutputPath != L"-")
@@ -200,26 +216,25 @@ public:
         }
 
         // evaluate with minibatches
-        dataReader.StartMinibatchLoop(mbSize, 0, numOutputSamples);
+        dataReader.StartMinibatchLoop(mbSize, 0, inputMatrices.GetStreamDescriptions(), numOutputSamples);
 
         m_net->StartEvaluateMinibatchLoop(outputNodes);
 
         size_t totalEpochSamples = 0;
-        size_t numMBsRun = 0;
-        size_t tempArraySize = 0;
-        ElemType* tempArray = nullptr;
 
         for (auto & onode : outputNodes)
         {
-            FILE * f = *outputStreams[onode];
+            FILE* f = *outputStreams[onode];
             fprintfOrDie(f, "%s", formattingOptions.prologue.c_str());
         }
 
+        size_t actualMBSize;
+        const size_t numIterationsBeforePrintingProgress = 100;
+        size_t numItersSinceLastPrintOfProgress = 0;
         char formatChar = !formattingOptions.isCategoryLabel ? 'f' : !formattingOptions.labelMappingFile.empty() ? 's' : 'u';
         std::string valueFormatString = "%" + formattingOptions.precisionFormat + formatChar; // format string used in fprintf() for formatting the values
 
-        size_t actualMBSize;
-        while (DataReaderHelpers::GetMinibatchIntoNetwork(dataReader, m_net, nullptr, false, false, inputMatrices, actualMBSize))
+        for (size_t numMBsRun = 0; DataReaderHelpers::GetMinibatchIntoNetwork<ElemType>(dataReader, m_net, nullptr, false, false, inputMatrices, actualMBSize, nullptr); numMBsRun++)
         {
             ComputationNetwork::BumpEvalTimeStamp(inputNodes);
 
@@ -229,100 +244,48 @@ public:
                 // Note: Intermediate values are memoized, so in case of multiple output nodes, we only compute what has not been computed already.
                 m_net->ForwardProp(onode);
 
-                // get it (into a flat CPU-side vector)
-                Matrix<ElemType>& outputValues = dynamic_pointer_cast<ComputationNode<ElemType>>(onode)->Value();
-                outputValues.CopyToArray(tempArray, tempArraySize);
-                ElemType* pCurValue = tempArray;
+                FILE* file = *outputStreams[onode];
+                WriteMinibatch(file, dynamic_pointer_cast<ComputationNode<ElemType>>(onode), formattingOptions, formatChar, valueFormatString, labelMapping, numMBsRun, /* gradient */ false);
 
-                // sequence separator
-                FILE * f = *outputStreams[onode];
-                const auto sequenceSeparator = formattingOptions.Processed(onode->NodeName(), formattingOptions.sequenceSeparator);
-                const auto sequencePrologue  = formattingOptions.Processed(onode->NodeName(), formattingOptions.sequencePrologue);
-                const auto sequenceEpilogue  = formattingOptions.Processed(onode->NodeName(), formattingOptions.sequenceEpilogue);
-                const auto elementSeparator  = formattingOptions.Processed(onode->NodeName(), formattingOptions.elementSeparator);
-                const auto sampleSeparator   = formattingOptions.Processed(onode->NodeName(), formattingOptions.sampleSeparator);
+                if (nodeUnitTest)
+                    m_net->Backprop(onode);
+            } // end loop over nodes
 
-                if (numMBsRun > 0 && !sequenceSeparator.empty())
-                    fprintfOrDie(f, "%s", sequenceSeparator.c_str());
-                fprintfOrDie(f, "%s", sequencePrologue.c_str());
-
-                // output it according to our format specification
-                size_t T   = outputValues.GetNumCols();
-                size_t dim = outputValues.GetNumRows();
-                if (formattingOptions.isCategoryLabel)
+            if (nodeUnitTest)
+            {
+                for (auto & node : gradientNodes)
                 {
-                    if (formatChar == 's') // verify label dimension
+                    FILE* file = *outputStreams[node];
+                    if (!node->GradientPtr())
                     {
-                        if (dim != labelMapping.size())
-                            InvalidArgument("write: Row dimension %d does not match number of entries %d in labelMappingFile '%ls'", (int)dim, (int)labelMapping.size(), formattingOptions.labelMappingFile.c_str());
+                        fprintf(stderr, "Warning: Gradient of node '%s' is empty. Not used in backward pass?", msra::strfun::utf8(node->NodeName().c_str()).c_str());
                     }
-                    // update the matrix in-place from one-hot (or max) to index
-                    // find the max in each column
-                    foreach_column(j, outputValues)
+                    else
                     {
-                        double maxPos = -1;
-                        double maxVal = 0;
-                        foreach_row(i, outputValues)
-                        {
-                            double val = pCurValue[i + j * dim];
-                            if (maxPos < 0 || val >= maxVal)
-                            {
-                                maxPos = (double)i;
-                                maxVal = val;
-                            }
-                        }
-                        pCurValue[j] = (ElemType) maxPos; // overwrite in-place, assuming a flat vector
-                    }
-                    dim = 1;
-                }
-                size_t iend    = formattingOptions.transpose ? dim  : T;
-                size_t jend    = formattingOptions.transpose ? T    : dim;
-                size_t istride = formattingOptions.transpose ? 1    : jend;
-                size_t jstride = formattingOptions.transpose ? iend : 1;
-                for (size_t j = 0; j < jend; j++)
-                {
-                    if (j > 0)
-                        fprintfOrDie(f, "%s", sampleSeparator.c_str());
-                    for (size_t i = 0; i < iend; i++)
-                    {
-                        if (i > 0)
-                            fprintfOrDie(f, "%s", elementSeparator.c_str());
-                        if (formatChar == 'f') // print as real number
-                        {
-                            double dval = pCurValue[i * istride + j * jstride];
-                            fprintfOrDie(f, valueFormatString.c_str(), dval);
-                        }
-                        else if (formatChar == 'u') // print category as integer index
-                        {
-                            unsigned int uval = (unsigned int) pCurValue[i * istride + j * jstride];
-                            fprintfOrDie(f, valueFormatString.c_str(), uval);
-                        }
-                        else if (formatChar == 's') // print category as a label string
-                        {
-                            size_t uval = (size_t) pCurValue[i * istride + j * jstride];
-                            assert(uval < labelMapping.size());
-                            const char * sval = labelMapping[uval].c_str();
-                            fprintfOrDie(f, valueFormatString.c_str(), sval);
-                        }
+                        WriteMinibatch(file, node, formattingOptions, formatChar, valueFormatString, labelMapping, numMBsRun, /* gradient */ true);
                     }
                 }
-                fprintfOrDie(f, "%s", sequenceEpilogue.c_str());
             }
-
             totalEpochSamples += actualMBSize;
 
-            fprintf(stderr, "Minibatch[%lu]: ActualMBSize = %lu\n", ++numMBsRun, actualMBSize);
-        }
+            fprintf(stderr, "Minibatch[%lu]: ActualMBSize = %lu\n", numMBsRun, actualMBSize);
+            if (outputPath == L"-") // if we mush all nodes together on stdout, add some visual separator
+                fprintf(stdout, "\n");
 
-        for (auto & onode : outputNodes)
+            numItersSinceLastPrintOfProgress = ProgressTracing::TraceFakeProgress(numIterationsBeforePrintingProgress, numItersSinceLastPrintOfProgress);
+
+            // call DataEnd function in dataReader to do
+            // reader specific process if sentence ending is reached
+            dataReader.DataEnd();
+        } // end loop over minibatches
+
+        for (auto & stream : outputStreams)
         {
-            FILE * f = *outputStreams[onode];
+            FILE* f = *stream.second;
             fprintfOrDie(f, "%s", formattingOptions.epilogue.c_str());
         }
 
-        delete[] tempArray;
-
-        fprintf(stderr, "Total Samples Evaluated = %lu\n", totalEpochSamples);
+        fprintf(stderr, "Written to %ls*\nTotal Samples Evaluated = %lu\n", outputPath.c_str(), totalEpochSamples);
 
         // flush all files (where we can catch errors) so that we can then destruct the handle cleanly without error
         for (auto & iter : outputStreams)

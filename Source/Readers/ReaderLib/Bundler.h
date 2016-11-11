@@ -6,6 +6,7 @@
 #pragma once
 
 #include "DataDeserializer.h"
+#include "DataDeserializerBase.h"
 #include "Config.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
@@ -13,55 +14,57 @@ namespace Microsoft { namespace MSR { namespace CNTK {
 // Class represents an bundler of several deserializers.
 // In case when only a single deserializer is used, the bundler can be omitted and 
 // no performance penalty is paid.
-// TODO: The interface will changed when the timeline will support chunking.
-class Bundler : public IDataDeserializer
+class Bundler : public DataDeserializerBase
 {
 public:
-    Bundler(const ConfigParameters& readerConfig, IDataDeserializerPtr driver, std::vector<IDataDeserializerPtr> deserializers);
+    Bundler(const ConfigParameters& readerConfig, IDataDeserializerPtr driver, std::vector<IDataDeserializerPtr> deserializers, bool cleanse);
 
-    // Retrieves description of all sequences this data deserializer can produce, together with associated chunks.
-    // TODO: For huge corpus, the memory footprint is too big. We adapt this interface to request timeline in chunks.
-    virtual const SequenceDescriptions& GetSequenceDescriptions() const override;
+    // Gets chunk descriptions.
+    virtual ChunkDescriptions GetChunkDescriptions() override;
 
-    // Retrieves description of a single sequence given its key.
-    virtual const SequenceDescription* GetSequenceDescriptionByKey(const KeyType& key) override;
+    // Gets sequence descriptions for a particular chunk.
+    virtual void GetSequencesForChunk(ChunkIdType chunkId, std::vector<SequenceDescription>& result) override;
 
-    // Describes bundled streams of the underlying data deserializers.
-    virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override;
-
-    // Retrieves a chunk with data.
-    virtual ChunkPtr GetChunk(size_t) override;
-
-    // Retrieves total number of chunks this deserializer can produce.
-    virtual size_t GetTotalNumberOfChunks() override;
+    // Gets a chunk with data.
+    virtual ChunkPtr GetChunk(ChunkIdType chunkId) override;
 
 private:
     DISABLE_COPY_AND_MOVE(Bundler);
 
-    void CreateSequenceDescriptions();
+    class BundlingChunk;
+    struct BundlerChunkDescription;
+    typedef std::shared_ptr<BundlerChunkDescription> BundlerChunkDescriptionPtr;
 
-    // Exposed bundled streams.
-    std::vector<StreamDescriptionPtr> m_streams;
+    // Creates chunk descriptions based on chunks of underlying deserializers.
+    void CreateChunkDescriptions();
+
     // Underlying deserializers.
     std::vector<IDataDeserializerPtr> m_deserializers;
+
     // Driving deserializer that defines chunks.
     IDataDeserializerPtr m_driver;
 
-    // Seqeunce descriptions.
-    std::vector<SequenceDescription> m_sequenceDescriptions;
-    SequenceDescriptions m_sequences;
+    // Chunk descriptions.
+    std::vector<BundlerChunkDescriptionPtr> m_chunks;
 
-    // Exposed sequence id to chunk mapping.
-    std::vector<std::vector<size_t>> m_sequenceToChunk;
+    // A flag that indicates whether there is a need to clean data between different deserializers.
+    // It is possible that some sequence is valid in one deserializer but invalid in another. This sequences should be removed.
+    // At the same time this introduces unnecessary overhead when the data is clean, because all chunks should be checked in advance to expose
+    // correct number of samples/sequences they contain.
+    // If this flag is set to false, no cleaning will be done, so additional overhead.
+    bool m_cleanse;
 
-    // Exposed sequence id to internal sequence id mapping.
-    std::vector<std::vector<size_t>> m_sequenceToSequence;
+    // If flag is set to true the sequence length is counted by the primary deserializer only.
+    // Used for optimization when sequences between different deserializers are of the same length
+    // (i.e. often in speech)
+    bool m_takePrimarySequenceLength;
 
-    // Chunk offsets - m_chunkOffsets[chunkId] stores the index of 
-    // the sequence in m_sequenceDescription where the chunk starts.
-    std::vector<size_t> m_chunkOffsets;
+    // A table of loaded chunks to make sure we do not load same chunk twice.
+    // Inner vector is the table of chunk id into weak pointer, the outer vector has an element per deserializer.
+    std::vector<std::vector<std::weak_ptr<Chunk>>> m_weakChunkTable;
 
-    friend class BundlingChunk;
+    // General configuration
+    int m_verbosity;
 };
 
 }}}

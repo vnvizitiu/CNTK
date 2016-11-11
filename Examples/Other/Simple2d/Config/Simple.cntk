@@ -5,14 +5,14 @@
 RootDir = ".."
 
 ConfigDir = "$RootDir$/Config"
-DataDir = "$RootDir$/Data"
+DataDir   = "$RootDir$/Data"
 OutputDir = "$RootDir$/Output"
-ModelDir = "$OutputDir$/Models"
+ModelDir  = "$OutputDir$/Models"
 
 # deviceId=-1 for CPU, >=0 for GPU devices, "auto" chooses the best GPU, or CPU if no usable GPU is available
 deviceId = -1
 
-command = Simple_Demo_Train:Simple_Demo_Test
+command = Simple_Demo_Train:Simple_Demo_Test:Simple_Demo_Output
 
 precision = "float"
 traceLevel = 1
@@ -32,7 +32,7 @@ Simple_Demo_Train = [
         # 2 input, 2 50-element hidden, 2 output
         layerSizes = 2:50*2:2
         trainingCriterion = "CrossEntropyWithSoftmax"
-        evalCriterion = "ErrorPrediction"
+        evalCriterion = "ClassificationError"
         layerTypes = "Sigmoid"
         initValueScale = 1.0
         applyMeanVarNorm = true
@@ -41,9 +41,9 @@ Simple_Demo_Train = [
     ]
 
     SGD = [
-	    # epochSize = 0 means epochSize is the size of the training set 
+        # epochSize = 0 means epochSize is the size of the training set 
         epochSize = 0 
-        minibatchSize = 25	
+        minibatchSize = 25  
         learningRatesPerMB = 0.5:0.2*20:0.1
         momentumPerMB = 0.9
         dropoutRate = 0.0
@@ -52,22 +52,17 @@ Simple_Demo_Train = [
        
     # Parameter values for the reader
     reader = [
-        readerType = "UCIFastReader"
-        file = "$DataDir$/SimpleDataTrain.txt"
-        miniBatchMode = "partial"
-        randomize = "auto"
-        verbosity = 1  
-
-        features = [
-            dim = 2        # two-dimensional input data
-            start = 0      # Start with first element on line
-        ]
-
-        labels = [
-            start = 2      # Skip two elements
-            dim = 1        # One label dimension
-            labelDim = 2   # Two labels possible
-            labelMappingFile = "$DataDir$/SimpleMapping.txt"
+        readerType = "CNTKTextFormatReader"
+        file = "$DataDir$/SimpleDataTrain_cntk_text.txt"
+        input = [
+            features = [
+                dim = 2        # two-dimensional input data
+                format = "dense"
+            ]
+            labels = [
+                dim = 2        # two-dimensional labels
+                format = "dense"
+            ]
         ]
     ]
 ]
@@ -84,20 +79,17 @@ Simple_Demo_Test = [
 
     # Parameter values for the reader
     reader = [
-        readerType = "UCIFastReader"
-        file = "$DataDir$/SimpleDataTest.txt"
-        randomize = "none"
-	  
-        features = [
-            dim = 2
-            start = 0
-        ]
-	  
-        labels = [
-            start = 2
-            dim = 1
-            labelDim = 2
-            labelMappingFile = "$DataDir$/SimpleMapping.txt"
+        readerType = "CNTKTextFormatReader"
+        file = "$DataDir$/SimpleDataTest_cntk_text.txt"
+        input = [
+            features = [
+                dim = 2        # two-dimensional input data
+                format = "dense"
+            ]
+            labels = [
+                dim = 2        # two-dimensional labels
+                format = "dense"
+            ]
         ]
     ]
 ]
@@ -113,22 +105,38 @@ Simple_Demo_Output=[
 
     # Parameter values for the reader
     reader = [
-        readerType = "UCIFastReader"
-        file = "$DataDir$/SimpleDataTest.txt"
-        randomize = "none"
-	  
-        features = [
-            dim = 2
-            start = 0
-        ]
-	  
-        labels = [
-            start = 2
-            dim = 1
-            labelDim = 2
-            labelMappingFile = "$DataDir$/SimpleMapping.txt"
+        readerType = "CNTKTextFormatReader"
+        file = "$DataDir$/SimpleDataTest_cntk_text.txt"
+        input = [
+            features = [
+                dim = 2        # two-dimensional input data
+                format = "dense"
+            ]
+            labels = [
+                dim = 2        # two-dimensional labels
+                format = "dense"
+            ]
         ]
     ]
-	
-    outputPath = "$OutputDir$/SimpleOutput"    # Dump output as text
+
+    outputNodeNames = PosteriorProb : labels    # Select the nodes to print. If this is not given, the nodes tagged as "output" are printed instead.
+
+    outputPath = "$OutputDir$/SimpleOutput"     # Path to write to. ".NODENAME" will be appended.
+    #outputPath = "-"                           # As an alternative, this prints to stdout.
+
+    # extra formatting options
+    # This is configured to print the classified and ground-truth labels.
+    # To write out the actual posterior probabilities, comment out this section.
+    format = [
+        type = "category"                                # This finds the highest-scoring entry and prints its index.
+        labelMappingFile = "$DataDir$/SimpleMapping.txt" # Specifying this as well will translate the index into a string.
+        sequenceEpilogue = "\t// %s\n"                   # Append this on every line, %s = node name. Useful when printing to stdout.
+
+        # How to implement simple error counting with this (cd into $OutputDir$ first):
+        #    grep PosteriorProb SimpleOutput.PosteriorProb | awk '{print $1}' > P
+        #    grep labels        SimpleOutput.labels        | awk '{print $1}' > L
+        #    diff L P | grep "<" | wc -l
+        #    wc -l P
+        # The ratio of the two numbers gives the same error rate as ClassificationError/Sample in the log.
+    ]
 ]

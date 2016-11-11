@@ -6,24 +6,20 @@
 #pragma once
 
 #include <vector>
-#include <map>
-#include "Transformer.h"
+#include "SequenceEnumerator.h"
 #include "DataDeserializer.h"
 
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 // The class represents a randomizer that does not randomize input (identity function over the original timeline).
-// This class is used for inference and for training where the training data has already been pre - randomized.
+// Used training where the training data has already been pre - randomized.
 // TODO: currently this code moved from the old block randomizer.
 // TODO: The class will be further refactored and common based will be extracted with BlockRandomizer.
-// TODO: Currently works only for frame mode (numberOfSample in sequence == 1) and without chunking
-// TODO: This layering will be changed, when we move transformers under the randomizer, it won't be a transformer anymore.
-class NoRandomizer : public Transformer
+class NoRandomizer : public SequenceEnumerator
 {
 public:
-    NoRandomizer(IDataDeserializerPtr deserializer);
+    NoRandomizer(IDataDeserializerPtr deserializer, bool multithreadedGetNextSequences = false);
 
-    virtual void Initialize(TransformerPtr next, const ConfigParameters& readerConfig) override;
     virtual void StartEpoch(const EpochConfiguration& config) override;
     virtual Sequences GetNextSequences(size_t sampleCount) override;
     virtual std::vector<StreamDescriptionPtr> GetStreamDescriptions() const override
@@ -31,22 +27,61 @@ public:
         return m_deserializer->GetStreamDescriptions();
     }
 
+    size_t GetCurrentSamplePosition() override;
+    void SetCurrentSamplePosition(size_t currentSamplePosition) override;
+
+    void SetConfiguration(const ReaderConfiguration& config) override;
+
 private:
-    // Deserializer and information on the original timeline
+    // Gets next sequence descriptions with total size less than sampleCount.
+    std::vector<SequenceDescription> GetNextSequenceDescriptions(size_t sampleCount);
+
+    // Get chunk index for the sample offset from the beginning of the sweep.
+    ChunkIdType GetChunkIndexOf(size_t samplePosition);
+
+    // Moves the cursor to the sequence possibly updating the chunk.
+    void MoveToNextSequence();
+
     IDataDeserializerPtr m_deserializer;
 
-    // Initial timeline.
-    SequenceDescriptions m_timeline;
+    // Whether to get sequences using multiple thread.
+    // TODO temporary; should go away when transformers are moved closer to the deserializer
+    bool m_multithreadedGetNextSequences;
 
     // Stream descriptions
     std::vector<StreamDescriptionPtr> m_streams;
 
     // Epoch configuration
     EpochConfiguration m_config;
-    size_t m_samplePositionInEpoch;
-    size_t m_sequencePosition;
 
-    std::map<size_t, ChunkPtr> m_chunks;
+    // Chunk descriptions.
+    ChunkDescriptions m_chunkDescriptions;
+
+    // m_chunkDescription defines the complete sweep of samples: [0 .. N]
+    // m_chunkSampleOffset for each chunk contains the sample offset in the sweep where the chunk begins.
+    std::vector<size_t> m_chunkSampleOffset;
+
+    // Current chunk data.
+    ChunkPtr m_currentChunk;
+    // Current chunk data id.
+    ChunkIdType m_currentChunkId;
+
+    // Current window of sequence descriptions.
+    std::vector<SequenceDescription> m_sequenceWindow;
+
+    // Current sequence position the randomizer works with.
+    size_t m_currentSequencePositionInChunk;
+
+    // Current chunk position that the randomizer works with.
+    // An index inside the m_chunkDescriptions.
+    ChunkIdType m_currentChunkPosition;
+
+    // Global sample position on the timeline.
+    // TODO: possible recalculate it base on samplePositionInEpoch.
+    size_t m_globalSamplePosition;
+
+    // Total number of samples in the sweep.
+    size_t m_totalNumberOfSamples;
 };
 
 }}}

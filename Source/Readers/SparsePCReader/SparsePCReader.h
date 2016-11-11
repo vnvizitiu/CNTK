@@ -21,12 +21,8 @@
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 template <class ElemType>
-class SparsePCReader : public IDataReader<ElemType>
+class SparsePCReader : public DataReaderBase
 {
-public:
-    using LabelType = typename IDataReader<ElemType>::LabelType;
-    using LabelIdType = typename IDataReader<ElemType>::LabelIdType;
-private:
     ConfigParameters m_readerConfig;
     std::wstring m_file;
     size_t m_featureCount;
@@ -63,7 +59,10 @@ private:
 
 public:
     SparsePCReader()
-        : m_pMBLayout(make_shared<MBLayout>()){};
+        : m_pMBLayout(make_shared<MBLayout>())
+    {
+        m_pMBLayout->SetUniqueAxisName(L"SparsePCReader");
+    };
     virtual ~SparsePCReader();
     virtual void Destroy();
     template <class ConfigRecordType>
@@ -77,9 +76,9 @@ public:
         InitFromConfig(config);
     }
     virtual void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples = requestDataSize);
-    virtual bool GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    virtual bool TryGetMinibatch(StreamMinibatchInputs& matrices);
 
-    size_t GetNumParallelSequences()
+    size_t GetNumParallelSequencesForFixingBPTTMode()
     {
         return m_pMBLayout->GetNumParallelSequences();
     }

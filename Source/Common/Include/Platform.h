@@ -11,6 +11,13 @@
 #define __UNIX__
 #endif
 
+#ifdef _MSC_VER
+// TODO: thread_local is supported in VS2015. Remove this macro when we uprade to VS2015
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL thread_local
+#endif
+
 // ===========================================================================
 // compiler differences
 // ===========================================================================
@@ -27,6 +34,9 @@
 #define noexcept throw() // noexcept not defined in VS2013, but needed for gcc to pick the correct overload for constructor/assignment from an rvalue ref
 #endif
 
+#if defined(_MSC_VER) && (_MSC_VER <= 1800 /*VS2013*/)
+#define __func__ __FUNCTION__
+#endif
 // ===========================================================================
 // emulation of some MSVC proprietary CRT
 // ===========================================================================

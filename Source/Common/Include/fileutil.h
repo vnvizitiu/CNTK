@@ -30,6 +30,9 @@
 #include <assert.h>
 #include <string.h>  // for strerror()
 #include <stdexcept> // for exception
+#include <fcntl.h>
+
+#define FCLOSE_SUCCESS 0
 
 // ----------------------------------------------------------------------------
 // fopenOrDie(): like fopen() but terminate with err msg in case of error.
@@ -591,7 +594,8 @@ void fgetfile(const std::wstring& pathname, std::vector<char>& buffer);
 void fgetfile(FILE* f, std::vector<char>& buffer);
 namespace msra { namespace files {
 
-void fgetfilelines(const std::wstring& pathname, std::vector<char>& readbuffer, std::vector<std::string>& lines);
+void fgetfilelines(const std::wstring& pathname, std::vector<char>& readbuffer, std::vector<std::string>& lines, int numberOfTries = 1);
+
 static inline std::vector<std::string> fgetfilelines(const std::wstring& pathname)
 {
     std::vector<char> buffer;
@@ -599,7 +603,7 @@ static inline std::vector<std::string> fgetfilelines(const std::wstring& pathnam
     fgetfilelines(pathname, buffer, lines);
     return lines;
 }
-std::vector<char*> fgetfilelines(const std::wstring& pathname, std::vector<char>& readbuffer);
+std::vector<char*> fgetfilelines(const std::wstring& pathname, std::vector<char>& readbuffer, int numberOfTries = 1);
 
 }}
 
@@ -694,19 +698,26 @@ class auto_file_ptr
     FILE* f;
     FILE* operator=(auto_file_ptr&); // can't ref-count: no assignment
     auto_file_ptr(auto_file_ptr&);
-    // implicit close (destructor, assignment): we ignore error
-    void close() throw()
+    void close()
     {
-        if (f)
-            try
-            {
-                if (f != stdin && f != stdout && f != stderr)
-                    ::fclose(f);
-            }
-            catch (...)
-            {
-            }
-        f = NULL;
+        if (f && f != stdin && f != stdout && f != stderr)
+        {
+            bool readMode = false;
+
+#ifdef _WIN32
+            if ((f->_flag&_IOREAD) == _IOREAD)
+                readMode = true;
+#else
+            int mode = fcntl(fileno(f), F_GETFL);
+            if ((mode & O_ACCMODE) == O_RDONLY)
+                readMode = true;
+#endif
+            int rc = ::fclose(f);
+            if (!readMode && (rc != FCLOSE_SUCCESS) && !std::uncaught_exception())
+                RuntimeError("auto_file_ptr: failed to close file: %s", strerror(errno));
+
+            f = NULL;
+        }
     }
 #pragma warning(push)
 #pragma warning(disable : 4996)

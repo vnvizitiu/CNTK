@@ -42,7 +42,8 @@
 
 #define IDX2C(i, j, ld) (((j) * (ld)) + (i)) // 0 based indexing
 
-// CUDA atomicAdd() only exists for 'float'. This is the 'double' version.
+// On older GPUs, CUDA atomicAdd() only exists for 'float'. This is the 'double' version.
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ < 600
 static __inline__ __device__ double atomicAdd(double* address, double val)
 {
     unsigned long long int* address_as_ull = (unsigned long long int*) address;
@@ -54,6 +55,7 @@ static __inline__ __device__ double atomicAdd(double* address, double val)
     } while (assumed != old);
     return __longlong_as_double(old);
 }
+#endif
 
 // TODO: replace this with TensorOps.h LogAdd(). It differs in using ElemType throughout, while this one seems to use 'double' versions of exp() and log().
 // The 'k' in the name is to avoid naming conflicts with various versions of logadd() that are defined throughout the codebase.
@@ -94,8 +96,8 @@ static INT CeilDiv(INT a, INT2 b) // ceil(a/b)
 
 struct GridDim
 {
-    static const CUDA_LONG maxThreadsPerBlock = 512; // use this many threads per block
-    static const CUDA_LONG maxWarpsPerBlock = 16;    // use this many warps per block
+    static const CUDA_LONG maxThreadsPerBlock = 1024; // use this many threads per block
+    static const CUDA_LONG maxWarpsPerBlock = 32;     // use this many warps per block. This means 1024 threads for warpSize=32
 
     // use these for launching
     //   GridDim grid(NN);
@@ -118,6 +120,7 @@ struct GridDim
         CUDA_LONG warpsPerProc = CeilDiv(N, numProcs * warpSize);
 
         // if too many warps per block then reduce #warps
+        // This limits the number of threads to 512.
         if (warpsPerProc > maxWarpsPerBlock)
         {
             CUDA_LONG overBy = CeilDiv(warpsPerProc, maxWarpsPerBlock); // we are over by this factor
@@ -125,34 +128,39 @@ struct GridDim
         }
 
         // put it back together
-        m_threadsPerBlock = warpsPerProc * warpSize;
+        m_threadsPerBlock = warpsPerProc * warpSize;        // =a multiple of 32 that is as close to 1024 as makes sense given NN
         m_blocksPerGrid = CeilDiv(N, m_threadsPerBlock);
         if (m_blocksPerGrid == 1)
             m_threadsPerBlock = N; // don't launch more than necessary  --TODO: Does this make a difference at all?
         assert(m_blocksPerGrid * m_threadsPerBlock >= N);
     }
 
-    static std::vector<cudaDeviceProp> CacheDeviceProps()
+    static const std::vector<cudaDeviceProp>& GetCachedDeviceProps()
     {
-        int numDevices;
-        CUDA_CALL(cudaGetDeviceCount(&numDevices));
-        std::vector<cudaDeviceProp> props(numDevices);
-        for (int i = 0; i < numDevices; i++)
-            CUDA_CALL(cudaGetDeviceProperties(&props[i], i));
-#if 0 // on Linux, maxGridSize[0] gets reported as 0
-        for (int i = 0; i < numDevices; i++)
-            fprintf(stderr, "%d procs  %d warps  %d %d %d max grid  on  %s\n", (int)props[i].multiProcessorCount, (int)props[i].warpSize, (int)props[i].maxGridSize[0], (int)props[i].maxGridSize[1], (int)props[i].maxGridSize[2], props[i].name);
-#endif
-        return props;
+        std::call_once(s_cachedDevicePropsInitFlag, [=]{
+            int numDevices;
+            CUDA_CALL(cudaGetDeviceCount(&numDevices));
+            s_cachedDeviceProps.resize(numDevices);
+            for (int i = 0; i < numDevices; i++)
+                CUDA_CALL(cudaGetDeviceProperties(&s_cachedDeviceProps[i], i));
+        });
+       
+        return s_cachedDeviceProps;
     }
+
+    static size_t GetCurrentDeviceId()
+    {
+        int deviceId;
+        cudaGetDevice(&deviceId);
+        return (size_t)deviceId;
+    }
+
 
     // get device properties of current device
     static const cudaDeviceProp& GetDeviceProps()
     {
-        static std::vector<cudaDeviceProp> props = CacheDeviceProps(); // thread-safe according to C++ standard
-        int deviceId;
-        cudaGetDevice(&deviceId);
-        return props[deviceId];
+        const auto& cachedDevicesProps = GetCachedDeviceProps();
+        return cachedDevicesProps[GetCurrentDeviceId()];
     }
 
     // compute our location on the grid
@@ -160,6 +168,11 @@ struct GridDim
     {
         return blockDim.x * blockIdx.x + threadIdx.x;
     }
+
+private: 
+    // TODO: drop call_once and co. and make cached devices a local static, once we're on VS2015.
+    static std::vector<cudaDeviceProp> s_cachedDeviceProps;
+    static std::once_flag s_cachedDevicePropsInitFlag;
 };
 
 #define CALCULATE_ELEMENTWISE_INDEX_OR_EXIT(id, N) \
@@ -840,16 +853,14 @@ __global__ void _logSoftMaxColWise(
 
 // each block processes one column. There must be 512 threads in a block
 template <class ElemType>
-__global__ void _assignColumnwiseLogSoftmaxOf(
+__global__ void _assignColumnwiseLogSoftmaxOf512Threads(
     const ElemType* a,
     ElemType* us,
     const CUDA_LONG m_numCols,
     const CUDA_LONG m_numRows)
 {
     // We first find max per column
-    __shared__ ElemType colMax[1];
     __shared__ ElemType partials[512];
-    colMax[0] = -10000000;
     partials[threadIdx.x] = -10000000;
 
     for (int i = threadIdx.x; i < m_numRows; i += 512)
@@ -900,16 +911,15 @@ __global__ void _assignColumnwiseLogSoftmaxOf(
     }
     __syncthreads();
 
+    __shared__ ElemType colMax[1];
     if (threadIdx.x == 0)
     {
         colMax[0] = max(max(partials[0], partials[1]), max(partials[2], partials[3]));
     }
-    partials[threadIdx.x] = 0.0f;
     __syncthreads();
+    partials[threadIdx.x] = 0.0f;
 
     // Now start finding sums
-    __shared__ ElemType colSum[1];
-    colSum[0] = 0.0f;
     for (int i = threadIdx.x; i < m_numRows; i += 512)
     {
         ElemType tmp = a[IDX2C(i, blockIdx.x, m_numRows)] - colMax[0];
@@ -960,6 +970,7 @@ __global__ void _assignColumnwiseLogSoftmaxOf(
     }
     __syncthreads();
 
+    __shared__ ElemType colSum[1];
     if (threadIdx.x == 0)
     {
         colSum[0] = partials[0] + partials[1] + partials[2] + partials[3];
@@ -1010,7 +1021,7 @@ __global__ void _logSoftMaxRowWise(
 
 // each block processes one column. There must be 512 threads in a block
 template <class ElemType>
-__global__ void _assignColumnwiseHardmaxOf(
+__global__ void _assignColumnwiseHardmaxOf512Threads(
     const ElemType* a,
     ElemType* us,
     const CUDA_LONG m_numCols,
@@ -2193,7 +2204,7 @@ __global__ void _addSignOf(
 
 // This function processes 1 column per block. this function needs 512 threads
 template <class ElemType, bool IsMax>
-__global__ void _vectorMaxMinReduce(
+__global__ void _vectorMaxMinReduce512Threads(
     const ElemType* us,
     ElemType* Indexes,
     ElemType* Values,
@@ -2567,17 +2578,20 @@ __global__ void _assignScaledDifference(
 
 template <class ElemType>
 __global__ void _addElementToElement(
+    ElemType beta,
     const ElemType* a, CUDA_LONG indexA,
     ElemType* c, CUDA_LONG indexC)
 {
-    CUDA_LONG id = blockDim.x * blockIdx.x + threadIdx.x;
-    if (id > 0)
-        return;
-    c[indexC] += a[indexA];
+    //CUDA_LONG id = blockDim.x * blockIdx.x + threadIdx.x;  // only one thread launched
+    //if (id > 0)
+    //    return;
+    ElemType us = beta ? beta * c[indexC] : 0; // do not multiply if beta is 0, could be a NaN
+    us += a[indexA];
+    c[indexC] = us;
 }
 
 template <class ElemType>
-__global__ void _assignNumOfDiff(
+__global__ void _assignNumOfDiff1024Threads(
     const ElemType* a,
     const ElemType* b,
     ElemType* c,
@@ -2656,7 +2670,7 @@ __global__ void _assignNumOfDiff(
 }
 
 /*template<class ElemType>
-__global__ void _assignNumOfDiff(
+__global__ void _assignNumOfDiff1024Threads(
 ElemType *a,
 ElemType *b,
 ElemType *c,
@@ -3149,7 +3163,8 @@ __global__ void _scaleSparseBlockAndAddToDense(
     rhs[IDX2C(row, col, numRows)] += alpha * lhsValues[index];
 }
 
-// compute predictions in cross entory node
+#if 0
+// compute predictions in cross entropy node
 template <class ElemType>
 __global__ void _computePrediction(
     int nv,
@@ -3332,9 +3347,11 @@ __global__ void _computeGradientOfInput(
 
     atomicAdd(&grd[IDX2C(h, j, numrows)], sum);
 }
+#endif
 
+#if 0
 template <class ElemType>
-__global__ void computeNCEForwardProp(
+__global__ void computeNCEForwardProp512Threads(
     const ElemType* val,
     const int* col,
     int numRows,
@@ -3396,9 +3413,10 @@ __global__ void computeNCEForwardProp(
             res[i] = partials[0];
     }
 }
+#endif
 
 template <class ElemType>
-__global__ void _computeNceOutput(
+__global__ void _computeNceOutputMax512Threads(
     const ElemType* col,
     int numRows,
     int sampleCount,
@@ -3467,7 +3485,7 @@ __global__ void _computeNceOutput(
 }
 
 template <class ElemType>
-__global__ void _assignSoftmaxSum(
+__global__ void _assignSoftmaxSumMax512Threads(
     const ElemType* softmax,
     int sampleCount,
     const ElemType* a,
@@ -3479,7 +3497,7 @@ __global__ void _assignSoftmaxSum(
     // col is an array contains index of the word samples
     // a is a matrix in column major format contains output from hidden layer
     // b is the weight matrix for output layer
-    // tmp is the buffer that stores NCE output calculated from _computeNceOutput
+    // tmp is the buffer that stores NCE output calculated from _computeNceOutputMax512Threads
     // c is the matrix to store objective
 
     __shared__ ElemType partials[512];
@@ -3519,7 +3537,7 @@ __global__ void _assignSoftmaxSum(
 }
 
 template <class ElemType>
-__global__ void _assignNoiseContrastiveEstimation(
+__global__ void _assignNoiseContrastiveEstimationMax512Threads(
     const ElemType* val,
     int numRows,
     int sampleCount,
@@ -3535,7 +3553,7 @@ __global__ void _assignNoiseContrastiveEstimation(
     // col is an array contains index of the word samples
     // a is a matrix in column major format contains output from hidden layer
     // b is the weight matrix for output layer
-    // tmp is the buffer that stores NCE output calculated from _computeNceOutput
+    // tmp is the buffer that stores NCE output calculated from _computeNceOutputMax512Threads
     // c is the matrix to store objective
 
     __shared__ ElemType partials[512];
@@ -3710,6 +3728,8 @@ __global__ void _assignNceDerivativeNew(
             atomicAdd(&c[wid], -er);
     }
 }
+
+#if 0
 // compute gradients of weights in cross entropy node
 template <class ElemType>
 __global__ void _computeGradientOfWeight(
@@ -3771,6 +3791,7 @@ __global__ void _computeGradientOfWeight(
         blockIds[ii] = i;
     }
 }
+#endif
 
 // used in clipping gradients
 template <class ElemType>
@@ -3850,7 +3871,7 @@ __global__ void _normalGradForSparseBlock(
 //This function should be called with 1024 threads per block and 1 block
 //THIS IS NOT THE MOST EFFICIENT IMPLEMENTATION!!!
 template <class ElemType>
-__global__ void _reductionSum(
+__global__ void _reductionSum1024Threads(
     const ElemType* data,
     ElemType* sum,
     CUDA_LONG N)
@@ -3931,7 +3952,7 @@ __global__ void _reductionSum(
 //This function should be called with 1024 threads per block and 1 block
 //THIS IS NOT THE MOST EFFICIENT IMPLEMENTATION!!!
 template <class ElemType>
-__global__ void _reductionSumAndAssign(
+__global__ void _reductionSumAndAssign1024Threads(
     ElemType* toAssign,
     const ElemType* data,
     CUDA_LONG N, // length of data
@@ -4015,7 +4036,7 @@ __global__ void _reductionSumAndAssign(
 //This function should be called with 1024 threads per block and 1 block
 //THIS IS NOT THE MOST EFFICIENT IMPLEMENTATION!!!
 template <class ElemType>
-__global__ void _reductionSum2(
+__global__ void _reductionSum21024Threads(
     const ElemType* data,
     ElemType* sum,
     CUDA_LONG N,
@@ -4105,7 +4126,7 @@ __global__ void _reductionSum2(
 //This function should be called with 1024 threads per block and 1 block
 //THIS IS NOT THE MOST EFFICIENT IMPLEMENTATION!!!
 template <class ElemType>
-__global__ void _reductionMatrixNormInf(
+__global__ void _reductionMatrixNormInf1024Threads(
     const ElemType* data,
     ElemType* maxAbs,
     CUDA_LONG N)
@@ -4193,7 +4214,7 @@ __global__ void _reductionMatrixNormInf(
 //This function should be called with 1024 threads per block and 1 block
 //THIS IS NOT THE MOST EFFICIENT IMPLEMENTATION!!!
 template <class ElemType>
-__global__ void _reductionMatrixNorm0(
+__global__ void _reductionMatrixNorm01024Threads(
     const ElemType* data,
     ElemType* nz,
     CUDA_LONG N)
@@ -4293,7 +4314,7 @@ __global__ void _getSparseVectorRepresntationForCSCMatrix(
 }
 
 template <class ElemType>
-__global__ void _lrHelper(
+__global__ void _lrHelper512Threads(
     const ElemType* data1,
     const ElemType* data2,
     const CUDA_LONG N,
@@ -4395,7 +4416,7 @@ __global__ void _lrHelper(
 
 /*
 template<class ElemType>
-__global__ void _lrHelper(
+__global__ void _lrHelper512Threads(
 ElemType* d_tmp)
 {
 if (sizeof(ElemType)==sizeof(float))
@@ -4559,83 +4580,11 @@ __global__ void _minusOneAt(
         c[id] = c[id] - 1.0;
 }
 
-// the kernel function for RCRF backward computation
+// the kernel function for CRFLSTMNetwork  backward computation
 // assume a column slice of input and output
+// This function assumes iNumLab <= 1024 and that shared memory == total (!) number of threads == 3 * iNumLab.
 template <class ElemType>
-__global__ void _rcrfBackwardCompute(
-    const size_t iNumPos,
-    const ElemType* galpha, // column slice at current time t
-    ElemType* gbeta,        // column slices with [row, 2] at current time t for [
-    const ElemType* gpair_scores,
-    const size_t iNumLab, const int shift)
-{
-    int id = blockDim.x * blockIdx.x + threadIdx.x;
-
-    extern __shared__ double sh_alpha_and_beta[]; // intersting, has to use [], instead of *
-    // need bye size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
-
-    ElemType* alpha = (ElemType*) (sh_alpha_and_beta);
-    ElemType* pair_scores = alpha + iNumPos * iNumLab;
-    ElemType* beta = alpha + iNumPos * iNumLab + iNumLab * iNumLab;
-
-    if (id < 0 || id >= iNumLab)
-        return;
-
-    // copy global memory to shared memory to save time
-    for (int t = iNumPos - 1; t >= 0; t--)
-    {
-        alpha[IDX2C(id, t, iNumLab)] = galpha[IDX2C(id, t, iNumLab)];
-    }
-
-    for (int j = 0; j < iNumLab; j++)
-        pair_scores[IDX2C(id, j, iNumLab)] = gpair_scores[IDX2C(id, j, iNumLab)];
-
-    __syncthreads();
-
-    for (int t = iNumPos - 1; t >= 0; t--)
-    {
-        ElemType fSum;
-        ElemType fTmp = LZERO;
-        if (t == iNumPos - 1)
-        {
-            fSum = LZERO;
-            for (int j = 0; j < iNumLab; j++)
-            {
-                fSum = logaddk(fSum, alpha[IDX2C(j, t, iNumLab)]);
-            }
-
-            fTmp = alpha[IDX2C(id, t, iNumLab)] - fSum;
-        }
-        else
-        {
-            for (int j = 0; j < iNumLab; j++)
-            {
-                fSum = LZERO;
-                for (int m = 0; m < iNumLab; m++)
-                {
-                    fSum = logaddk(fSum, alpha[IDX2C(m, t, iNumLab)] + pair_scores[IDX2C(j, m, iNumLab)]);
-                }
-
-                fTmp = logaddk(fTmp, beta[IDX2C(j, t + 1, iNumLab)] + alpha[IDX2C(id, t, iNumLab)] + pair_scores[IDX2C(j, id, iNumLab)] - fSum);
-            }
-        }
-
-        beta[IDX2C(id, t, iNumLab)] = fTmp;
-        __syncthreads();
-    }
-
-    // copy from shared memory to global memory to pass values
-    for (int t = iNumPos - 1; t >= 0; t--)
-    {
-        gbeta[IDX2C(id, t, iNumLab)] = beta[IDX2C(id, t, iNumLab)];
-    }
-    //    __syncthreads();
-}
-
-/// the kernel function for CRFLSTMNetwork  backward computation
-/// assume a column slice of input and output
-template <class ElemType>
-__global__ void _rcrfBackwardCompute(
+__global__ void _rcrfBackwardComputeMax1024Labels(
     const size_t t, // time position
     const size_t iNumPos,
     const ElemType* galpha,       // column slice at current time t
@@ -4646,13 +4595,13 @@ __global__ void _rcrfBackwardCompute(
 {
     int id = blockDim.x * blockIdx.x + threadIdx.x;
 
-    extern __shared__ double sh_alpha_and_beta[]; // intersting, has to use [], instead of *
-    // need bye size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
+    extern __shared__ double sh_alpha_and_beta[]; // [id] or [id + iNumLab] or [id + 2 * iNumLab)]
+    // need byte size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
 
     ElemType* alpha = (ElemType*) (sh_alpha_and_beta);
     ElemType* beta_t1 = (ElemType*) (alpha + iNumLab);
     ElemType* zeta = (ElemType*) (beta_t1 + iNumLab);
-    ElemType pair_scores[1024];
+    ElemType pair_scores[1024];  // [j=0..iNumLab-1]
 
     if (id < 0 || id >= iNumLab)
         return;
@@ -4684,9 +4633,10 @@ __global__ void _rcrfBackwardCompute(
     gbeta[IDX2C(id, t, iNumLab)] = fTmp;
 }
 
-/// $\zeta_t(j) = {\sum_k exp(\delta_{t-1}(k) + a_{kj}(t))}$.
+// $\zeta_t(j) = {\sum_k exp(\delta_{t-1}(k) + a_{kj}(t))}$.
+// This function assumes iNumLab <= 1024 and that shared memory == total (!) number of threads == iNumLab.
 template <class ElemType>
-__global__ void _rcrfBackwardComputeZeta(
+__global__ void _rcrfBackwardComputeZetaMax1024Labels(
     const size_t t, // time position
     const size_t iNumPos,
     const ElemType* galpha, // column slice at current time t
@@ -4696,11 +4646,11 @@ __global__ void _rcrfBackwardComputeZeta(
 {
     int id = blockDim.x * blockIdx.x + threadIdx.x;
 
-    extern __shared__ double sh_alpha_and_beta[]; // intersting, has to use [], instead of *
-    // need bye size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
+    extern __shared__ double sh_alpha_and_beta[]; // [id]
+    // need byte size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
 
     ElemType* alpha = (ElemType*) (sh_alpha_and_beta);
-    ElemType pair_scores[1024];
+    ElemType pair_scores[1024]; // [j=0..iNumLab-1]
 
     if (id < 0 || id >= iNumLab)
         return;
@@ -4726,8 +4676,9 @@ __global__ void _rcrfBackwardComputeZeta(
 }
 
 /// $\zeta_t(j) = {\sum_k exp(\delta_{t-1}(k) + a_{kj}(t))}$.
+// This function assumes iNumLab <= 1024 and that shared memory == total (!) number of threads == iNumLab.
 template <class ElemType>
-__global__ void _rcrfTransGrdComputeZeta(
+__global__ void _rcrfTransGrdComputeZetaMax1024Labels(
     const int t, // time position
     const size_t iNumPos,
     const ElemType* galpha, // column slice at current time t
@@ -4739,11 +4690,11 @@ __global__ void _rcrfTransGrdComputeZeta(
 {
     int id = blockDim.x * blockIdx.x + threadIdx.x;
 
-    extern __shared__ double sh_alpha_and_beta[]; // intersting, has to use [], instead of *
-    // need bye size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
+    extern __shared__ double sh_alpha_and_beta[]; // [id]
+    // need byte size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
 
     ElemType* alpha = (ElemType*) (sh_alpha_and_beta);
-    ElemType pair_scores[1024];
+    ElemType pair_scores[1024]; // [j=0..iNumLab-1]
 
     if (id < 0 || id >= iNumLab)
         return;
@@ -4777,8 +4728,9 @@ __global__ void _rcrfTransGrdComputeZeta(
     gzeta[id] = fSum;
 }
 
+// This function assumes iNumLab <= 1024 and that shared memory == total (!) number of threads == iNumLab.
 template <class ElemType>
-__global__ void _rcrfTransGrdCompute(
+__global__ void _rcrfTransGrdComputeMax1024Labels(
     int t,
     const size_t start_lbl,
     const ElemType* galpha,
@@ -4793,13 +4745,13 @@ __global__ void _rcrfTransGrdCompute(
 {
     int id = blockDim.x * blockIdx.x + threadIdx.x;
 
-    extern __shared__ double sh_alpha_and_beta[]; // intersting, has to use [], instead of *
-    // need bye size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
+    extern __shared__ double sh_alpha_and_beta[]; // [id]
+    // need byte size = (iNumPos * iNumLab * 2 + iNumLab * iNumLab) * sizeof(ElemType)
 
     ElemType* alpha = (ElemType*) (sh_alpha_and_beta);
     ElemType* beta = (ElemType*) (alpha + iNumLab);
     ElemType* zeta = (ElemType*) (beta + iNumLab);
-    ElemType pair_scores[1024];
+    ElemType pair_scores[1024]; // [j=0..iNumLab-1]
 
     if (id < 0 || id >= iNumLab)
         return;

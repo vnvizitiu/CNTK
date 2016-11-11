@@ -2,29 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="CNTKEval.cpp" />
-    <ClCompile Include="..\Common\fileutil.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\File.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\TimerUtility.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Misc</Filter>
+    <ClCompile Include="..\CNTK\BrainScript\BrainScriptEvaluator.cpp">
+      <Filter>BrainScript</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Config.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Eval.cpp">
-      <Filter>For External Use</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\ExceptionWithCallStack.cpp">
-      <Filter>Common</Filter>
+    <ClCompile Include="..\CNTK\BrainScript\BrainScriptParser.cpp">
+      <Filter>BrainScript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -42,12 +27,6 @@
     </ClInclude>
     <ClInclude Include="..\Common\Include\Basics.h">
       <Filter>Common\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Include\Config.h">
       <Filter>Common\Include</Filter>
@@ -68,6 +47,9 @@
     </Filter>
     <Filter Include="For External Use">
       <UniqueIdentifier>{fa8ec6d7-8998-44f0-bddb-cb4dffc5ec0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BrainScript">
+      <UniqueIdentifier>{eff3a7b6-ad84-4438-9422-1b66077cfded}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

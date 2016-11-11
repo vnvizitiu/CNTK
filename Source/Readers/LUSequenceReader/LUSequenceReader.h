@@ -47,7 +47,7 @@ enum ReaderMode
 };
 
 template <class ElemType>
-class LUSequenceReader : public IDataReader<ElemType>
+class LUSequenceReader : public DataReaderBase
 {
 protected:
     bool m_idx2clsRead;
@@ -149,8 +149,8 @@ protected:
     } m_labelInfo[labelInfoNum];
 
     // caching support
-    DataReader<ElemType>* m_cachingReader;
-    DataWriter<ElemType>* m_cachingWriter;
+    DataReader* m_cachingReader;
+    DataWriter* m_cachingWriter;
     ConfigParameters m_readerConfig;
     void InitCache(const ConfigParameters& config);
 
@@ -191,8 +191,10 @@ public:
 
     virtual bool GetData(const std::wstring& sectionName, size_t numRecords, void* data, size_t& dataBufferSize, size_t recordStart = 0);
 
-//public:
-//    int GetSentenceEndIdFromOutputLabel();
+    size_t GetCurrentSamplePosition() override
+    {
+        return m_mbStartSample;
+    }
 };
 
 template <class ElemType>
@@ -270,6 +272,7 @@ public:
     BatchLUSequenceReader()
         : m_pMBLayout(make_shared<MBLayout>())
     {
+        m_pMBLayout->SetUniqueAxisName(L"LUSequenceReader");
         mLastProcessedSentenceId = 0;
         mRequestedNumParallelSequences = 1;
         mLastPosInSentence = 0;
@@ -315,15 +318,13 @@ public:
         SetSentenceEnd((int) wrd, (int) pos, (int) actualMbSize);
     }
 
-    size_t GetLabelOutput(std::map<std::wstring,
-                                   Matrix<ElemType>*>& matrices,
-                          LabelInfo& labelInfo, size_t actualmbsize);
+    size_t GetLabelOutput(StreamMinibatchInputs& matrices, LabelInfo& labelInfo, size_t actualmbsize);
 
     void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples = requestDataSize);
-    bool GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    bool TryGetMinibatch(StreamMinibatchInputs& matrices);
 
     bool EnsureDataAvailable(size_t mbStartSample);
-    size_t GetNumParallelSequences();
+    size_t GetNumParallelSequencesForFixingBPTTMode();
     void SetNumParallelSequences(const size_t mz);
 
     void CopyMBLayoutTo(MBLayoutPtr pMBLayout);
@@ -363,10 +364,10 @@ public:
     // this is for frame-by-frame reading of data.
     // data is first read into these matrices and then if needed is column-by-column retrieved
     map<wstring, std::shared_ptr<Matrix<ElemType>>> mMatrices;
-    bool GetFrame(std::map<std::wstring, Matrix<ElemType>*>& matrices, const size_t tidx, vector<size_t>& history);
+    bool GetFrame(StreamMinibatchInputs& matrices, const size_t tidx, vector<size_t>& history);
 
     // create proposals
-    void InitProposals(map<wstring, Matrix<ElemType>*>& pMat);
+    void InitProposals(StreamMinibatchInputs& pMat);
 
 public:
     bool mEqualLengthOutput;
@@ -412,13 +413,13 @@ public:
         }
     };
 
-    bool GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    bool TryGetMinibatch(StreamMinibatchInputs& matrices);
 
     void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples);
 
     void CopyMBLayoutTo(MBLayoutPtr pMBLayout);
 
-    size_t GetNumParallelSequences();
+    size_t GetNumParallelSequencesForFixingBPTTMode();
 
     template <class ConfigRecordType>
     void InitFromConfig(const ConfigRecordType&);
@@ -439,7 +440,7 @@ public:
     bool DataEnd();
 
     // create proposals
-    void InitProposals(map<wstring, Matrix<ElemType>*>& pMat);
-    bool GetProposalObs(std::map<std::wstring, Matrix<ElemType>*>& matrices, const size_t tidx, vector<size_t>& history);
+    void InitProposals(StreamMinibatchInputs& pMat);
+    bool GetProposalObs(StreamMinibatchInputs& matrices, const size_t tidx, vector<size_t>& history);
 };
 } } }

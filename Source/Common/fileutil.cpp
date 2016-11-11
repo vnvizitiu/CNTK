@@ -16,6 +16,7 @@
 #endif
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #include "Basics.h"
+#include "basetypes.h" //for attemp()
 #include "fileutil.h"
 #include "ProgressTracing.h"
 
@@ -51,11 +52,18 @@
 #endif
 
 #define __out_z_cap(x) // a fake SAL annotation; this may come in handy some day if we try static code analysis, so I don't want to delete it
+#define FINDCLOSE_ERROR 0
 
 #include <errno.h>
 
 using namespace std;
 using namespace Microsoft::MSR::CNTK;
+
+// All sizes are in bytes
+const int BUF_SIZE = 1000000;                       // Default buffer size 
+const int LARGE_BUF_SIZE = 10 * BUF_SIZE;           // Used by fopenOrDie
+const DWORD READ_SIZE_LIMIT = 15 * 1024 * 1024;     // Used by freadOrDie
+const DWORD WRITE_SIZE_LIMIT = 16 * 1024 * 1024;    // Used by fwriteOrDie
 
 // ----------------------------------------------------------------------------
 // some mappings for non-Windows builds
@@ -239,8 +247,9 @@ FILE* fopenOrDie(const string& pathname, const char* mode)
         RuntimeError("error opening file '%s': %s", pathname.c_str(), strerror(errno));
     }
     if (strchr(mode, 'S'))
-    {                                       // if optimized for sequential access then use large buffer
-        setvbuf(f, NULL, _IOFBF, 10000000); // OK if it fails
+    {
+        // If optimized for sequential access, then use large buffer. OK if it fails
+        setvbuf(f, NULL, _IOFBF, LARGE_BUF_SIZE);
     }
     return f;
 }
@@ -253,8 +262,9 @@ FILE* fopenOrDie(const wstring& pathname, const wchar_t* mode)
         RuntimeError("error opening file '%ls': %s", pathname.c_str(), strerror(errno));
     }
     if (strchr(mode, 'S'))
-    {                                       // if optimized for sequential access then use large buffer
-        setvbuf(f, NULL, _IOFBF, 10000000); // OK if it fails
+    {
+        // If optimized for sequential access, then use large buffer. OK if it fails
+        setvbuf(f, NULL, _IOFBF, LARGE_BUF_SIZE);
     }
     return f;
 }
@@ -287,10 +297,12 @@ void fsetmode(FILE* f, char type)
 
 void freadOrDie(void* ptr, size_t size, size_t count, FILE* f)
 {
+    size_t limit = max(READ_SIZE_LIMIT / size, (size_t)1);  // Normalize by size, as fread() expects units, not bytes
+
     // \\XXX\C$ reads are limited, with some randomness (e.g. 48 MB), on Windows 7 32 bit, so we break this into chunks of some MB. Meh.
     while (count > 0)
     {
-        size_t chunkn = min(count, (size_t) 15 * 1024 * 1024); // BUGBUG: I surely meant this limit to be bytes, not units of 'size'...
+        size_t chunkn = min(count, limit);
         size_t n = fread(ptr, size, chunkn, f);
         if (n != chunkn)
             RuntimeError("error reading from file: %s", strerror(errno));
@@ -305,9 +317,9 @@ void freadOrDie(void* ptr, size_t size, size_t count, const HANDLE f)
     // \\XXX\C$ reads are limited, with some randomness (e.g. 48 MB), on Windows 7 32 bit, so we break this into chunks of some MB. Meh.
     while (count > 0)
     {
-        size_t chunkn = min(count * size, (size_t) 15 * 1024 * 1024);
+        DWORD chunkn = min((DWORD)(count * size), READ_SIZE_LIMIT);
         DWORD n;
-        ReadFile(f, ptr, (DWORD) chunkn, &n, NULL);
+        ReadFile(f, ptr, chunkn, &n, NULL);
         if (n != chunkn)
             RuntimeError("error number for reading from file: %s", GetLastError());
         count -= (size_t)(n / size);
@@ -329,10 +341,9 @@ void fwriteOrDie(const void* ptr, size_t size, size_t count, FILE* f)
     while (totalBytes > 0)
     {
         size_t wantWrite = totalBytes;
-#define LIMIT (16 * 1024 * 1024) // limit to 16 MB at a time
-        if (wantWrite > LIMIT)
+        if (wantWrite > WRITE_SIZE_LIMIT)
         {
-            wantWrite = LIMIT;
+            wantWrite = WRITE_SIZE_LIMIT;
         }
         size_t n = fwrite((const void*) p1, 1, wantWrite, f);
         if (n != wantWrite)
@@ -355,10 +366,9 @@ void fwriteOrDie(const void* ptr, size_t size, size_t count, const HANDLE f)
     while (totalBytes > 0)
     {
         DWORD wantWrite = totalBytes;
-#define LIMIT (16 * 1024 * 1024) // limit to 16 MB at a time
-        if (wantWrite > LIMIT)
+        if (wantWrite > WRITE_SIZE_LIMIT)
         {
-            wantWrite = LIMIT;
+            wantWrite = WRITE_SIZE_LIMIT;
         }
         DWORD byteWritten = 0;
         if (WriteFile(f, (const void*) p1, wantWrite, &byteWritten, NULL) == false)
@@ -609,11 +619,6 @@ void renameOrDie(const std::string& from, const std::string& to)
     // WORKAROUND: "rename" should do this but this is a workaround
     // to the HDFS FUSE implementation's bug of failing to do so
     // workaround for FUSE rename when running on Philly
-    if (ProgressTracing::GetTracingFlag())
-    {
-        fprintf(stderr, "rename %s to %s\n", from.c_str(), to.c_str());
-    }    
-    
     unlinkOrDie(to);
     if (rename(from.c_str(), to.c_str()) != 0)
     {
@@ -820,28 +825,28 @@ CHAR* fgetline(FILE* f, CHAR* buf, int size)
 // STL string version
 std::string fgetline(FILE* f)
 {
-    vector<char> buf(1000000);
+    vector<char> buf(BUF_SIZE);
     return fgetline(f, &buf[0], (int) buf.size());
 }
 
 // STL string version
 std::wstring fgetlinew(FILE* f)
 {
-    vector<wchar_t> buf(1000000);
+    vector<wchar_t> buf(BUF_SIZE);
     return fgetline(f, &buf[0], (int) buf.size());
 }
 
 // STL string version avoiding most memory allocations
 void fgetline(FILE* f, std::string& s, std::vector<char>& buf)
 {
-    buf.resize(1000000); // enough? // KIT: increased to 1M to be safe
+    buf.resize(BUF_SIZE);
     const char* p = fgetline(f, &buf[0], (int) buf.size());
     s.assign(p);
 }
 
 void fgetline(FILE* f, std::wstring& s, std::vector<wchar_t>& buf)
 {
-    buf.resize(1000000); // enough? // KIT: increased to 1M to be safe
+    buf.resize(BUF_SIZE);
     const wchar_t* p = fgetline(f, &buf[0], (int) buf.size());
     s.assign(p);
 }
@@ -849,7 +854,6 @@ void fgetline(FILE* f, std::wstring& s, std::vector<wchar_t>& buf)
 // char buffer version
 void fgetline(FILE* f, std::vector<char>& buf)
 {
-    const int BUF_SIZE = 1000000; // enough? // KIT: increased to 1M to be safe
     buf.resize(BUF_SIZE);
     fgetline(f, &buf[0], (int) buf.size());
     buf.resize(strnlen(&buf[0], BUF_SIZE) + 1); // SECURITY NOTE: string use has been reviewed
@@ -857,7 +861,6 @@ void fgetline(FILE* f, std::vector<char>& buf)
 
 void fgetline(FILE* f, std::vector<wchar_t>& buf)
 {
-    const int BUF_SIZE = 1000000; // enough? // KIT: increased to 1M to be safe
     buf.resize(BUF_SIZE);
     fgetline(f, &buf[0], (int) buf.size());
     buf.resize(wcsnlen(&buf[0], BUF_SIZE) + 1); // SECURITY NOTE: string use has been reviewed
@@ -1637,6 +1640,11 @@ static size_t fgetfilechars(const std::wstring& path, vector<char>& buffer)
     return len;
 }
 
+static void fgetfilechars(const std::wstring& path, vector<char>& buffer, size_t& len)
+{
+    len = fgetfilechars(path, buffer);
+}
+
 template <class LINES>
 static void strtoklines(char* s, LINES& lines)
 {
@@ -1644,10 +1652,14 @@ static void strtoklines(char* s, LINES& lines)
         lines.push_back(p);
 }
 
-void msra::files::fgetfilelines(const std::wstring& path, vector<char>& buffer, std::vector<std::string>& lines)
+void msra::files::fgetfilelines(const std::wstring& path, vector<char>& buffer, std::vector<std::string>& lines, int numberOfTries)
 {
-    // load it into RAM in one huge chunk
-    const size_t len = fgetfilechars(path, buffer);
+    size_t len = 0;
+    msra::util::attempt(numberOfTries, [&]() // (can be reading from network)
+    {
+        // load it into RAM in one huge chunk
+        fgetfilechars(path, buffer, len);
+    });
 
     // parse into lines
     lines.resize(0);
@@ -1656,11 +1668,15 @@ void msra::files::fgetfilelines(const std::wstring& path, vector<char>& buffer, 
 }
 
 // same as above but returning const char* (avoiding the memory allocation)
-vector<char*> msra::files::fgetfilelines(const wstring& path, vector<char>& buffer)
+vector<char*> msra::files::fgetfilelines(const wstring& path, vector<char>& buffer, int numberOfTries)
 {
-    // load it into RAM in one huge chunk
-    const size_t len = fgetfilechars(path, buffer);
-
+    size_t len = 0;
+    msra::util::attempt(numberOfTries, [&]() // (can be reading from network)
+    {
+        // load it into RAM in one huge chunk
+        fgetfilechars(path, buffer, len);
+    });
+    
     // parse into lines
     vector<char*> lines;
     lines.reserve(len / 20);
@@ -1698,7 +1714,13 @@ public:
     ~auto_find_handle()
     {
         if (h != INVALID_HANDLE_VALUE)
-            ::FindClose(h);
+        {
+            int rc = ::FindClose(h);
+            if ((rc == FINDCLOSE_ERROR) && !std::uncaught_exception())
+            {
+                RuntimeError("Release: Failed to close handle: %d", ::GetLastError());
+            }
+        }
     }
     operator HANDLE() const
     {

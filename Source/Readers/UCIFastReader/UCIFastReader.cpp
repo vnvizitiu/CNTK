@@ -95,7 +95,7 @@ bool UCIFastReader<ElemType>::EnsureDataAvailable(size_t mbStartSample, bool end
         m_featureData.resize(epochSample * m_featureCount);
     if (m_labelType == labelCategory && m_labelData.size() > epochSample)
     {
-            m_labelIdData.resize(epochSample);
+        m_labelIdData.resize(epochSample);
         m_labelData.resize(epochSample);
     }
     else if (m_labelType != labelNone && m_labelData.size() > epochSample * m_labelDim)
@@ -302,7 +302,7 @@ void UCIFastReader<ElemType>::InitFromConfig(const ConfigRecordType& readerConfi
     if (features.size() > 0)
     {
         m_featuresName = features[0];
-        if (!readerConfig.Exists(m_featuresName))
+        if (!readerConfig.Exists(m_featuresName)) // BUGBUG: How can this ever fire? We wouldn't be able to get this name in the first place if it wasn't there.
             RuntimeError("features file not found, required in configuration: i.e. 'features=[file=c:\\myfile.txt;start=1;dim=123]'");
     }
     if (labels.size() > 0)
@@ -500,11 +500,11 @@ void UCIFastReader<ElemType>::InitCache(const ConfigParameters& readerConfig)
             // mmodify the config so the reader types look correct
             config["readerType"] = config("writerType");
             config["file"] = filesList;
-            m_cachingReader = new DataReader<ElemType>(config);
+            m_cachingReader = new DataReader(config);
         }
         else
         {
-            m_cachingWriter = new DataWriter<ElemType>(readerConfig);
+            m_cachingWriter = new DataWriter(readerConfig);
 
             // now get the section names for map and category types
             std::map<std::wstring, SectionType, nocase_compare> sections;
@@ -596,7 +596,7 @@ void UCIFastReader<ElemType>::SetupEpoch()
         size_t mbStartSample = m_epoch * m_epochSize;
 
         size_t fileRecord = m_totalSamples ? mbStartSample % m_totalSamples : 0;
-        fprintf(stderr, "starting epoch %lu at record count %lu, and file position %lu\n", (unsigned long) m_epoch, (unsigned long) mbStartSample, (unsigned long) fileRecord);
+        fprintf(stderr, "starting epoch %lu at record count %lu, and file position %lu\n", (unsigned long) m_epoch+1, (unsigned long) mbStartSample, (unsigned long) fileRecord);
         size_t currentFileRecord = m_mbStartSample % m_totalSamples;
 
         // reset the next read sample
@@ -765,7 +765,7 @@ void UCIFastReader<ElemType>::StoreLabel(ElemType& labelStore, const LabelType& 
 //             [out] each matrix resized if necessary containing data.
 // returns - true if there are more minibatches, false if no more minibatchs remain
 template <class ElemType>
-bool UCIFastReader<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices)
+bool UCIFastReader<ElemType>::TryGetMinibatch(StreamMinibatchInputs& matrices)
 {
     bool minibatchesRemaining = true;
     if (m_pendingAsyncGetMinibatch.valid())
@@ -775,52 +775,48 @@ bool UCIFastReader<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemTyp
         minibatchesRemaining = m_pendingAsyncGetMinibatch.get();
 
         // Now swap the m_prefetchedMatrices and parameter matrices
-        for (auto iter = matrices.begin(); iter != matrices.end(); ++iter)
+        for (auto& iter : matrices)
         {
-            if (m_prefetchMatrices.find(iter->first) == m_prefetchMatrices.end())
-            {
-                LogicError("No matching prefetch matrix found for matrix named %S!", iter->first.c_str());
-            }
+            if (m_prefetchMatrices.find(iter.first) == m_prefetchMatrices.end())
+                LogicError("GetMinibatch: No matching prefetch matrix found for matrix named %ls.", iter.first.c_str());
 
-            Matrix<ElemType>* prefetchMatrix = m_prefetchMatrices[iter->first].get();
-            std::swap(*(iter->second), *prefetchMatrix);
+            std::swap(matrices.GetInputMatrix<ElemType>(iter.first), m_prefetchMatrices.GetInputMatrix<ElemType>(iter.first)); // BUGBUG?: This swaps the matrix structures directly, messing with ownership. And are we sure it does not do deep copies for this?
+            //Matrix<ElemType>* prefetchMatrix = m_prefetchMatrices[iter->first].get();
+            //std::swap(*(iter->second), *prefetchMatrix);
         }
     }
     else
     {
         minibatchesRemaining = GetMinibatchImpl(matrices);
 
-        // Allocate prefetch matrices if we would be firing an async minibatch prefetch
+        // Allocate prefetch matrices if were firing an async minibatch prefetch
         if (minibatchesRemaining && m_prefetchEnabled)
         {
-            // DeAllocate the existing m_prefetchMatrices
+            // create a matrix for every output
             m_prefetchMatrices.clear();
 
-            for (auto iter = matrices.begin(); iter != matrices.end(); ++iter)
-            {
-                m_prefetchMatrices[iter->first].reset(new Matrix<ElemType>(iter->second->GetDeviceId()));
-            }
+            for (auto& iter : matrices)
+                m_prefetchMatrices.AddInput(iter.first, make_shared<Matrix<ElemType>>(iter.second.matrix->GetDeviceId()), iter.second.pMBLayout, iter.second.sampleLayout);
         }
     }
 
     // Fire a new prefetch if there are any minibatches remaining
     if (minibatchesRemaining && m_prefetchEnabled)
     {
-        Matrix<ElemType>& features = *matrices[m_featuresName];
+        Matrix<ElemType>& features = matrices.GetInputMatrix<ElemType>(m_featuresName);
         int deviceId = features.GetDeviceId();
         m_pendingAsyncGetMinibatch = std::async(std::launch::async, [this, deviceId]()
-                                                {
-                                                    // Set the device since this will execute on a new thread
-                                                    Matrix<ElemType>::SetDevice(deviceId);
+        {
+            // Set the device since this will execute on a new thread
+            Matrix<ElemType>::SetDevice(deviceId);
 
-                                                    std::map<std::wstring, Matrix<ElemType>*> prefetchMatrices;
-                                                    for (auto iter = m_prefetchMatrices.begin(); iter != m_prefetchMatrices.end(); ++iter)
-                                                    {
-                                                        prefetchMatrices[iter->first] = iter->second.get();
-                                                    }
+            StreamMinibatchInputs prefetchMatrices;
+            for (auto& iter : m_prefetchMatrices)
+                prefetchMatrices.AddInput(iter.first, iter.second);
+            // TODO: Why can we not just pass m_prefetchMatrices?
 
-                                                    return GetMinibatchImpl(prefetchMatrices);
-                                                });
+            return GetMinibatchImpl(prefetchMatrices);
+        });
     }
 
     return minibatchesRemaining;
@@ -831,7 +827,7 @@ bool UCIFastReader<ElemType>::GetMinibatch(std::map<std::wstring, Matrix<ElemTyp
 //             [out] each matrix resized if necessary containing data.
 // returns - true if there are more minibatches, false if no more minibatchs remain
 template <class ElemType>
-bool UCIFastReader<ElemType>::GetMinibatchImpl(std::map<std::wstring, Matrix<ElemType>*>& matrices)
+bool UCIFastReader<ElemType>::GetMinibatchImpl(StreamMinibatchInputs& matrices)
 {
     if (m_cachingReader)
     {
@@ -839,9 +835,9 @@ bool UCIFastReader<ElemType>::GetMinibatchImpl(std::map<std::wstring, Matrix<Ele
     }
     // get the features array
     if (matrices.find(m_featuresName) == matrices.end())
-        RuntimeError("Features matrix not found in config file, there should be a section '%ls=[...]' in the configuration file.", m_featuresName.c_str());
+        RuntimeError("Features matrix not found in config file, there should be a node '%ls' in the network.", m_featuresName.c_str());
 
-    Matrix<ElemType>& features = *matrices[m_featuresName];
+    Matrix<ElemType>& features = matrices.GetInputMatrix<ElemType>(m_featuresName);
 
     // get out if they didn't call StartMinibatchLoop() first  --BUGBUG: We should throw in that case.
     if (m_mbSize == 0)
@@ -926,7 +922,7 @@ bool UCIFastReader<ElemType>::GetMinibatchImpl(std::map<std::wstring, Matrix<Ele
         {
             // pick the right sample with randomization if desired
             size_t jRand = randomize ? (randBase + tmap[jSample % m_randomizeRange]) : jSample;
-            jRand %= m_epochSize; //BUGBUG: this will make it randomize only inside m_epochSize which is not enough 
+            jRand %= m_epochSize; // BUGBUG: this will make it randomize only inside m_epochSize which is not enough 
 
             // vector of feature data goes into matrix column
             memcpy(&m_featuresBuffer.get()[j * m_featureCount], &m_featureData[jRand * m_featureCount], sizeof(ElemType) * m_featureCount);
@@ -1005,12 +1001,10 @@ bool UCIFastReader<ElemType>::GetMinibatchImpl(std::map<std::wstring, Matrix<Ele
     features.SetValue(m_featureCount, currSubsetSize, features.GetDeviceId(), m_featuresBuffer.get() + (m_featureCount * currSubsetStartCol), matrixFlagNormal);
     if (m_labelType != labelNone)
     {
-        auto labelEntry = matrices.find(m_labelsName);
-        if (labelEntry != matrices.end())
+        if (matrices.HasInput(m_labelsName))
         {
-            Matrix<ElemType>* labels = labelEntry->second;
-            if (labels != nullptr)
-                labels->SetValue(m_labelDim, currSubsetSize, labels->GetDeviceId(), m_labelsBuffer.get() + (m_labelDim * currSubsetStartCol), matrixFlagNormal);
+            auto& labels = matrices.GetInputMatrix<ElemType>(m_labelsName);
+            labels.SetValue(m_labelDim, currSubsetSize, labels.GetDeviceId(), m_labelsBuffer.get() + (m_labelDim * currSubsetStartCol), matrixFlagNormal);
         }
     }
 
@@ -1021,7 +1015,7 @@ bool UCIFastReader<ElemType>::GetMinibatchImpl(std::map<std::wstring, Matrix<Ele
 // GetLabelMapping - Gets the label mapping from integer index to label type
 // returns - a map from numeric datatype to native label type
 template <class ElemType>
-const std::map<typename IDataReader<ElemType>::LabelIdType, typename IDataReader<ElemType>::LabelType>& UCIFastReader<ElemType>::GetLabelMapping(const std::wstring& sectionName)
+const std::map<IDataReader::LabelIdType, IDataReader::LabelType>& UCIFastReader<ElemType>::GetLabelMapping(const std::wstring& sectionName)
 {
     if (m_cachingReader)
     {
@@ -1034,7 +1028,7 @@ const std::map<typename IDataReader<ElemType>::LabelIdType, typename IDataReader
 // labelMapping - mapping table from label values to IDs (must be 0-n)
 // note: for tasks with labels, the mapping table must be the same between a training run and a testing run
 template <class ElemType>
-void UCIFastReader<ElemType>::SetLabelMapping(const std::wstring& /*sectionName*/, const std::map<typename IDataReader<ElemType>::LabelIdType, LabelType>& labelMapping)
+void UCIFastReader<ElemType>::SetLabelMapping(const std::wstring& /*sectionName*/, const std::map<LabelIdType, LabelType>& labelMapping)
 {
     if (m_cachingReader)
     {

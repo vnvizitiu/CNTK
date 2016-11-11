@@ -5,8 +5,14 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CNTK", "Source\CNTK\CNTK.vcxproj", "{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}"
 	ProjectSection(ProjectDependencies) = postProject
-		{33D2FD22-DEF2-4507-A58A-368F641AEBE5} = {33D2FD22-DEF2-4507-A58A-368F641AEBE5}
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1} = {EB2BE26F-6BD4-4274-971F-86D080779DD1}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {E5606ECE-48CA-4464-BB12-09D81D02B9EF}
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937} = {DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D45DF403-6781-444E-B654-A96868C5BE68}"
@@ -116,6 +122,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{5F733BBA-F
 		Tests\EndToEndTests\Speech\Data\glob_0000.mlf = Tests\EndToEndTests\Speech\Data\glob_0000.mlf
 		Tests\EndToEndTests\Speech\Data\glob_0000.scp = Tests\EndToEndTests\Speech\Data\glob_0000.scp
 		Tests\EndToEndTests\Speech\Data\README.txt = Tests\EndToEndTests\Speech\Data\README.txt
+		Tests\EndToEndTests\Speech\Data\SimpleDataTest_cntk_text.txt = Tests\EndToEndTests\Speech\Data\SimpleDataTest_cntk_text.txt
+		Tests\EndToEndTests\Speech\Data\SimpleDataTrain_cntk_text.txt = Tests\EndToEndTests\Speech\Data\SimpleDataTrain_cntk_text.txt
 		Tests\EndToEndTests\Speech\Data\state.list = Tests\EndToEndTests\Speech\Data\state.list
 	EndProjectSection
 EndProject
@@ -127,15 +135,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LSTM", "LSTM", "{19EE975B-2
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComputationNetworkLib", "Source\ComputationNetworkLib\ComputationNetworkLib.vcxproj", "{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}"
-	ProjectSection(ProjectDependencies) = postProject
-		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
-		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SGDLib", "Source\SGDLib\SGDLib.vcxproj", "{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}"
-	ProjectSection(ProjectDependencies) = postProject
-		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelTraining", "ParallelTraining", "{5E666C53-2D82-49C9-9127-3FDDC321C741}"
 	ProjectSection(SolutionItems) = preProject
@@ -144,8 +145,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelTraining", "Paralle
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{6D1353D6-F196-466F-B886-F16D48759B20}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\ParallelTraining\Data\SimpleDataTrain.txt = Tests\EndToEndTests\ParallelTraining\Data\SimpleDataTrain.txt
-		Tests\EndToEndTests\ParallelTraining\Data\SimpleMapping.txt = Tests\EndToEndTests\ParallelTraining\Data\SimpleMapping.txt
+		Tests\EndToEndTests\ParallelTraining\Data\SimpleDataTrain_cntk_text.txt = Tests\EndToEndTests\ParallelTraining\Data\SimpleDataTrain_cntk_text.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NoQuantization", "NoQuantization", "{B6725C9F-A6D2-4269-9B74-7888A90F7884}"
@@ -172,7 +172,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DoublePrecision", "DoublePr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kaldi2Reader", "Kaldi2Reader", "{C70E1572-20FF-496C-A0A9-10AA6755A07C}"
 	ProjectSection(SolutionItems) = preProject
-		Source\Readers\Kaldi2Reader\basetypes.h = Source\Readers\Kaldi2Reader\basetypes.h
 		Source\Readers\Kaldi2Reader\biggrowablevectors.h = Source\Readers\Kaldi2Reader\biggrowablevectors.h
 		Source\Readers\Kaldi2Reader\chunkevalsource.h = Source\Readers\Kaldi2Reader\chunkevalsource.h
 		Source\Readers\Kaldi2Reader\DataReader.cpp = Source\Readers\Kaldi2Reader\DataReader.cpp
@@ -276,13 +275,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathTests", "Tests\UnitTests\MathTests\MathTests.vcxproj", "{4701E678-5E6F-470D-B348-9CD1A2C095D1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ActionsLib", "Source\ActionsLib\ActionsLib.vcxproj", "{EB2BE26F-6BD4-4274-971F-86D080779DD1}"
 	ProjectSection(ProjectDependencies) = postProject
-		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
-		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
-		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937} = {DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {E5606ECE-48CA-4464-BB12-09D81D02B9EF}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SequenceTraining", "SequenceTraining", "{BB8B9FC5-C4B3-477F-80E2-665DC8E431BD}"
@@ -303,22 +301,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Image", "Image", "{8071EF60
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{76F9323D-34A1-43A5-A594-C4798931FF21}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Image\Data\labelsmap.txt = Tests\EndToEndTests\Image\Data\labelsmap.txt
-		Tests\EndToEndTests\Image\Data\Test.txt = Tests\EndToEndTests\Image\Data\Test.txt
-		Tests\EndToEndTests\Image\Data\Train.txt = Tests\EndToEndTests\Image\Data\Train.txt
+		Tests\EndToEndTests\Image\Data\Test_cntk_text.txt = Tests\EndToEndTests\Image\Data\Test_cntk_text.txt
+		Tests\EndToEndTests\Image\Data\Train_cntk_text.txt = Tests\EndToEndTests\Image\Data\Train_cntk_text.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QuickE2E", "QuickE2E", "{2A884EB5-037C-481E-8170-BCDC8B3EDD93}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Image\QuickE2E\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Image\QuickE2E\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Image\QuickE2E\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Image\QuickE2E\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Image\QuickE2E\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Image\QuickE2E\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Image\QuickE2E\baseline.linux.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.linux.txt
+		Tests\EndToEndTests\Image\QuickE2E\baseline.windows.txt = Tests\EndToEndTests\Image\QuickE2E\baseline.windows.txt
 		Tests\EndToEndTests\Image\QuickE2E\cntk.cntk = Tests\EndToEndTests\Image\QuickE2E\cntk.cntk
-		Tests\EndToEndTests\Image\QuickE2E\Convolution.ndl = Tests\EndToEndTests\Image\QuickE2E\Convolution.ndl
-		Tests\EndToEndTests\Image\QuickE2E\Macros.ndl = Tests\EndToEndTests\Image\QuickE2E\Macros.ndl
+		Tests\EndToEndTests\Image\QuickE2E\README.txt = Tests\EndToEndTests\Image\QuickE2E\README.txt
 		Tests\EndToEndTests\Image\QuickE2E\run-test = Tests\EndToEndTests\Image\QuickE2E\run-test
 		Tests\EndToEndTests\Image\QuickE2E\testcases.yml = Tests\EndToEndTests\Image\QuickE2E\testcases.yml
 	EndProjectSection
@@ -336,11 +328,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SVD", "SVD", "{669B6203-967
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{81AE014F-DD63-47C7-B6E2-DB1D2833DCD1}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Speech\Simple\baseline.cpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.cpu.txt
-		Tests\EndToEndTests\Speech\Simple\baseline.gpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\Simple\baseline.linux.cpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Speech\Simple\baseline.linux.gpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.linux.gpu.txt
 		Tests\EndToEndTests\Speech\Simple\baseline.windows.cpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.windows.cpu.txt
 		Tests\EndToEndTests\Speech\Simple\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\Simple\baseline.windows.gpu.txt
 		Tests\EndToEndTests\Speech\Simple\cntk.cntk = Tests\EndToEndTests\Speech\Simple\cntk.cntk
+		Tests\EndToEndTests\Speech\Simple\README.txt = Tests\EndToEndTests\Speech\Simple\README.txt
 		Tests\EndToEndTests\Speech\Simple\run-test = Tests\EndToEndTests\Speech\Simple\run-test
 		Tests\EndToEndTests\Speech\Simple\testcases.yml = Tests\EndToEndTests\Speech\Simple\testcases.yml
 	EndProjectSection
@@ -358,8 +351,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text", "Text", "{97AAB0C8-D
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReaderTests", "Tests\UnitTests\ReaderTests\ReaderTests.vcxproj", "{A4FC3467-4787-43E8-BBC0-D79AE56B468D}"
 	ProjectSection(ProjectDependencies) = postProject
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB} = {9BD0A711-0BBD-45B6-B81C-053F03C26CFB}
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5} = {33D2FD22-DEF2-4507-A58A-368F641AEBE5}
+		{7B7A563D-AA8E-4660-A805-D50235A02120} = {7B7A563D-AA8E-4660-A805-D50235A02120}
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715} = {91973E60-A7BE-4C86-8FDB-59C88A0B3715}
 		{7B7A51ED-AA8E-4660-A805-D50235A02120} = {7B7A51ED-AA8E-4660-A805-D50235A02120}
 		{E6646FFE-3588-4276-8A15-8D65C22711C1} = {E6646FFE-3588-4276-8A15-8D65C22711C1}
 	EndProjectSection
@@ -368,10 +365,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EvalDll", "Source\EvalDll\E
 	ProjectSection(ProjectDependencies) = postProject
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1} = {EB2BE26F-6BD4-4274-971F-86D080779DD1}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Math", "Source\Math\Math.vcxproj", "{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}"
 	ProjectSection(ProjectDependencies) = postProject
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 		{B3DD765E-694E-4494-BAD7-37BBF2942517} = {B3DD765E-694E-4494-BAD7-37BBF2942517}
 	EndProjectSection
 EndProject
@@ -380,46 +381,49 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibSVMBinaryReader", "Source\Readers\LibSVMBinaryReader\LibSVMBinaryReader.vcxproj", "{D667AF32-028A-4A5D-BE19-F46776F0F6B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinaryReader", "Source\Readers\BinaryReader\BinaryReader.vcxproj", "{1D5787D4-52E4-45DB-951B-82F220EE0C6A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSSMReader", "Source\Readers\DSSMReader\DSSMReader.vcxproj", "{014DA766-B37B-4581-BC26-963EA5507931}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTKMLFReader", "Source\Readers\HTKMLFReader\HTKMLFReader.vcxproj", "{33D2FD22-DEF2-4507-A58A-368F641AEBE5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LMSequenceReader", "Source\Readers\LMSequenceReader\LMSequenceReader.vcxproj", "{9A2F2441-5972-4EA8-9215-4119FCE0FB68}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUSequenceReader", "Source\Readers\LUSequenceReader\LUSequenceReader.vcxproj", "{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparsePCReader", "Source\Readers\SparsePCReader\SparsePCReader.vcxproj", "{CE429AA2-3778-4619-8FD1-49BA3B81197B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCIFastReader", "Source\Readers\UCIFastReader\UCIFastReader.vcxproj", "{E6646FFE-3588-4276-8A15-8D65C22711C1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EvalTest", "Tests\UnitTests\EvalTest\EvalTest.vcxproj", "{731312A8-6DA3-4841-AFCD-57520BA1BF8E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathPerformanceTests", "Tests\UnitTests\MathPerformanceTests\MathPerformanceTests.vcxproj", "{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}"
@@ -448,20 +452,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GPU", "GPU", "{2A1F0FB0-230
 		Tests\EndToEndTests\LM\RNNLM\GPU\rnnlm.cntk = Tests\EndToEndTests\LM\RNNLM\GPU\rnnlm.cntk
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLU", "SLU", "{BFBC6BE1-C33E-4A80-B8F3-A33410EC00FC}"
-	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\SLU\atis.dev.IOB.simple = Tests\EndToEndTests\SLU\atis.dev.IOB.simple
-		Tests\EndToEndTests\SLU\atis.test.apos.pred.pos.head.IOB.simple = Tests\EndToEndTests\SLU\atis.test.apos.pred.pos.head.IOB.simple
-		Tests\EndToEndTests\SLU\atis.train.apos.pred.pos.head.IOB.simple = Tests\EndToEndTests\SLU\atis.train.apos.pred.pos.head.IOB.simple
-		Tests\EndToEndTests\SLU\globals.cntk = Tests\EndToEndTests\SLU\globals.cntk
-		Tests\EndToEndTests\SLU\input.txt = Tests\EndToEndTests\SLU\input.txt
-		Tests\EndToEndTests\SLU\inputmap.txt = Tests\EndToEndTests\SLU\inputmap.txt
-		Tests\EndToEndTests\SLU\lstmNDL.txt = Tests\EndToEndTests\SLU\lstmNDL.txt
-		Tests\EndToEndTests\SLU\README.txt = Tests\EndToEndTests\SLU\README.txt
-		Tests\EndToEndTests\SLU\rnnlu.cntk = Tests\EndToEndTests\SLU\rnnlu.cntk
-		Tests\EndToEndTests\SLU\rnnlu.ndl.cntk = Tests\EndToEndTests\SLU\rnnlu.ndl.cntk
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MNIST", "MNIST", "{FA33A61E-95C7-4049-8111-22058CE361A3}"
 	ProjectSection(SolutionItems) = preProject
 		Examples\Image\MNIST\README.md = Examples\Image\MNIST\README.md
@@ -469,39 +459,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MNIST", "MNIST", "{FA33A61E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Miscellaneous", "Miscellaneous", "{F99E1E80-50D8-421C-AD94-8ED0DF08C355}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdditionalFiles", "AdditionalFiles", "{ED57E827-B28F-4BEE-BFB7-398EF8D83357}"
-	ProjectSection(SolutionItems) = preProject
-		Examples\Image\MNIST\AdditionalFiles\mnist_convert.py = Examples\Image\MNIST\AdditionalFiles\mnist_convert.py
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{6E5A252C-ACCE-42E0-9819-FF4DEF6D739E}"
 	ProjectSection(SolutionItems) = preProject
-		Examples\Image\MNIST\Config\01_OneHidden.cntk = Examples\Image\MNIST\Config\01_OneHidden.cntk
 		Examples\Image\MNIST\Config\01_OneHidden.ndl = Examples\Image\MNIST\Config\01_OneHidden.ndl
-		Examples\Image\MNIST\Config\02_Convolution.cntk = Examples\Image\MNIST\Config\02_Convolution.cntk
+		Examples\Image\MNIST\Config\01_OneHidden_ndl_deprecated.cntk = Examples\Image\MNIST\Config\01_OneHidden_ndl_deprecated.cntk
 		Examples\Image\MNIST\Config\02_Convolution.ndl = Examples\Image\MNIST\Config\02_Convolution.ndl
-		Examples\Image\MNIST\Config\03_ConvBatchNorm.cntk = Examples\Image\MNIST\Config\03_ConvBatchNorm.cntk
+		Examples\Image\MNIST\Config\02_Convolution_ndl_deprecated.cntk = Examples\Image\MNIST\Config\02_Convolution_ndl_deprecated.cntk
 		Examples\Image\MNIST\Config\03_ConvBatchNorm.ndl = Examples\Image\MNIST\Config\03_ConvBatchNorm.ndl
+		Examples\Image\MNIST\Config\03_ConvBatchNorm_ndl_deprecated.cntk = Examples\Image\MNIST\Config\03_ConvBatchNorm_ndl_deprecated.cntk
 		Examples\Image\MNIST\Config\Macros.ndl = Examples\Image\MNIST\Config\Macros.ndl
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CIFAR-10", "CIFAR-10", "{77125562-3BF2-45D2-9B73-72CA8E03C78C}"
 	ProjectSection(SolutionItems) = preProject
-		Examples\Image\Miscellaneous\CIFAR-10\01_Conv.cntk = Examples\Image\Miscellaneous\CIFAR-10\01_Conv.cntk
+		Examples\Image\Miscellaneous\CIFAR-10\01_Conv_ndl_deprecated.cntk = Examples\Image\Miscellaneous\CIFAR-10\01_Conv_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\01_Convolution.ndl = Examples\Image\Miscellaneous\CIFAR-10\01_Convolution.ndl
-		Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.cntk = Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.mel = Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.mel
 		Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.ndl = Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv.ndl
+		Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv_ndl_deprecated.cntk = Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\03_ProjWeightsGen.py = Examples\Image\Miscellaneous\CIFAR-10\03_ProjWeightsGen.py
-		Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.cntk = Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.mel = Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.mel
 		Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.ndl = Examples\Image\Miscellaneous\CIFAR-10\03_ResNet.ndl
-		Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56.cntk = Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56.cntk
+		Examples\Image\Miscellaneous\CIFAR-10\03_ResNet_ndl_deprecated.cntk = Examples\Image\Miscellaneous\CIFAR-10\03_ResNet_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56.ndl = Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56.ndl
+		Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56_ndl_deprecated.cntk = Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\CIFAR-10\16to32.txt = Examples\Image\Miscellaneous\CIFAR-10\16to32.txt
 		Examples\Image\Miscellaneous\CIFAR-10\32to64.txt = Examples\Image\Miscellaneous\CIFAR-10\32to64.txt
-		Examples\Image\Miscellaneous\CIFAR-10\CIFAR_convert.py = Examples\Image\Miscellaneous\CIFAR-10\CIFAR_convert.py
-		Examples\Image\Miscellaneous\CIFAR-10\CifarConverter.py = Examples\Image\Miscellaneous\CIFAR-10\CifarConverter.py
 		Examples\Image\Miscellaneous\CIFAR-10\labelsmap.txt = Examples\Image\Miscellaneous\CIFAR-10\labelsmap.txt
 		Examples\Image\Miscellaneous\CIFAR-10\Macros.ndl = Examples\Image\Miscellaneous\CIFAR-10\Macros.ndl
 		Examples\Image\Miscellaneous\CIFAR-10\readme.txt = Examples\Image\Miscellaneous\CIFAR-10\readme.txt
@@ -512,8 +495,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AlexNet", "AlexNet", "{D29DC402-98A3-40C7-B683-4CC84DEC5C18}"
 	ProjectSection(SolutionItems) = preProject
 		Examples\Image\Miscellaneous\ImageNet\AlexNet\add_top5_layer.mel = Examples\Image\Miscellaneous\ImageNet\AlexNet\add_top5_layer.mel
-		Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet.cntk = Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet.cntk
 		Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet.ndl = Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet.ndl
+		Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\AlexNet\AlexNet_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\ImageNet\AlexNet\Macros.ndl = Examples\Image\Miscellaneous\ImageNet\AlexNet\Macros.ndl
 	EndProjectSection
 EndProject
@@ -522,12 +505,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VGG", "VGG", "{BC0D6DFF-80C
 		Examples\Image\Miscellaneous\ImageNet\VGG\add_top5_layer.mel = Examples\Image\Miscellaneous\ImageNet\VGG\add_top5_layer.mel
 		Examples\Image\Miscellaneous\ImageNet\VGG\ImageNet1K_mean.xml = Examples\Image\Miscellaneous\ImageNet\VGG\ImageNet1K_mean.xml
 		Examples\Image\Miscellaneous\ImageNet\VGG\Macros.ndl = Examples\Image\Miscellaneous\ImageNet\VGG\Macros.ndl
-		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A.cntk
 		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A.ndl = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A.ndl
-		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E.cntk
+		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_A_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E.ndl = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E.ndl
-		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN.cntk
 		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN.ndl = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN.ndl
+		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_BN_ndl_deprecated.cntk
+		Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\VGG\VGG_E_ndl_deprecated.cntk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{CCD56F12-BA17-4753-B5EE-4995FE682995}"
@@ -539,11 +522,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple2d", "Simple2d", "{D2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NdlExamples", "NdlExamples", "{FC573A62-6DAE-40A4-8153-520C8571A007}"
 	ProjectSection(SolutionItems) = preProject
+		Examples\Other\NdlExamples\AddOperator.ndl = Examples\Other\NdlExamples\AddOperator.ndl
+		Examples\Other\NdlExamples\AddOperatorConstant.ndl = Examples\Other\NdlExamples\AddOperatorConstant.ndl
 		Examples\Other\NdlExamples\NDLExamples.ndl = Examples\Other\NdlExamples\NDLExamples.ndl
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{1E37CE40-556D-4693-B58C-F8D4CE349BB7}"
 	ProjectSection(SolutionItems) = preProject
+		Examples\Other\Simple2d\Config\AddOperatorConstant_ndl_deprecated.cntk = Examples\Other\Simple2d\Config\AddOperatorConstant_ndl_deprecated.cntk
+		Examples\Other\Simple2d\Config\AddOperatorConstantNoInput_ndl_deprecated.cntk = Examples\Other\Simple2d\Config\AddOperatorConstantNoInput_ndl_deprecated.cntk
 		Examples\Other\Simple2d\Config\Multigpu.cntk = Examples\Other\Simple2d\Config\Multigpu.cntk
 		Examples\Other\Simple2d\Config\Simple.cntk = Examples\Other\Simple2d\Config\Simple.cntk
 	EndProjectSection
@@ -560,7 +547,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{B3E3AF4A-FEF5-46AB-A72A-19AF4F1FDD49}"
 	ProjectSection(SolutionItems) = preProject
 		Examples\Speech\AN4\Config\FeedForward.cntk = Examples\Speech\AN4\Config\FeedForward.cntk
-		Examples\Speech\AN4\Config\LSTM-NDL.cntk = Examples\Speech\AN4\Config\LSTM-NDL.cntk
+		Examples\Speech\AN4\Config\LSTM-NDL_ndl_deprecated.cntk = Examples\Speech\AN4\Config\LSTM-NDL_ndl_deprecated.cntk
 		Examples\Speech\AN4\Config\lstmp-3layer-opt.ndl = Examples\Speech\AN4\Config\lstmp-3layer-opt.ndl
 	EndProjectSection
 EndProject
@@ -585,12 +572,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cntk_config", "cntk_config"
 		Examples\Speech\Miscellaneous\AMI\cntk_config\80fbank.conf = Examples\Speech\Miscellaneous\AMI\cntk_config\80fbank.conf
 		Examples\Speech\Miscellaneous\AMI\cntk_config\Align.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\Align.cntk
 		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK.cntk
-		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2.cntk
-		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn.cntk
+		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn_ndl_deprecated.cntk
 		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn_smbr.mel = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_dnn_smbr.mel
-		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp.cntk
-		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_smbr.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_smbr.cntk
-		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_smbr.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_smbr.cntk
+		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_smbr_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_lstmp_smbr_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_smbr_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_smbr_ndl_deprecated.cntk
 		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_write.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK2_write.cntk
 		Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK_write.cntk = Examples\Speech\Miscellaneous\AMI\cntk_config\CNTK_write.cntk
 		Examples\Speech\Miscellaneous\AMI\cntk_config\default_macros.ndl = Examples\Speech\Miscellaneous\AMI\cntk_config\default_macros.ndl
@@ -625,27 +612,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{1C7D22
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_AdaptLearnRate.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_AdaptLearnRate.cntk
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_CrossValidateSimpleNetwork.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_CrossValidateSimpleNetwork.cntk
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_EvalSimpleNetwork.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_EvalSimpleNetwork.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainAutoEncoder.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainAutoEncoder.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainLSTM.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainLSTM.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiInput.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiInput.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiTask.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiTask.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainNDLNetwork.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainNDLNetwork.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainAutoEncoder_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainAutoEncoder_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainLSTM_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainLSTM_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiInput_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiInput_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiTask_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainMultiTask_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainNDLNetwork_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainNDLNetwork_ndl_deprecated.cntk
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainSimpleNetwork.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainSimpleNetwork.cntk
-		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainWithPreTrain.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainWithPreTrain.cntk
+		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainWithPreTrain_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_TrainWithPreTrain_ndl_deprecated.cntk
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_WriteBottleneck.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_WriteBottleneck.cntk
 		Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_WriteScaledLogLike.cntk = Examples\Speech\Miscellaneous\TIMIT\config\TIMIT_WriteScaledLogLike.cntk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CPU", "CPU", "{5ED4F5DC-E016-4E10-BACD-6A760A0CDE89}"
 	ProjectSection(SolutionItems) = preProject
-		Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_DNN.cntk = Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_DNN.cntk
-		Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_LSTM.cntk = Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_LSTM.cntk
+		Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_DNN_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_DNN_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_LSTM_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\CPU\TIMIT_LSTM_ndl_deprecated.cntk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GPU", "GPU", "{35CFD8E3-7206-4243-AB5C-AAF610109A5C}"
 	ProjectSection(SolutionItems) = preProject
-		Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_DNN.cntk = Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_DNN.cntk
-		Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_LSTM.cntk = Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_LSTM.cntk
+		Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_DNN_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_DNN_ndl_deprecated.cntk
+		Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_LSTM_ndl_deprecated.cntk = Examples\Speech\Miscellaneous\TIMIT\GPU\TIMIT_LSTM_ndl_deprecated.cntk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PennTreebank", "PennTreebank", "{6F4125B5-220F-4FB7-B6C4-85A966A0268C}"
@@ -679,12 +666,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ResNet", "ResNet", "{06D2C6
 		Examples\Image\Miscellaneous\ImageNet\ResNet\create_eval_model.mel = Examples\Image\Miscellaneous\ImageNet\ResNet\create_eval_model.mel
 		Examples\Image\Miscellaneous\ImageNet\ResNet\Macros.ndl = Examples\Image\Miscellaneous\ImageNet\ResNet\Macros.ndl
 		Examples\Image\Miscellaneous\ImageNet\ResNet\ProjWeightsGen.py = Examples\Image\Miscellaneous\ImageNet\ResNet\ProjWeightsGen.py
-		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152.cntk
 		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152.ndl = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152.ndl
-		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34.cntk
+		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_152_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34.ndl = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34.ndl
-		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50.cntk
+		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_34_ndl_deprecated.cntk
 		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50.ndl = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50.ndl
+		Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50_ndl_deprecated.cntk = Examples\Image\Miscellaneous\ImageNet\ResNet\ResNet_50_ndl_deprecated.cntk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensibility", "Extensibility", "{60F87E25-BC87-4782-8E20-1621AAEBB113}"
@@ -692,11 +679,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EvalWrapper", "Source\Extensibility\EvalWrapper\EvalWrapper.vcxproj", "{EF766CAE-9CB1-494C-9153-0030631A6340}"
 	ProjectSection(ProjectDependencies) = postProject
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9} = {482999D1-B7E2-466E-9F8D-2119F93EAFD9}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSEvalClient", "Source\Extensibility\CSEvalClient\CSEvalClient.csproj", "{41E11A59-62B2-4927-A4F8-F40B1B612C6C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EF766CAE-9CB1-494C-9153-0030631A6340} = {EF766CAE-9CB1-494C-9153-0030631A6340}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{BD46CE02-3740-4526-80F6-CC7973B953E5}"
@@ -710,80 +692,59 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text", "Text", "{439BE0E0-FABE-403D-BF2C-A41FB8A60616}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MNIST", "MNIST", "{63C6816D-66BF-487E-B541-094142C8272B}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\MNIST\run-test-common = Tests\EndToEndTests\Examples\Image\MNIST\run-test-common
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02_Convolution", "02_Convolution", "{6F1D0CE1-0F18-4B4C-9581-1F2146C8D300}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\README.txt = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\README.txt
 		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\run-test = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\run-test
 		Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\testcases.yml = Tests\EndToEndTests\Examples\Image\MNIST\02_Convolution\testcases.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_OneHidden", "01_OneHidden", "{A0B366FE-2EEA-4E32-9AED-12C46409C30C}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\README.txt = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\README.txt
 		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\run-test = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\run-test
 		Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\testcases.yml = Tests\EndToEndTests\Examples\Image\MNIST\01_OneHidden\testcases.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_ConvBatchNorm", "03_ConvBatchNorm", "{BD783D50-47E2-485F-BDAF-29BD40D84645}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\README.txt = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\README.txt
 		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\run-test = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\run-test
 		Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\testcases.yml = Tests\EndToEndTests\Examples\Image\MNIST\03_ConvBatchNorm\testcases.yml
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReaderLib", "Source\Readers\ReaderLib\ReaderLib.vcxproj", "{F0A9637C-20DA-42F0-83D4-23B4704DE602}"
-	ProjectSection(ProjectDependencies) = postProject
-		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple2d", "Simple2d", "{D456FA9C-A51C-48B9-87DE-0F7D8A910265}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MultiGpu", "MultiGpu", "{C86A6572-DE7A-4EBB-ADD0-A6C4906D46A3}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\README.txt = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\README.txt
 		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\run-test = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\run-test
 		Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\testcases.yml = Tests\EndToEndTests\Examples\Other\Simple2d\MultiGpu\testcases.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple", "Simple", "{E330CA6B-5954-4EBA-9C64-6058494E338A}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.cpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.gpu.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\README.txt = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\README.txt
 		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\run-test = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\run-test
 		Tests\EndToEndTests\Examples\Other\Simple2d\Simple\testcases.yml = Tests\EndToEndTests\Examples\Other\Simple2d\Simple\testcases.yml
 	EndProjectSection
@@ -822,236 +783,1493 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PennTreebank", "PennTreeban
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RNN", "RNN", "{B72C5B0E-38E8-41BF-91FE-0C1012C7C078}"
 	ProjectSection(SolutionItems) = preProject
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.debug.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.release.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.release.cpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.release.gpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.debug.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.debug.cpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.debug.gpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.release.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.release.cpu.txt
-		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.cpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.gpu.txt = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\baseline.windows.gpu.txt
 		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\run-test = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\run-test
 		Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\testcases.yml = Tests\EndToEndTests\Examples\Text\PennTreebank\RNN\testcases.yml
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExperimentalHTKMLFReader", "Source\Readers\ExperimentalHTKMLFReader\ExperimentalHTKMLFReader.vcxproj", "{7B7A51ED-AA8E-4660-A805-D50235A02120}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CNTKTextFormatReader", "Source\Readers\CNTKTextFormatReader\CNTKTextFormatReader.vcxproj", "{91973E60-A7BE-4C86-8FDB-59C88A0B3715}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTKDeserializers", "Source\Readers\HTKDeserializers\HTKDeserializers.vcxproj", "{7B7A51ED-AA8E-4660-A805-D50235A02120}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageReader", "Source\Readers\ImageReader\ImageReader.vcxproj", "{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelExport", "ModelExport", "{08A05A9A-4E45-42D5-83FA-719E99C04A30}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model0", "Model0", "{715C0E2D-6FF6-4B26-9E49-1C68920CFAF6}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model0\0.cntk = Tests\EndToEndTests\ModelExport\Model0\0.cntk
+		Tests\EndToEndTests\ModelExport\Model0\baseline.txt = Tests\EndToEndTests\ModelExport\Model0\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model0\run-test = Tests\EndToEndTests\ModelExport\Model0\run-test
+		Tests\EndToEndTests\ModelExport\Model0\testcases.yml = Tests\EndToEndTests\ModelExport\Model0\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model1", "Model1", "{48C2A9DE-FB2C-4724-9ADC-744216D79BCF}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\ModelExport\Model1\1.cntk = Tests\EndToEndTests\ModelExport\Model1\1.cntk
+		Tests\EndToEndTests\ModelExport\Model1\baseline.txt = Tests\EndToEndTests\ModelExport\Model1\baseline.txt
+		Tests\EndToEndTests\ModelExport\Model1\run-test = Tests\EndToEndTests\ModelExport\Model1\run-test
+		Tests\EndToEndTests\ModelExport\Model1\testcases.yml = Tests\EndToEndTests\ModelExport\Model1\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AlexNet", "AlexNet", "{2B1046A1-0140-43B7-B3DC-CF7DEEE1009E}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Image\AlexNet\add_top5_layer.mel = Tests\EndToEndTests\Image\AlexNet\add_top5_layer.mel
+		Tests\EndToEndTests\Image\AlexNet\AlexNet.cntk = Tests\EndToEndTests\Image\AlexNet\AlexNet.cntk
+		Tests\EndToEndTests\Image\AlexNet\AlexNet.ndl = Tests\EndToEndTests\Image\AlexNet\AlexNet.ndl
+		Tests\EndToEndTests\Image\AlexNet\baseline.linux.debug.gpu.txt = Tests\EndToEndTests\Image\AlexNet\baseline.linux.debug.gpu.txt
+		Tests\EndToEndTests\Image\AlexNet\baseline.linux.release.gpu.txt = Tests\EndToEndTests\Image\AlexNet\baseline.linux.release.gpu.txt
+		Tests\EndToEndTests\Image\AlexNet\baseline.windows.debug.gpu.txt = Tests\EndToEndTests\Image\AlexNet\baseline.windows.debug.gpu.txt
+		Tests\EndToEndTests\Image\AlexNet\baseline.windows.release.gpu.txt = Tests\EndToEndTests\Image\AlexNet\baseline.windows.release.gpu.txt
+		Tests\EndToEndTests\Image\AlexNet\ImageNet1K_mean.xml = Tests\EndToEndTests\Image\AlexNet\ImageNet1K_mean.xml
+		Tests\EndToEndTests\Image\AlexNet\Macros.ndl = Tests\EndToEndTests\Image\AlexNet\Macros.ndl
+		Tests\EndToEndTests\Image\AlexNet\run-test = Tests\EndToEndTests\Image\AlexNet\run-test
+		Tests\EndToEndTests\Image\AlexNet\testcases.yml = Tests\EndToEndTests\Image\AlexNet\testcases.yml
+		Tests\EndToEndTests\Image\AlexNet\train_map.txt = Tests\EndToEndTests\Image\AlexNet\train_map.txt
+		Tests\EndToEndTests\Image\AlexNet\val_map.txt = Tests\EndToEndTests\Image\AlexNet\val_map.txt
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkTests", "Tests\UnitTests\NetworkTests\NetworkTests.vcxproj", "{CDA96AA3-3252-4978-A0BF-2ACD670823CB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715} = {91973E60-A7BE-4C86-8FDB-59C88A0B3715}
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1} = {EB2BE26F-6BD4-4274-971F-86D080779DD1}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text", "Text", "{8656B71D-E24C-4AC2-8BE4-C07B415A3E15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SequenceClassification", "SequenceClassification", "{E53E63A0-FAA9-4416-9AD1-08A8FB87FEE1}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\SequenceClassification\baseline.linux.cpu.txt = Tests\EndToEndTests\Text\SequenceClassification\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Text\SequenceClassification\baseline.linux.gpu.txt = Tests\EndToEndTests\Text\SequenceClassification\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Text\SequenceClassification\baseline.windows.cpu.txt = Tests\EndToEndTests\Text\SequenceClassification\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Text\SequenceClassification\baseline.windows.gpu.txt = Tests\EndToEndTests\Text\SequenceClassification\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Text\SequenceClassification\run-test = Tests\EndToEndTests\Text\SequenceClassification\run-test
+		Tests\EndToEndTests\Text\SequenceClassification\testcases.yml = Tests\EndToEndTests\Text\SequenceClassification\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Miscellaneous", "Miscellaneous", "{8629430A-821E-43BA-AEC5-8B2CF31A2A7A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CIFAR-10", "CIFAR-10", "{0141526B-F257-4574-8CBE-99634726FFCE}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\run-test-common = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\run-test-common
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_Convolution", "01_Convolution", "{58286327-6742-44C4-A34E-D2583419E55E}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\baseline.linux.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\README.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\README.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\run-test = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\run-test
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\testcases.yml = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\01_Convolution\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02_BatchNormConv", "02_BatchNormConv", "{AB9207B9-B134-4C57-B7ED-F3DCF7B0DC5F}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\README.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\README.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\run-test = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\run-test
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\testcases.yml = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\02_BatchNormConv\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_ResNet", "03_ResNet", "{12FB912C-43F8-40FE-BD7F-B52F589A1EBC}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\run-test = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\run-test
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\testcases.yml = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\03_ResNet\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04_ResNet", "04_ResNet", "{2BFE4D88-6F32-4701-887A-1DE3D7626DBB}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\run-test = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\run-test
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\testcases.yml = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\04_ResNet_56\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Miscellaneous", "Miscellaneous", "{CCB0CD89-DE53-4104-94D3-041D46FC8885}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLU", "SLU", "{B900D033-DC37-45F1-AE52-F35584FD3024}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.linux.cpu.txt = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.linux.gpu.txt = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.windows.cpu.txt = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.windows.gpu.txt = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\run-test = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\run-test
+		Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\testcases.yml = Tests\EndToEndTests\Examples\Text\Miscellaneous\SLU\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{EC780385-7580-4D15-914B-1D878A295CBC}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\SequenceClassification\Config\seqcla.cntk = Tests\EndToEndTests\Text\SequenceClassification\Config\seqcla.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{D11F76CC-DB6D-4CB4-B3B7-AB139DE2F5FA}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\SequenceClassification\Data\embeddingmatrix.txt = Tests\EndToEndTests\Text\SequenceClassification\Data\embeddingmatrix.txt
+		Tests\EndToEndTests\Text\SequenceClassification\Data\Train.ctf = Tests\EndToEndTests\Text\SequenceClassification\Data\Train.ctf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLU", "SLU", "{181664AC-4C95-4798-A923-09B879215B33}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\SLU\atis.dev.IOB.simple = Tests\EndToEndTests\Text\SLU\atis.dev.IOB.simple
+		Tests\EndToEndTests\Text\SLU\atis.test.apos.pred.pos.head.IOB.simple = Tests\EndToEndTests\Text\SLU\atis.test.apos.pred.pos.head.IOB.simple
+		Tests\EndToEndTests\Text\SLU\atis.train.apos.pred.pos.head.IOB.simple = Tests\EndToEndTests\Text\SLU\atis.train.apos.pred.pos.head.IOB.simple
+		Tests\EndToEndTests\Text\SLU\baseline.linux.cpu.txt = Tests\EndToEndTests\Text\SLU\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Text\SLU\baseline.linux.gpu.txt = Tests\EndToEndTests\Text\SLU\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Text\SLU\baseline.windows.cpu.txt = Tests\EndToEndTests\Text\SLU\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Text\SLU\baseline.windows.gpu.txt = Tests\EndToEndTests\Text\SLU\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Text\SLU\globals.cntk = Tests\EndToEndTests\Text\SLU\globals.cntk
+		Tests\EndToEndTests\Text\SLU\input.txt = Tests\EndToEndTests\Text\SLU\input.txt
+		Tests\EndToEndTests\Text\SLU\inputmap.txt = Tests\EndToEndTests\Text\SLU\inputmap.txt
+		Tests\EndToEndTests\Text\SLU\lstm.ndl = Tests\EndToEndTests\Text\SLU\lstm.ndl
+		Tests\EndToEndTests\Text\SLU\output.txt = Tests\EndToEndTests\Text\SLU\output.txt
+		Tests\EndToEndTests\Text\SLU\rnnlu.cntk = Tests\EndToEndTests\Text\SLU\rnnlu.cntk
+		Tests\EndToEndTests\Text\SLU\rnnlu.ndl.cntk = Tests\EndToEndTests\Text\SLU\rnnlu.ndl.cntk
+		Tests\EndToEndTests\Text\SLU\run-test = Tests\EndToEndTests\Text\SLU\run-test
+		Tests\EndToEndTests\Text\SLU\testcases.yml = Tests\EndToEndTests\Text\SLU\testcases.yml
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Source\Common\Common.vcxproj", "{86883653-8A61-4038-81A0-2379FAE4200A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CompositeDataReader", "Source\Readers\CompositeDataReader\CompositeDataReader.vcxproj", "{7B7A563D-AA8E-4660-A805-D50235A02120}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SparseDSSM", "SparseDSSM", "{1FB54750-B668-4AC3-966F-ED504020AC06}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\SparseDSSM\baseline.cpu.txt = Tests\EndToEndTests\Text\SparseDSSM\baseline.cpu.txt
+		Tests\EndToEndTests\Text\SparseDSSM\baseline.gpu.txt = Tests\EndToEndTests\Text\SparseDSSM\baseline.gpu.txt
+		Tests\EndToEndTests\Text\SparseDSSM\baseline.windows.cpu.txt = Tests\EndToEndTests\Text\SparseDSSM\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Text\SparseDSSM\baseline.windows.gpu.txt = Tests\EndToEndTests\Text\SparseDSSM\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Text\SparseDSSM\dssm.cntk = Tests\EndToEndTests\Text\SparseDSSM\dssm.cntk
+		Tests\EndToEndTests\Text\SparseDSSM\dssm.ndl = Tests\EndToEndTests\Text\SparseDSSM\dssm.ndl
+		Tests\EndToEndTests\Text\SparseDSSM\run-test = Tests\EndToEndTests\Text\SparseDSSM\run-test
+		Tests\EndToEndTests\Text\SparseDSSM\testcases.yml = Tests\EndToEndTests\Text\SparseDSSM\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WriteCommand", "WriteCommand", "{3E9BD61F-1F0A-4966-BE17-803AEFD1DFA4}"
+	ProjectSection(SolutionItems) = preProject
+		tests\endtoendtests\Speech\DNN\WriteCommand\baseline.cpu.txt = tests\endtoendtests\Speech\DNN\WriteCommand\baseline.cpu.txt
+		tests\endtoendtests\Speech\DNN\WriteCommand\baseline.gpu.txt = tests\endtoendtests\Speech\DNN\WriteCommand\baseline.gpu.txt
+		tests\endtoendtests\Speech\DNN\WriteCommand\baseline.windows.cpu.txt = tests\endtoendtests\Speech\DNN\WriteCommand\baseline.windows.cpu.txt
+		tests\endtoendtests\Speech\DNN\WriteCommand\baseline.windows.gpu.txt = tests\endtoendtests\Speech\DNN\WriteCommand\baseline.windows.gpu.txt
+		tests\endtoendtests\Speech\DNN\WriteCommand\cntk.cntk = tests\endtoendtests\Speech\DNN\WriteCommand\cntk.cntk
+		tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.cpu = tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.cpu
+		tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.gpu = tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.gpu
+		tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.windows.cpu = tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.windows.cpu
+		tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.windows.gpu = tests\endtoendtests\Speech\DNN\WriteCommand\Output.ScaledLogLikelihood.windows.gpu
+		Tests\endtoendtests\Speech\DNN\WriteCommand\run-test = Tests\endtoendtests\Speech\DNN\WriteCommand\run-test
+		tests\endtoendtests\Speech\DNN\WriteCommand\testcases.yml = tests\endtoendtests\Speech\DNN\WriteCommand\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelBufferedAsyncGradientAggregation", "ParallelBufferedAsyncGradientAggregation", "{5560DDD4-1E6E-4F41-B9BD-F52A19DF0B31}"
+	ProjectSection(SolutionItems) = preProject
+		tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.cpu.txt = tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.gpu.txt = tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.gpu.txt
+		tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.windows.cpu.txt = tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.windows.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.windows.gpu.txt = tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\baseline.windows.gpu.txt
+		Tests\endtoendtests\Speech\DNN\ParallelBufferedAsyncGradientAggregation\run-test = Tests\endtoendtests\Speech\DNN\ParallelBufferedAsyncGradientAggregation\run-test
+		tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\testcases.yml = tests\endtoendtests\speech\dnn\ParallelBufferedAsyncGradientAggregation\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelCrossValidation", "ParallelCrossValidation", "{9834E864-A8CD-4D28-A3C9-F79FE0F421AE}"
+	ProjectSection(SolutionItems) = preProject
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.cpu.txt = tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.gpu.txt = tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.gpu.txt
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.windows.cpu.txt = tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.windows.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.windows.gpu.txt = tests\endtoendtests\speech\dnn\ParallelCrossValidation\baseline.windows.gpu.txt
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\cntkcv.cntk = tests\endtoendtests\speech\dnn\ParallelCrossValidation\cntkcv.cntk
+		Tests\endtoendtests\Speech\DNN\ParallelCrossValidation\run-test = Tests\endtoendtests\Speech\DNN\ParallelCrossValidation\run-test
+		tests\endtoendtests\speech\dnn\ParallelCrossValidation\testcases.yml = tests\endtoendtests\speech\dnn\ParallelCrossValidation\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelNoQuantizationBufferedAsyncGradientAggregation", "ParallelNoQuantizationBufferedAsyncGradientAggregation", "{40F65441-A7B7-4425-8E75-CD74AB262F3F}"
+	ProjectSection(SolutionItems) = preProject
+		tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.cpu.txt = tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.gpu.txt = tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.gpu.txt
+		tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.windows.cpu.txt = tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.windows.cpu.txt
+		tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.windows.gpu.txt = tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\baseline.windows.gpu.txt
+		Tests\endtoendtests\Speech\DNN\ParallelNoQuantizationBufferedAsyncGradientAggregation\run-test = Tests\endtoendtests\Speech\DNN\ParallelNoQuantizationBufferedAsyncGradientAggregation\run-test
+		tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\testcases.yml = tests\endtoendtests\speech\dnn\ParallelNoQuantizationBufferedAsyncGradientAggregation\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PlotDNN", "PlotDNN", "{4D6F731C-4A6D-4E21-AC3C-9E1F26E5547E}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\endtoendtests\Speech\DNN\PlotDNN\baseline.txt = Tests\endtoendtests\Speech\DNN\PlotDNN\baseline.txt
+		tests\endtoendtests\speech\dnn\PlotDNN\cntkSpeech.dnn.dot = tests\endtoendtests\speech\dnn\PlotDNN\cntkSpeech.dnn.dot
+		tests\endtoendtests\speech\dnn\PlotDNN\plot.cntk = tests\endtoendtests\speech\dnn\PlotDNN\plot.cntk
+		Tests\endtoendtests\Speech\DNN\PlotDNN\run-test = Tests\endtoendtests\Speech\DNN\PlotDNN\run-test
+		tests\endtoendtests\speech\dnn\PlotDNN\testcases.yml = tests\endtoendtests\speech\dnn\PlotDNN\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ParallelBM", "ParallelBM", "{36C42845-0D48-4A46-9C67-2B593A80A09C}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.linux.cpu.txt = Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.linux.cpu.txt
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.linux.gpu.txt = Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.linux.gpu.txt
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.windows.cpu.txt = Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\DNN\ParallelBM\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\cntk.cntk = Tests\EndToEndTests\Speech\DNN\ParallelBM\cntk.cntk
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\run-test = Tests\EndToEndTests\Speech\DNN\ParallelBM\run-test
+		Tests\EndToEndTests\Speech\DNN\ParallelBM\testcases.yml = Tests\EndToEndTests\Speech\DNN\ParallelBM\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SequenceToSequence", "SequenceToSequence", "{A1521DC4-C8EC-47BD-9E63-7BE30ED2EC26}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HtkDeserializers", "HtkDeserializers", "{977ECCB7-598D-4548-B95B-BACA9CC7D98B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DNN", "DNN", "{1DBB2575-F5C8-43F4-B982-D05D6ADC2F9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LSTM", "LSTM", "{772A0DB3-4710-4281-8AA9-A9F1F7C543D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QuickE2E", "QuickE2E", "{FE3592CF-3EB9-4502-BB95-E2AB974C0FB5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SVD", "SVD", "{BA6A65C5-92A2-4040-ADC3-0727A45694F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FullUtterance", "FullUtterance", "{3BDF52CD-7F3C-42BC-AB78-CF5BBC5F4AB4}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\HtkDeserializers\LSTM\FullUtterance\baseline.cpu.txt = Tests\EndToEndTests\Speech\HtkDeserializers\LSTM\FullUtterance\baseline.cpu.txt
+		Tests\EndToEndTests\Speech\HtkDeserializers\LSTM\FullUtterance\baseline.gpu.txt = Tests\EndToEndTests\Speech\HtkDeserializers\LSTM\FullUtterance\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\baseline.windows.cpu.txt = Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\cntk.cntk = Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\cntk.cntk
+		Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\run-test = Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\run-test
+		Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\testcases.yml = Tests\EndToEndTests\Speech\HTKDeserializers\LSTM\FullUtterance\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Truncated", "Truncated", "{1141DC61-E014-4DEC-9157-F6B1FC055C7A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CMUDict", "CMUDict", "{EC7298E3-AAA9-4672-941F-0B342C494CB3}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\SequenceToSequence\CMUDict\README.md = Examples\SequenceToSequence\CMUDict\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{ECED747C-86D7-4009-B2A9-0525FE5DF4EB}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\SequenceToSequence\CMUDict\Config\G2P.cntk = Examples\SequenceToSequence\CMUDict\Config\G2P.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{25E144C1-0B7C-4CD4-811A-2E9F4943120D}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.test = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.test
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.test.txt = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.test.txt
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-1-21 = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-1-21
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-1-21.txt = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-1-21.txt
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-20-21 = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-20-21
+		Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-20-21.txt = Examples\SequenceToSequence\CMUDict\Data\cmudict-0.7b.train-dev-20-21.txt
+		Examples\SequenceToSequence\CMUDict\Data\README.txt = Examples\SequenceToSequence\CMUDict\Data\README.txt
+		Examples\SequenceToSequence\CMUDict\Data\ThirdPartyNotice.md = Examples\SequenceToSequence\CMUDict\Data\ThirdPartyNotice.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05_ConvLocal", "05_ConvLocal", "{3F77BF79-E0D3-4D60-8685-5A449F164081}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\baseline.linux.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\baseline.windows.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\README.txt = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\README.txt
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\run-test = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\run-test
+		Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\testcases.yml = Tests\EndToEndTests\Examples\Image\Miscellaneous\CIFAR-10\05_ConvLocal\testcases.yml
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EvalTests", "Tests\UnitTests\EvalTests\EvalTests.vcxproj", "{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9} = {482999D1-B7E2-466E-9F8D-2119F93EAFD9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommandEval", "Tests\UnitTests\CommandEval\CommandEval.vcxproj", "{731312A8-6DA3-4841-AFCD-57520BA1BF8E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CNTKv2LibraryDll", "Source\CNTKv2LibraryDll\CNTKv2LibraryDll.vcxproj", "{E5606ECE-48CA-4464-BB12-09D81D02B9EF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602} = {F0A9637C-20DA-42F0-83D4-23B4704DE602}
+		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "V2LibraryTests", "Tests\UnitTests\V2LibraryTests\V2LibraryTests.vcxproj", "{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {E5606ECE-48CA-4464-BB12-09D81D02B9EF}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{68263A2F-1D5F-4C46-B5AF-2304B80FC3D4}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\pytest.ini = Scripts\pytest.ini
+		Scripts\txt2ctf.py = Scripts\txt2ctf.py
+		Scripts\uci2ctf.py = Scripts\uci2ctf.py
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedEvalTests", "Tests\UnitTests\ManagedEvalTests\ManagedEvalTests.csproj", "{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BrainScriptTests", "Tests\UnitTests\BrainScriptTests\BrainScriptTests.vcxproj", "{9F999212-AFC5-4EAC-AA78-F7247D46C456}"
+	ProjectSection(ProjectDependencies) = postProject
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513} = {928ABD1B-4D3B-4017-AEF1-0FA1B4467513}
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {86883653-8A61-4038-81A0-2379FAE4200A}
+		{EAD17188-072C-4726-B840-A769C36DAD1B} = {EAD17188-072C-4726-B840-A769C36DAD1B}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tutorials", "Tutorials", "{8BE0642A-A3AA-4A64-95D0-C78FB285B2A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImageHandsOn", "ImageHandsOn", "{2230BF3D-4317-4A3F-A743-DDD6160503F8}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SLUHandsOn", "SLUHandsOn", "{CC143D08-567D-4DAC-9E14-264749C19039}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\SLUHandsOn\SLUHandsOn.cntk = Examples\Tutorials\SLUHandsOn\SLUHandsOn.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pretrained Models", "Pretrained Models", "{0ED2EE97-0A26-4865-871F-11033867BA34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions", "Solutions", "{A2A4893C-0D5B-42E2-BFAD-C123AE7FDAFD}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution1.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution1.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution2.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution2.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution3.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution3.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution4.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution4.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution5.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Solution5.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Task4_Start.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Task4_Start.cntk
+		Examples\Tutorials\ImageHandsOn\ImageHandsOn_Task6.cntk = Examples\Tutorials\ImageHandsOn\ImageHandsOn_Task6.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{8CFBD0DB-5F16-48E6-984C-4401317FA10E}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\SLUHandsOn\atis.test.ctf = Examples\Tutorials\SLUHandsOn\atis.test.ctf
+		Examples\Tutorials\SLUHandsOn\atis.train.ctf = Examples\Tutorials\SLUHandsOn\atis.train.ctf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solutions", "Solutions", "{BD7FF8C0-EC3A-49CD-9D81-4A8A29B8AD8E}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution1.cntk = Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution1.cntk
+		Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution2.cntk = Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution2.cntk
+		Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution3.cntk = Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution3.cntk
+		Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution4.cntk = Examples\Tutorials\SLUHandsOn\SLUHandsOn_Solution4.cntk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pretrained Models", "Pretrained Models", "{4727594B-A052-4834-B0E8-57DBB9ADEF13}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\SLUHandsOn\slu.forward.backward.cmf = Examples\Tutorials\SLUHandsOn\slu.forward.backward.cmf
+		Examples\Tutorials\SLUHandsOn\slu.forward.cmf = Examples\Tutorials\SLUHandsOn\slu.forward.cmf
+		Examples\Tutorials\SLUHandsOn\slu.forward.lookahead.cmf = Examples\Tutorials\SLUHandsOn\slu.forward.lookahead.cmf
+		Examples\Tutorials\SLUHandsOn\slu.forward.nobn.cmf = Examples\Tutorials\SLUHandsOn\slu.forward.nobn.cmf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{4A59163B-1EDE-4439-9E7D-40A30B82A3A0}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\Tutorials\ImageHandsOn\CifarConverter.py = Examples\Tutorials\ImageHandsOn\CifarConverter.py
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TIMIT", "TIMIT", "{B586AA4C-0BB9-4629-9EDA-25FF2618AC9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TrainSimpleNetwork", "TrainSimpleNetwork", "{C2102C39-BF5F-4B12-9C41-849D1ED35EE8}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\baseline.linux.txt = Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\baseline.linux.txt
+		Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\baseline.windows.txt = Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\baseline.windows.txt
+		Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\run-test = Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\run-test
+		Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\testcases.yml = Tests\EndToEndTests\Examples\Speech\TIMIT\TrainSimpleNetwork\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FullUtteranceLayers", "FullUtteranceLayers", "{4DDFD21D-E82C-4321-B380-8A9382E18107}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.cpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.cpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.gpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.windows.cpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\run-test = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\run-test
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\testcases.yml = Tests\EndToEndTests\Speech\LSTM\FullUtteranceLayers\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FullUtteranceCuDNN5", "FullUtteranceCuDNN5", "{D293C7C7-B7D7-47CE-A796-45262C16F980}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\baseline.gpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\run-test = Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\run-test
+		Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\testcases.yml = Tests\EndToEndTests\Speech\LSTM\FullUtteranceCuDNN5\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TruncatedLayers", "TruncatedLayers", "{4F534076-39A5-40E2-BF87-64EC464C52B2}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.cpu.txt = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.cpu.txt
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.gpu.txt = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.windows.cpu.txt = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.windows.cpu.txt
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.windows.gpu.txt = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\baseline.windows.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\run-test = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\run-test
+		Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\testcases.yml = Tests\EndToEndTests\Speech\LSTM\TruncatedLayers\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Truncated-Kaldi", "Truncated-Kaldi", "{31263D7F-F590-475E-B4F0-7DFA4E4FF4B8}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\baseline.cpu.txt = Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\baseline.cpu.txt
+		Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\baseline.gpu.txt = Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\baseline.gpu.txt
+		Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\run-test = Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\run-test
+		Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\testcases.yml = Tests\EndToEndTests\Speech\LSTM\Truncated-Kaldi\testcases.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EvalClientTests", "EvalClientTests", "{05E45AF7-C069-4057-BC16-0A532D068CE4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPPEvalClientTest", "Tests\EndToEndTests\EvalClientTests\CPPEvalClientTest\CPPEvalClientTest.vcxproj", "{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9} = {482999D1-B7E2-466E-9F8D-2119F93EAFD9}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSEvalClientTest", "Tests\EndToEndTests\EvalClientTests\CSEvalClientTest\CSEvalClientTest.csproj", "{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "CNTKv2", "bindings\python\examples\CNTKv2.pyproj", "{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IRMetric", "IRMetric", "{E844AB9A-A48F-4A99-9625-F528C5C46D83}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\EndToEndTests\Text\IRMetric\baseline.linux.txt = Tests\EndToEndTests\Text\IRMetric\baseline.linux.txt
+		Tests\EndToEndTests\Text\IRMetric\baseline.windows.txt = Tests\EndToEndTests\Text\IRMetric\baseline.windows.txt
+		Tests\EndToEndTests\Text\IRMetric\ir.cntk = Tests\EndToEndTests\Text\IRMetric\ir.cntk
+		Tests\EndToEndTests\Text\IRMetric\run-test = Tests\EndToEndTests\Text\IRMetric\run-test
+		Tests\EndToEndTests\Text\IRMetric\testcases.yml = Tests\EndToEndTests\Text\IRMetric\testcases.yml
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonBindings", "bindings\python\PythonBindings.vcxproj", "{CD721536-CFD3-413E-A3D7-FB0FAF989635}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB} = {9BD0A711-0BBD-45B6-B81C-053F03C26CFB}
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5} = {33D2FD22-DEF2-4507-A58A-368F641AEBE5}
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2} = {D667AF32-028A-4A5D-BE19-F46776F0F6B2}
+		{7B7A563D-AA8E-4660-A805-D50235A02120} = {7B7A563D-AA8E-4660-A805-D50235A02120}
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68} = {9A2F2441-5972-4EA8-9215-4119FCE0FB68}
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5} = {60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715} = {91973E60-A7BE-4C86-8FDB-59C88A0B3715}
+		{014DA766-B37B-4581-BC26-963EA5507931} = {014DA766-B37B-4581-BC26-963EA5507931}
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B} = {CE429AA2-3778-4619-8FD1-49BA3B81197B}
+		{EF766CAE-9CB1-494C-9153-0030631A6340} = {EF766CAE-9CB1-494C-9153-0030631A6340}
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6} = {62836DC1-DF77-4B98-BF2D-45C943B7DDC6}
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {E5606ECE-48CA-4464-BB12-09D81D02B9EF}
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9} = {482999D1-B7E2-466E-9F8D-2119F93EAFD9}
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A} = {1D5787D4-52E4-45DB-951B-82F220EE0C6A}
+		{7B7A51ED-AA8E-4660-A805-D50235A02120} = {7B7A51ED-AA8E-4660-A805-D50235A02120}
+		{E6646FFE-3588-4276-8A15-8D65C22711C1} = {E6646FFE-3588-4276-8A15-8D65C22711C1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "V2LibraryDistributionTests", "Tests\UnitTests\V2LibraryDistributionTests\V2LibraryDistributionTests.vcxproj", "{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {E5606ECE-48CA-4464-BB12-09D81D02B9EF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPPEvalExtendedClientTest", "Tests\EndToEndTests\EvalClientTests\CPPEvalExtendedClientTest\CPPEvalExtendedClientTest.vcxproj", "{5D29C76D-648A-456F-920D-48230F2FB3C8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9} = {482999D1-B7E2-466E-9F8D-2119F93EAFD9}
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_CpuOnly|Any CPU = Debug_CpuOnly|Any CPU
+		Debug_CpuOnly|Mixed Platforms = Debug_CpuOnly|Mixed Platforms
 		Debug_CpuOnly|x64 = Debug_CpuOnly|x64
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
 		Debug|x64 = Debug|x64
+		Release_CpuOnly|Any CPU = Release_CpuOnly|Any CPU
+		Release_CpuOnly|Mixed Platforms = Release_CpuOnly|Mixed Platforms
 		Release_CpuOnly|x64 = Release_CpuOnly|x64
+		Release_NoOpt|Any CPU = Release_NoOpt|Any CPU
+		Release_NoOpt|Mixed Platforms = Release_NoOpt|Mixed Platforms
+		Release_NoOpt|x64 = Release_NoOpt|x64
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug|x64.ActiveCfg = Debug|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Debug|x64.Build.0 = Debug|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release|Any CPU.ActiveCfg = Release|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release|Mixed Platforms.Build.0 = Release|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release|x64.ActiveCfg = Release|x64
 		{E6F26F9A-FF64-4F0A-B749-CD309EE357EE}.Release|x64.Build.0 = Release|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug|x64.ActiveCfg = Debug|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Debug|x64.Build.0 = Debug|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release|Any CPU.ActiveCfg = Release|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release|Mixed Platforms.Build.0 = Release|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release|x64.ActiveCfg = Release|x64
 		{928ABD1B-4D3B-4017-AEF1-0FA1B4467513}.Release|x64.Build.0 = Release|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug|x64.ActiveCfg = Debug|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Debug|x64.Build.0 = Debug|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release|Any CPU.ActiveCfg = Release|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release|Mixed Platforms.Build.0 = Release|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release|x64.ActiveCfg = Release|x64
 		{DE3C54E5-D7D0-47AF-A783-DFDCE59E7937}.Release|x64.Build.0 = Release|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug|x64.ActiveCfg = Debug|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Debug|x64.Build.0 = Debug|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release|Any CPU.ActiveCfg = Release|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release|Mixed Platforms.Build.0 = Release|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release|x64.ActiveCfg = Release|x64
 		{EAD17188-072C-4726-B840-A769C36DAD1B}.Release|x64.Build.0 = Release|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug|x64.ActiveCfg = Debug|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Debug|x64.Build.0 = Debug|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release|Any CPU.ActiveCfg = Release|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release|Mixed Platforms.Build.0 = Release|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release|x64.ActiveCfg = Release|x64
 		{4701E678-5E6F-470D-B348-9CD1A2C095D1}.Release|x64.Build.0 = Release|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug|x64.ActiveCfg = Debug|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Debug|x64.Build.0 = Debug|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release|Any CPU.ActiveCfg = Release|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release|Mixed Platforms.Build.0 = Release|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release|x64.ActiveCfg = Release|x64
 		{EB2BE26F-6BD4-4274-971F-86D080779DD1}.Release|x64.Build.0 = Release|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug|x64.ActiveCfg = Debug|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Debug|x64.Build.0 = Debug|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release|Any CPU.ActiveCfg = Release|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release|Mixed Platforms.Build.0 = Release|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release|x64.ActiveCfg = Release|x64
 		{A4FC3467-4787-43E8-BBC0-D79AE56B468D}.Release|x64.Build.0 = Release|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug|x64.ActiveCfg = Debug|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Debug|x64.Build.0 = Debug|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release|Any CPU.ActiveCfg = Release|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release|Mixed Platforms.Build.0 = Release|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release|x64.ActiveCfg = Release|x64
 		{482999D1-B7E2-466E-9F8D-2119F93EAFD9}.Release|x64.Build.0 = Release|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug|x64.ActiveCfg = Debug|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Debug|x64.Build.0 = Debug|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release|Any CPU.ActiveCfg = Release|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release|Mixed Platforms.Build.0 = Release|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release|x64.ActiveCfg = Release|x64
 		{60BDB847-D0C4-4FD3-A947-0C15C08BCDB5}.Release|x64.Build.0 = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug_CpuOnly|x64.ActiveCfg = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug|x64.ActiveCfg = Debug|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Debug|x64.Build.0 = Debug|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_CpuOnly|Any CPU.ActiveCfg = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_CpuOnly|Mixed Platforms.Build.0 = Release|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_CpuOnly|x64.ActiveCfg = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release|Any CPU.ActiveCfg = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release|Mixed Platforms.Build.0 = Release|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release|x64.ActiveCfg = Release|x64
 		{B3DD765E-694E-4494-BAD7-37BBF2942517}.Release|x64.Build.0 = Release|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug|x64.ActiveCfg = Debug|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Debug|x64.Build.0 = Debug|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release|Any CPU.ActiveCfg = Release|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release|Mixed Platforms.Build.0 = Release|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release|x64.ActiveCfg = Release|x64
 		{D667AF32-028A-4A5D-BE19-F46776F0F6B2}.Release|x64.Build.0 = Release|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug|x64.ActiveCfg = Debug|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Debug|x64.Build.0 = Debug|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release|Any CPU.ActiveCfg = Release|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release|Mixed Platforms.Build.0 = Release|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release|x64.ActiveCfg = Release|x64
 		{1D5787D4-52E4-45DB-951B-82F220EE0C6A}.Release|x64.Build.0 = Release|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Debug|x64.ActiveCfg = Debug|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Debug|x64.Build.0 = Debug|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release|Any CPU.ActiveCfg = Release|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{014DA766-B37B-4581-BC26-963EA5507931}.Release|Mixed Platforms.Build.0 = Release|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Release|x64.ActiveCfg = Release|x64
 		{014DA766-B37B-4581-BC26-963EA5507931}.Release|x64.Build.0 = Release|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug|x64.ActiveCfg = Debug|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Debug|x64.Build.0 = Debug|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release|Any CPU.ActiveCfg = Release|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release|Mixed Platforms.Build.0 = Release|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release|x64.ActiveCfg = Release|x64
 		{33D2FD22-DEF2-4507-A58A-368F641AEBE5}.Release|x64.Build.0 = Release|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug|x64.ActiveCfg = Debug|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Debug|x64.Build.0 = Debug|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release|Any CPU.ActiveCfg = Release|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release|Mixed Platforms.Build.0 = Release|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release|x64.ActiveCfg = Release|x64
 		{9A2F2441-5972-4EA8-9215-4119FCE0FB68}.Release|x64.Build.0 = Release|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug|x64.ActiveCfg = Debug|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Debug|x64.Build.0 = Debug|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release|Any CPU.ActiveCfg = Release|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release|Mixed Platforms.Build.0 = Release|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release|x64.ActiveCfg = Release|x64
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6}.Release|x64.Build.0 = Release|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug|x64.ActiveCfg = Debug|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Debug|x64.Build.0 = Debug|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release|Any CPU.ActiveCfg = Release|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release|Mixed Platforms.Build.0 = Release|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release|x64.ActiveCfg = Release|x64
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B}.Release|x64.Build.0 = Release|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug|x64.ActiveCfg = Debug|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Debug|x64.Build.0 = Debug|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release|Any CPU.ActiveCfg = Release|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release|Mixed Platforms.Build.0 = Release|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release|x64.ActiveCfg = Release|x64
 		{E6646FFE-3588-4276-8A15-8D65C22711C1}.Release|x64.Build.0 = Release|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|x64.ActiveCfg = Debug|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|x64.Build.0 = Debug|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|x64.ActiveCfg = Release|x64
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|x64.Build.0 = Release|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug|x64.ActiveCfg = Debug|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Debug|x64.Build.0 = Debug|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release|Any CPU.ActiveCfg = Release|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release|Mixed Platforms.Build.0 = Release|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release|x64.ActiveCfg = Release|x64
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976}.Release|x64.Build.0 = Release|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug|x64.ActiveCfg = Debug|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Debug|x64.Build.0 = Debug|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release|Any CPU.ActiveCfg = Release|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release|Mixed Platforms.Build.0 = Release|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release|x64.ActiveCfg = Release|x64
 		{EF766CAE-9CB1-494C-9153-0030631A6340}.Release|x64.Build.0 = Release|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Debug|x64.ActiveCfg = Debug|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Debug|x64.Build.0 = Debug|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Release|x64.ActiveCfg = Release|x64
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C}.Release|x64.Build.0 = Release|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug|x64.ActiveCfg = Debug|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Debug|x64.Build.0 = Debug|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release|Any CPU.ActiveCfg = Release|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release|Mixed Platforms.Build.0 = Release|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release|x64.ActiveCfg = Release|x64
 		{F0A9637C-20DA-42F0-83D4-23B4704DE602}.Release|x64.Build.0 = Release|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug|x64.ActiveCfg = Debug|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Debug|x64.Build.0 = Debug|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release|Any CPU.ActiveCfg = Release|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release|Mixed Platforms.Build.0 = Release|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release|x64.ActiveCfg = Release|x64
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715}.Release|x64.Build.0 = Release|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug|x64.ActiveCfg = Debug|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Debug|x64.Build.0 = Debug|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release|Any CPU.ActiveCfg = Release|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release|Mixed Platforms.Build.0 = Release|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release|x64.ActiveCfg = Release|x64
 		{7B7A51ED-AA8E-4660-A805-D50235A02120}.Release|x64.Build.0 = Release|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug|x64.ActiveCfg = Debug|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Debug|x64.Build.0 = Debug|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release|Any CPU.ActiveCfg = Release|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release|Mixed Platforms.Build.0 = Release|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release|x64.ActiveCfg = Release|x64
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB}.Release|x64.Build.0 = Release|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug|x64.ActiveCfg = Debug|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Debug|x64.Build.0 = Debug|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release|Any CPU.ActiveCfg = Release|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release|Mixed Platforms.Build.0 = Release|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release|x64.ActiveCfg = Release|x64
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB}.Release|x64.Build.0 = Release|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug|x64.ActiveCfg = Debug|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Debug|x64.Build.0 = Debug|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release|Any CPU.ActiveCfg = Release|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release|Mixed Platforms.Build.0 = Release|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release|x64.ActiveCfg = Release|x64
+		{86883653-8A61-4038-81A0-2379FAE4200A}.Release|x64.Build.0 = Release|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug|x64.ActiveCfg = Debug|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Debug|x64.Build.0 = Debug|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release|Any CPU.ActiveCfg = Release|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release|Mixed Platforms.Build.0 = Release|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release|x64.ActiveCfg = Release|x64
+		{7B7A563D-AA8E-4660-A805-D50235A02120}.Release|x64.Build.0 = Release|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug|x64.ActiveCfg = Debug|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Debug|x64.Build.0 = Debug|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release|Any CPU.ActiveCfg = Release|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release|Mixed Platforms.Build.0 = Release|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release|x64.ActiveCfg = Release|x64
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7}.Release|x64.Build.0 = Release|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|x64.ActiveCfg = Debug|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Debug|x64.Build.0 = Debug|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|Any CPU.ActiveCfg = Release|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|Mixed Platforms.Build.0 = Release|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|x64.ActiveCfg = Release|x64
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E}.Release|x64.Build.0 = Release|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug|x64.ActiveCfg = Debug|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Debug|x64.Build.0 = Debug|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release|Any CPU.ActiveCfg = Release|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release|Mixed Platforms.Build.0 = Release|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release|x64.ActiveCfg = Release|x64
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF}.Release|x64.Build.0 = Release|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|x64.ActiveCfg = Debug|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|x64.Build.0 = Debug|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Any CPU.ActiveCfg = Release|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Mixed Platforms.Build.0 = Release|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release|x64.ActiveCfg = Release|x64
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E}.Release|x64.Build.0 = Release|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug|x64.ActiveCfg = Debug|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Debug|x64.Build.0 = Debug|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release|Any CPU.ActiveCfg = Release|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release|Mixed Platforms.Build.0 = Release|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release|x64.ActiveCfg = Release|x64
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31}.Release|x64.Build.0 = Release|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug|x64.ActiveCfg = Debug|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Debug|x64.Build.0 = Debug|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release|Any CPU.ActiveCfg = Release|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release|Mixed Platforms.Build.0 = Release|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release|x64.ActiveCfg = Release|x64
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456}.Release|x64.Build.0 = Release|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug|x64.ActiveCfg = Debug|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Debug|x64.Build.0 = Debug|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release|Any CPU.ActiveCfg = Release|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release|Mixed Platforms.Build.0 = Release|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release|x64.ActiveCfg = Release|x64
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E}.Release|x64.Build.0 = Release|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug|x64.ActiveCfg = Debug|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Debug|x64.Build.0 = Debug|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release|Any CPU.ActiveCfg = Release|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release|Mixed Platforms.Build.0 = Release|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release|x64.ActiveCfg = Release|x64
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF}.Release|x64.Build.0 = Release|x64
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug_CpuOnly|x64.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_CpuOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_CpuOnly|x64.ActiveCfg = Release|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74}.Release|x64.ActiveCfg = Release|Any CPU
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug|x64.ActiveCfg = Debug|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Debug|x64.Build.0 = Debug|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_NoOpt|Any CPU.ActiveCfg = Release_NoOpt|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_NoOpt|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_NoOpt|Mixed Platforms.Build.0 = Release_NoOpt|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release|Any CPU.ActiveCfg = Release|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release|Mixed Platforms.Build.0 = Release|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release|x64.ActiveCfg = Release|x64
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635}.Release|x64.Build.0 = Release|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|x64.ActiveCfg = Debug|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Debug|x64.Build.0 = Debug|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release_NoOpt|x64.ActiveCfg = Release_CpuOnly|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Any CPU.ActiveCfg = Release|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release|Mixed Platforms.Build.0 = Release|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release|x64.ActiveCfg = Release|x64
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E}.Release|x64.Build.0 = Release|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug_CpuOnly|Any CPU.ActiveCfg = Debug_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug_CpuOnly|Mixed Platforms.ActiveCfg = Debug_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug_CpuOnly|Mixed Platforms.Build.0 = Debug_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug_CpuOnly|x64.ActiveCfg = Debug_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug_CpuOnly|x64.Build.0 = Debug_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug|x64.ActiveCfg = Debug|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Debug|x64.Build.0 = Debug|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_CpuOnly|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_CpuOnly|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_CpuOnly|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_CpuOnly|x64.ActiveCfg = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_CpuOnly|x64.Build.0 = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_NoOpt|Any CPU.ActiveCfg = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_NoOpt|Mixed Platforms.ActiveCfg = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_NoOpt|Mixed Platforms.Build.0 = Release_CpuOnly|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_NoOpt|x64.ActiveCfg = Release_NoOpt|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release_NoOpt|x64.Build.0 = Release_NoOpt|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release|Any CPU.ActiveCfg = Release|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release|Mixed Platforms.Build.0 = Release|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release|x64.ActiveCfg = Release|x64
+		{5D29C76D-648A-456F-920D-48230F2FB3C8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1108,17 +2326,14 @@ Global
 		{62836DC1-DF77-4B98-BF2D-45C943B7DDC6} = {33EBFE78-A1A8-4961-8938-92A271941F94}
 		{CE429AA2-3778-4619-8FD1-49BA3B81197B} = {33EBFE78-A1A8-4961-8938-92A271941F94}
 		{E6646FFE-3588-4276-8A15-8D65C22711C1} = {33EBFE78-A1A8-4961-8938-92A271941F94}
-		{731312A8-6DA3-4841-AFCD-57520BA1BF8E} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
 		{668BEED5-AC07-4F35-B3AE-EE65A7F9C976} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
 		{6E565B48-1923-49CE-9787-9BBB9D96F4C5} = {D45DF403-6781-444E-B654-A96868C5BE68}
 		{3BF59CCE-D245-420A-9F17-73CE61E284C2} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
 		{811924DE-2F12-4EA0-BE58-E57BEF3B74D1} = {3BF59CCE-D245-420A-9F17-73CE61E284C2}
 		{96012801-5187-4FAF-A54E-BF4B73C855F8} = {811924DE-2F12-4EA0-BE58-E57BEF3B74D1}
 		{2A1F0FB0-2304-4F35-87B3-66230C6E58F0} = {811924DE-2F12-4EA0-BE58-E57BEF3B74D1}
-		{BFBC6BE1-C33E-4A80-B8F3-A33410EC00FC} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
 		{FA33A61E-95C7-4049-8111-22058CE361A3} = {9BDFA4BE-790E-408F-915B-5979BB5078C6}
 		{F99E1E80-50D8-421C-AD94-8ED0DF08C355} = {9BDFA4BE-790E-408F-915B-5979BB5078C6}
-		{ED57E827-B28F-4BEE-BFB7-398EF8D83357} = {FA33A61E-95C7-4049-8111-22058CE361A3}
 		{6E5A252C-ACCE-42E0-9819-FF4DEF6D739E} = {FA33A61E-95C7-4049-8111-22058CE361A3}
 		{77125562-3BF2-45D2-9B73-72CA8E03C78C} = {F99E1E80-50D8-421C-AD94-8ED0DF08C355}
 		{EF710C5A-E616-442A-889D-C997D39AF2E1} = {F99E1E80-50D8-421C-AD94-8ED0DF08C355}
@@ -1144,7 +2359,6 @@ Global
 		{E6DC3B7D-303D-4A54-B040-D8DCF8C56E17} = {8C128B1D-87E0-4643-AB93-2581589AE425}
 		{06D2C644-AE5F-4C30-A1F6-C78E2845AAB1} = {EF710C5A-E616-442A-889D-C997D39AF2E1}
 		{EF766CAE-9CB1-494C-9153-0030631A6340} = {60F87E25-BC87-4782-8E20-1621AAEBB113}
-		{41E11A59-62B2-4927-A4F8-F40B1B612C6C} = {60F87E25-BC87-4782-8E20-1621AAEBB113}
 		{BD46CE02-3740-4526-80F6-CC7973B953E5} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
 		{FC7E7EC7-6E6A-4518-81C6-DA60451C657A} = {BD46CE02-3740-4526-80F6-CC7973B953E5}
 		{CEADE942-4077-4577-ACF9-41C04388DDC0} = {BD46CE02-3740-4526-80F6-CC7973B953E5}
@@ -1163,7 +2377,76 @@ Global
 		{9F1F9C7C-2CC3-410C-ACDC-988B12D6AC14} = {AC7BA8D3-B4C8-42A4-8507-B359BB6D49E8}
 		{A3231EF2-DED1-4638-B0A2-5F87C484CA92} = {439BE0E0-FABE-403D-BF2C-A41FB8A60616}
 		{B72C5B0E-38E8-41BF-91FE-0C1012C7C078} = {A3231EF2-DED1-4638-B0A2-5F87C484CA92}
+		{91973E60-A7BE-4C86-8FDB-59C88A0B3715} = {33EBFE78-A1A8-4961-8938-92A271941F94}
 		{7B7A51ED-AA8E-4660-A805-D50235A02120} = {33EBFE78-A1A8-4961-8938-92A271941F94}
 		{9BD0A711-0BBD-45B6-B81C-053F03C26CFB} = {33EBFE78-A1A8-4961-8938-92A271941F94}
+		{08A05A9A-4E45-42D5-83FA-719E99C04A30} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
+		{715C0E2D-6FF6-4B26-9E49-1C68920CFAF6} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
+		{48C2A9DE-FB2C-4724-9ADC-744216D79BCF} = {08A05A9A-4E45-42D5-83FA-719E99C04A30}
+		{2B1046A1-0140-43B7-B3DC-CF7DEEE1009E} = {8071EF60-30F7-4A77-81AA-ADCA0E18B1E3}
+		{CDA96AA3-3252-4978-A0BF-2ACD670823CB} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{8656B71D-E24C-4AC2-8BE4-C07B415A3E15} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
+		{E53E63A0-FAA9-4416-9AD1-08A8FB87FEE1} = {8656B71D-E24C-4AC2-8BE4-C07B415A3E15}
+		{8629430A-821E-43BA-AEC5-8B2CF31A2A7A} = {FC7E7EC7-6E6A-4518-81C6-DA60451C657A}
+		{0141526B-F257-4574-8CBE-99634726FFCE} = {8629430A-821E-43BA-AEC5-8B2CF31A2A7A}
+		{58286327-6742-44C4-A34E-D2583419E55E} = {0141526B-F257-4574-8CBE-99634726FFCE}
+		{AB9207B9-B134-4C57-B7ED-F3DCF7B0DC5F} = {0141526B-F257-4574-8CBE-99634726FFCE}
+		{12FB912C-43F8-40FE-BD7F-B52F589A1EBC} = {0141526B-F257-4574-8CBE-99634726FFCE}
+		{2BFE4D88-6F32-4701-887A-1DE3D7626DBB} = {0141526B-F257-4574-8CBE-99634726FFCE}
+		{CCB0CD89-DE53-4104-94D3-041D46FC8885} = {439BE0E0-FABE-403D-BF2C-A41FB8A60616}
+		{B900D033-DC37-45F1-AE52-F35584FD3024} = {CCB0CD89-DE53-4104-94D3-041D46FC8885}
+		{EC780385-7580-4D15-914B-1D878A295CBC} = {E53E63A0-FAA9-4416-9AD1-08A8FB87FEE1}
+		{D11F76CC-DB6D-4CB4-B3B7-AB139DE2F5FA} = {E53E63A0-FAA9-4416-9AD1-08A8FB87FEE1}
+		{181664AC-4C95-4798-A923-09B879215B33} = {8656B71D-E24C-4AC2-8BE4-C07B415A3E15}
+		{86883653-8A61-4038-81A0-2379FAE4200A} = {DD043083-71A4-409A-AA91-F9C548DCF7EC}
+		{7B7A563D-AA8E-4660-A805-D50235A02120} = {33EBFE78-A1A8-4961-8938-92A271941F94}
+		{1FB54750-B668-4AC3-966F-ED504020AC06} = {8656B71D-E24C-4AC2-8BE4-C07B415A3E15}
+		{3E9BD61F-1F0A-4966-BE17-803AEFD1DFA4} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{5560DDD4-1E6E-4F41-B9BD-F52A19DF0B31} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{9834E864-A8CD-4D28-A3C9-F79FE0F421AE} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{40F65441-A7B7-4425-8E75-CD74AB262F3F} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{4D6F731C-4A6D-4E21-AC3C-9E1F26E5547E} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{36C42845-0D48-4A46-9C67-2B593A80A09C} = {6994C86D-A672-4254-824A-51F4DFEB807F}
+		{A1521DC4-C8EC-47BD-9E63-7BE30ED2EC26} = {47755F2E-D674-4175-9E38-8EA053455072}
+		{977ECCB7-598D-4548-B95B-BACA9CC7D98B} = {C47CDAA5-6D6C-429E-BC89-7CA0F868FDC8}
+		{1DBB2575-F5C8-43F4-B982-D05D6ADC2F9B} = {977ECCB7-598D-4548-B95B-BACA9CC7D98B}
+		{772A0DB3-4710-4281-8AA9-A9F1F7C543D3} = {977ECCB7-598D-4548-B95B-BACA9CC7D98B}
+		{FE3592CF-3EB9-4502-BB95-E2AB974C0FB5} = {977ECCB7-598D-4548-B95B-BACA9CC7D98B}
+		{BA6A65C5-92A2-4040-ADC3-0727A45694F6} = {977ECCB7-598D-4548-B95B-BACA9CC7D98B}
+		{3BDF52CD-7F3C-42BC-AB78-CF5BBC5F4AB4} = {772A0DB3-4710-4281-8AA9-A9F1F7C543D3}
+		{1141DC61-E014-4DEC-9157-F6B1FC055C7A} = {772A0DB3-4710-4281-8AA9-A9F1F7C543D3}
+		{EC7298E3-AAA9-4672-941F-0B342C494CB3} = {A1521DC4-C8EC-47BD-9E63-7BE30ED2EC26}
+		{ECED747C-86D7-4009-B2A9-0525FE5DF4EB} = {EC7298E3-AAA9-4672-941F-0B342C494CB3}
+		{25E144C1-0B7C-4CD4-811A-2E9F4943120D} = {EC7298E3-AAA9-4672-941F-0B342C494CB3}
+		{3F77BF79-E0D3-4D60-8685-5A449F164081} = {0141526B-F257-4574-8CBE-99634726FFCE}
+		{82125DA1-1CD7-45B5-9281-E6AE7C287CB7} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{731312A8-6DA3-4841-AFCD-57520BA1BF8E} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{E5606ECE-48CA-4464-BB12-09D81D02B9EF} = {DD043083-71A4-409A-AA91-F9C548DCF7EC}
+		{F4CC3AB2-0DB2-4281-929A-2E68E30F0F6E} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{CC8DDDCB-D53A-4B30-8596-AEF1C493DB31} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{9F999212-AFC5-4EAC-AA78-F7247D46C456} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{8BE0642A-A3AA-4A64-95D0-C78FB285B2A4} = {47755F2E-D674-4175-9E38-8EA053455072}
+		{2230BF3D-4317-4A3F-A743-DDD6160503F8} = {8BE0642A-A3AA-4A64-95D0-C78FB285B2A4}
+		{CC143D08-567D-4DAC-9E14-264749C19039} = {8BE0642A-A3AA-4A64-95D0-C78FB285B2A4}
+		{0ED2EE97-0A26-4865-871F-11033867BA34} = {2230BF3D-4317-4A3F-A743-DDD6160503F8}
+		{A2A4893C-0D5B-42E2-BFAD-C123AE7FDAFD} = {2230BF3D-4317-4A3F-A743-DDD6160503F8}
+		{8CFBD0DB-5F16-48E6-984C-4401317FA10E} = {CC143D08-567D-4DAC-9E14-264749C19039}
+		{BD7FF8C0-EC3A-49CD-9D81-4A8A29B8AD8E} = {CC143D08-567D-4DAC-9E14-264749C19039}
+		{4727594B-A052-4834-B0E8-57DBB9ADEF13} = {CC143D08-567D-4DAC-9E14-264749C19039}
+		{4A59163B-1EDE-4439-9E7D-40A30B82A3A0} = {2230BF3D-4317-4A3F-A743-DDD6160503F8}
+		{B586AA4C-0BB9-4629-9EDA-25FF2618AC9F} = {FB7AF7B9-6BEA-459F-94D9-94D53916D2B6}
+		{C2102C39-BF5F-4B12-9C41-849D1ED35EE8} = {B586AA4C-0BB9-4629-9EDA-25FF2618AC9F}
+		{4DDFD21D-E82C-4321-B380-8A9382E18107} = {19EE975B-232D-49F0-94C7-6F1C6424FB53}
+		{D293C7C7-B7D7-47CE-A796-45262C16F980} = {19EE975B-232D-49F0-94C7-6F1C6424FB53}
+		{4F534076-39A5-40E2-BF87-64EC464C52B2} = {19EE975B-232D-49F0-94C7-6F1C6424FB53}
+		{31263D7F-F590-475E-B4F0-7DFA4E4FF4B8} = {19EE975B-232D-49F0-94C7-6F1C6424FB53}
+		{05E45AF7-C069-4057-BC16-0A532D068CE4} = {6E565B48-1923-49CE-9787-9BBB9D96F4C5}
+		{CCC07E8E-F33A-4AF7-9F60-93E2AA61C75E} = {05E45AF7-C069-4057-BC16-0A532D068CE4}
+		{1C6E6C53-1AA7-4B69-913E-B97BB5A872CF} = {05E45AF7-C069-4057-BC16-0A532D068CE4}
+		{1A078FC2-21C0-4F42-9A5B-0E84E944BC74} = {47755F2E-D674-4175-9E38-8EA053455072}
+		{E844AB9A-A48F-4A99-9625-F528C5C46D83} = {8656B71D-E24C-4AC2-8BE4-C07B415A3E15}
+		{CD721536-CFD3-413E-A3D7-FB0FAF989635} = {DD043083-71A4-409A-AA91-F9C548DCF7EC}
+		{F4CCAAB2-0DB2-4281-929A-2E68E30F0F6E} = {6F19321A-65E7-4829-B00C-3886CD6C6EDE}
+		{5D29C76D-648A-456F-920D-48230F2FB3C8} = {05E45AF7-C069-4057-BC16-0A532D068CE4}
 	EndGlobalSection
 EndGlobal

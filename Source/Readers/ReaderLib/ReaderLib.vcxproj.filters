@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="BlockRandomizer.h">
-      <Filter>Randomizers</Filter>
-    </ClInclude>
     <ClInclude Include="NoRandomizer.h">
       <Filter>Randomizers</Filter>
     </ClInclude>
@@ -31,34 +28,103 @@
     <ClInclude Include="ElementTypeUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="TransformerBase.h">
-      <Filter>Transformers</Filter>
-    </ClInclude>
     <ClInclude Include="DataDeserializerBase.h">
       <Filter>Deserializers</Filter>
-    </ClInclude>
-    <ClInclude Include="SampleModePacker.h">
-      <Filter>Packers</Filter>
     </ClInclude>
     <ClInclude Include="Bundler.h">
       <Filter>Deserializers</Filter>
     </ClInclude>
+    <ClInclude Include="ChunkRandomizer.h">
+      <Filter>Randomizers</Filter>
+    </ClInclude>
+    <ClInclude Include="SequenceRandomizer.h">
+      <Filter>Randomizers</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockRandomizer.h">
+      <Filter>Randomizers</Filter>
+    </ClInclude>
+    <ClInclude Include="StringToIdMap.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Packer.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="SequencePacker.h">
+      <Filter>Packers</Filter>
+    </ClInclude>
+    <ClInclude Include="PackerBase.h">
+      <Filter>Packers</Filter>
+    </ClInclude>
+    <ClInclude Include="FramePacker.h">
+      <Filter>Packers</Filter>
+    </ClInclude>
+    <ClInclude Include="TruncatedBpttPacker.h">
+      <Filter>Packers</Filter>
+    </ClInclude>
+    <ClInclude Include="SequenceEnumerator.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ChunkCache.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CorpusDescriptor.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformController.h">
+      <Filter>Transformers</Filter>
+    </ClInclude>
+    <ClInclude Include="ExceptionCapture.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ReaderBase.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SequenceData.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformBase.h">
+      <Filter>Transformers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlockRandomizer.cpp">
-      <Filter>Randomizers</Filter>
-    </ClCompile>
     <ClCompile Include="NoRandomizer.cpp">
       <Filter>Randomizers</Filter>
     </ClCompile>
     <ClCompile Include="ReaderShim.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="SampleModePacker.cpp">
-      <Filter>Packers</Filter>
-    </ClCompile>
     <ClCompile Include="Bundler.cpp">
       <Filter>Deserializers</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkRandomizer.cpp">
+      <Filter>Randomizers</Filter>
+    </ClCompile>
+    <ClCompile Include="SequenceRandomizer.cpp">
+      <Filter>Randomizers</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockRandomizer.cpp">
+      <Filter>Randomizers</Filter>
+    </ClCompile>
+    <ClCompile Include="SequencePacker.cpp">
+      <Filter>Packers</Filter>
+    </ClCompile>
+    <ClCompile Include="PackerBase.cpp">
+      <Filter>Packers</Filter>
+    </ClCompile>
+    <ClCompile Include="FramePacker.cpp">
+      <Filter>Packers</Filter>
+    </ClCompile>
+    <ClCompile Include="TruncatedBpttPacker.cpp">
+      <Filter>Packers</Filter>
+    </ClCompile>
+    <ClCompile Include="ChunkCache.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ReaderBase.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

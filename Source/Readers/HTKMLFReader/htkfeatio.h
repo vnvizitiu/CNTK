@@ -71,6 +71,11 @@ protected:
         const unsigned char* b = (const unsigned char*) &v;
         return (short) ((b[0] << 8) + b[1]);
     }
+    static unsigned short swapunsignedshort(unsigned short v) throw()
+    {
+        const unsigned char* b = (const unsigned char*)&v;
+        return (unsigned short)((b[0] << 8) + b[1]);
+    }
     static int swapint(int v) throw()
     {
         const unsigned char* b = (const unsigned char*) &v;
@@ -81,13 +86,13 @@ protected:
     {
         int nsamples;
         int sampperiod;
-        short sampsize;
+        unsigned short sampsize;
         short sampkind;
         void read(FILE* f)
         {
             nsamples = fgetint(f);
             sampperiod = fgetint(f);
-            sampsize = fgetshort(f);
+            sampsize = (unsigned short) fgetshort(f);
             sampkind = fgetshort(f);
         }
 
@@ -102,21 +107,24 @@ protected:
             sampkind = (short) 9; // user type
             int nRows = swapint(fgetint(f));
             int nCols = swapint(fgetint(f));
-            sampsize = (short) (nRows * nCols); // features are stored as bytes;
+            int rawsampsize = nRows * nCols;
+            sampsize = (unsigned short) rawsampsize; // features are stored as bytes;
+            if (sampsize != rawsampsize)
+                RuntimeError("reading idx feature cache header: sample size overflow");
         }
 
         void write(FILE* f)
         {
             fputint(f, nsamples);
             fputint(f, sampperiod);
-            fputshort(f, sampsize);
+            fputshort(f, (short) sampsize);
             fputshort(f, sampkind);
         }
         void byteswap()
         {
             nsamples = swapint(nsamples);
             sampperiod = swapint(sampperiod);
-            sampsize = swapshort(sampsize);
+            sampsize = swapunsignedshort(sampsize);
             sampkind = swapshort(sampkind);
         }
     };
@@ -215,7 +223,10 @@ public:
         H.nsamples = 0; // unknown for now, updated in close()
         H.sampperiod = period;
         const int bytesPerValue = sizeof(float); // we do not support compression for now
-        H.sampsize = (short) featdim * bytesPerValue;
+        size_t rawsampsize = featdim * bytesPerValue;
+        H.sampsize = (unsigned short) rawsampsize;
+        if (H.sampsize != rawsampsize)
+            RuntimeError("htkfeatwriter: sample size overflow");
         H.sampkind = parsekind(kind);
         if (needbyteswapping)
             H.byteswap();
@@ -298,11 +309,9 @@ public:
 #else
         W.close(numframes);
 #endif
-#ifdef _WIN32 // BUGBUG: and on Linux??
         // rename to final destination
         // (This would only fail in strange circumstances such as accidental multiple processes writing to the same file.)
         renameOrDie(tmppath, path);
-#endif
     }
 };
 
@@ -359,9 +368,9 @@ public:
             return archivePathStringVector[archivePathIdx];
         }
 
-        size_t s, e;         // first and last frame inside the archive file; (0, INT_MAX) if not given
         bool isarchive;      // true if archive (range specified)
         bool isidxformat;    // support reading of features in idxformat as well (it's a hack, but different format's are not supported yet)
+        size_t s, e;         // first and last frame inside the archive file; (0, INT_MAX) if not given
         void malformed(const wstring& path) const
         {
             RuntimeError("parsedpath: malformed path '%ls'", path.c_str());
@@ -417,7 +426,8 @@ public:
                     if (xpath.empty())
                         malformed(pathParam);
                     e = msra::strfun::toint(consume(xpath, L"]"));
-                    if (!xpath.empty())
+                    // TODO \r should be handled elsewhere; refine this
+                    if (!xpath.empty() && xpath != L"\r")
                         malformed(pathParam);
                     isarchive = true;
                 }
@@ -442,6 +452,20 @@ public:
         wstring physicallocation() const
         {
             return archivepath();
+        }
+
+        // Gets logical path of the utterance.
+        string GetLogicalPath() const
+        {
+            assert(!logicalpath.empty());
+            return logicalpath.substr(0, logicalpath.find_last_of("."));
+        }
+
+        // Clears logical path after parsing, in order not to duplicate it 
+        // with the one stored in the corpus descriptor.
+        void ClearLogicalPath()
+        {
+            logicalpath.clear();
         }
 
         // casting to wstring yields the logical path
@@ -559,7 +583,8 @@ private:
 
         // done: swap it in
         int64_t bytepos = fgetpos(f);
-        setkind(kind, dim, H.sampperiod, ppath); // this checks consistency
+        auto location = ((std::wstring)ppath).empty() ? ppath.physicallocation() : (std::wstring)ppath;
+        setkind(kind, dim, H.sampperiod, location); // this checks consistency
         this->physicalpath.swap(physpath);
         this->physicaldatastart = bytepos;
         this->physicalframes = H.nsamples;
@@ -697,19 +722,29 @@ public:
                     v.insert(iter, 0.0f);
                 }
             }
-            foreach_index (k, v)
+            foreach_index(k, v)
                 feat(k, t) = v[k];
         }
     }
     // read an entire utterance into an already allocated matrix
     // Matrix type needs to have operator(i,j)
     template <class MATRIX>
-    void read(const parsedpath& ppath, const string& kindstr, const unsigned int period, MATRIX& feat)
+    void read(const parsedpath& ppath, const string& kindstr, const unsigned int period, MATRIX& feat, bool needsExpansion=false)
     {
         // open the file and check dimensions
         size_t numframes = open(ppath);
-        if (feat.cols() != numframes || feat.rows() != featdim)
-            LogicError("read: stripe read called with wrong dimensions");
+        if (needsExpansion)
+        {
+            if (numframes != 1)
+                throw std::logic_error("read: if doing utterance-based expansion of features (e.g. ivectors), utterance must contain 1 frame only");
+            if (feat.rows() != featdim)
+                throw std::logic_error("read: stripe read called with wrong dimensions");
+        }
+        else
+        {
+            if (feat.cols() != numframes || feat.rows() != featdim)
+                LogicError("read: stripe read called with wrong dimensions");
+        }
         if (kindstr != featkind || period != featperiod)
             LogicError("read: attempting to mixing different feature kinds");
 
@@ -717,6 +752,16 @@ public:
         try
         {
             read(feat, 0, numframes);
+            if (needsExpansion) // copy first frame to all the frames in the stripe
+            {
+                for (int t = 1; t < feat.cols(); t++)
+                {
+                    for (int k = 0; k < feat.rows(); k++)
+                    {
+                        feat(k, t) = feat(k, 0);
+                    }
+                }
+            }
         }
         catch (...)
         {

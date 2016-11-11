@@ -109,9 +109,8 @@ public:
 
 // Note: This class is deprecated for standalone use, only used as a base for BatchSequenceReader which overrides most of the functions.
 template <class ElemType>
-class SequenceReader : public IDataReader<ElemType>
+class SequenceReader : public DataReaderBase
 {
-    typedef IDataReader<ElemType> Base;
 protected:
     bool m_idx2clsRead;
     bool m_clsinfoRead;
@@ -119,9 +118,6 @@ protected:
     bool m_idx2probRead;
 
 public:
-    using LabelType   = typename Base::LabelType;
-    using LabelIdType = typename Base::LabelIdType;
-
     map<string, int> word4idx;
     map<int, string> idx4word;
     map<int, int> idx4class;
@@ -211,8 +207,8 @@ protected:
     } m_labelInfo[labelInfoNum];
 
     // caching support
-    DataReader<ElemType>* m_cachingReader;
-    DataWriter<ElemType>* m_cachingWriter;
+    DataReader* m_cachingReader;
+    DataWriter* m_cachingWriter;
     ConfigParameters m_readerConfig;
     void InitCache(const ConfigParameters& config);
 
@@ -252,11 +248,10 @@ public:
                               bool flatten);
     //static void ReadWord(char* wrod, FILE* fin);
 
-    void GetLabelOutput(std::map<std::wstring, Matrix<ElemType>*>& matrices,
-                        size_t m_mbStartSample, size_t actualmbsize);
-    void GetInputToClass(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    void GetLabelOutput(StreamMinibatchInputs& matrices, size_t m_mbStartSample, size_t actualmbsize);
+    void GetInputToClass(StreamMinibatchInputs& matrices);
 
-    void GetInputProb(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    void GetInputProb(StreamMinibatchInputs& matrices);
     void GetClassInfo();
 
     virtual void Destroy();
@@ -281,7 +276,7 @@ public:
     }
     virtual ~SequenceReader();
     virtual void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples = requestDataSize);
-    virtual bool GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices);
+    virtual bool TryGetMinibatch(StreamMinibatchInputs& matrices);
 
     // void SetSentenceSegBatch(std::vector<size_t> &/*sentenceEnd*/) {};
     // TODO: ^^ should this be   void CopyMBLayoutTo(MBLayoutPtr pMBLayout);
@@ -291,7 +286,10 @@ public:
 
     virtual bool DataEnd();
 
-    //int GetSentenceEndIdFromOutputLabel() { return -1; };
+    size_t GetCurrentSamplePosition() override
+    {
+        return m_mbStartSample;
+    }
 };
 
 template <class ElemType>
@@ -359,7 +357,9 @@ public:
     using Base::mRequestedNumParallelSequences; // IDataReader<ElemType>
 
 private:
-    size_t mLastProcssedSentenceId;
+    unsigned int m_randomSeed = 0; // deterministic random seed
+
+    size_t mLastProcessedSentenceId;
 
     size_t mNumRead;               // number of sentences in current cache block
     vector<bool> mProcessed;       // [mNumRead] true if sequence has already been returned in this cache block
@@ -384,7 +384,8 @@ public:
     BatchSequenceReader()
         : m_pMBLayout(make_shared<MBLayout>())
     {
-        mLastProcssedSentenceId = 0;
+        m_pMBLayout->SetUniqueAxisName(L"LMSequenceReader");
+        mLastProcessedSentenceId = 0;
         mRequestedNumParallelSequences = 1;
         mLastPosInSentence = 0;
         mNumRead = 0;
@@ -405,16 +406,15 @@ private:
     void Reset();
     size_t DetermineSequencesToProcess();
     bool GetMinibatchData(size_t& firstPosInSentence);
-    void GetLabelOutput(std::map<std::wstring, Matrix<ElemType>*>& matrices,
-                        size_t m_mbStartSample, size_t actualmbsize);
+    void GetLabelOutput(StreamMinibatchInputs& matrices, size_t m_mbStartSample, size_t actualmbsize);
 
 public:
     void StartMinibatchLoop(size_t mbSize, size_t epoch, size_t requestedEpochSamples = requestDataSize) override;
-    bool GetMinibatch(std::map<std::wstring, Matrix<ElemType>*>& matrices) override;
+    bool TryGetMinibatch(StreamMinibatchInputs& matrices) override;
     bool DataEnd() override;
 
     void CopyMBLayoutTo(MBLayoutPtr pMBLayout) { assert(mToProcess.size() == m_pMBLayout->GetNumParallelSequences()); pMBLayout->CopyFrom(m_pMBLayout); }
-    size_t GetNumParallelSequences() override { return mToProcess.size(); } // TODO: or get it from MBLayout? Can this ever be called before GetMinibatch()?
+    size_t GetNumParallelSequencesForFixingBPTTMode() override { return mToProcess.size(); } // TODO: or get it from MBLayout? Can this ever be called before GetMinibatch()?
 
     // TODO: what are these?
     //bool RequireSentenceSeg() const override { return true; }

@@ -1,0 +1,262 @@
+#!/bin/bash
+
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+# WARNING. This will run in Microsoft Internal Environment ONLY
+# Generating CNTK Binary drops in Jenkins environment
+
+# Stop on Error
+set -e
+
+# Define variables to be set via command parameters
+buildConfig=
+targetConfig=
+verbose=false
+
+# Process Command line parameters
+
+usage="Usage: make_binary_drop_linux -b build_configuration -t target_configuration [-v] [-h]\nBuild and Target configurations should correspond to Jenkins environment\n-v Verbose output\n-h Displays this message\nExample: make_binary_drop_linux -b Release -t gpu -v"
+
+if [[ $# == 0 ]]; then
+    echo "Command line parameters are missing" >&2
+    echo -e $usage >&2
+    exit 1
+fi
+
+while getopts ":b::t::v" opt; do
+    case $opt in
+    b)
+        # Supposed to be taken from Jenkins BUILD_CONFIGURATION
+        buildConfig=$OPTARG
+        ;;
+    t)
+        # Supposed to be taken from Jenkins TARGET_CONFIGURATION
+        targetConfig=$OPTARG
+        ;;
+    v)
+        # Enables verbose output
+        verbose=true
+        ;;
+    h)
+        # Display Usage message and exit
+        echo -e $usage
+        exit 0
+        ;;
+    \?)
+        echo "Invalid parameter: -$OPTARG" >&2
+        echo -e $usage >&2
+        exit 1
+        ;;
+    :)
+        echo "Parameter -$OPTARG requires an argument." >&2
+        echo -e $usage >&2
+        exit 1
+        ;;
+    esac
+done
+
+# Check mandatory parameters presence
+if [[ -z "$buildConfig" ]]; then
+    echo "Parameter -b is missing." >&2
+    echo -e $usage >&2
+    exit 1
+fi
+
+if [[ -z "$targetConfig" ]]; then
+    echo "Parameter -t is missing." >&2
+    echo -e $usage >&2
+    exit 1
+fi
+
+# Make buildConfig and targetConfig lowercase
+buildConfig=$(echo ${buildConfig} | tr '[:upper:]' '[:lower:]')
+targetConfig=$(echo ${targetConfig} | tr '[:upper:]' '[:lower:]')
+
+# Enable "verbose" mode if needed
+# stderr is NOT changed
+if [[ "$verbose" == true ]]; then
+    exec 3>&1
+else
+    exec 3>/dev/null
+fi
+
+# Define helper function
+
+# File List Copy function
+# usage: CopyFilesFromList source_path file_name_array destination_path
+function CopyFilesFromList ()
+{
+    declare -a fileNames=(${!2})
+    for fileName in  "${fileNames[@]}"
+    do
+        cp "$1/$fileName" "$3"
+    done
+}
+
+# Main script
+
+echo "Making binary drops..." >&3
+
+# If not a Release build quit
+if [[ $buildConfig != "release" ]]; then
+    echo "Not a release build. No binary drops generation" >&3
+    exit 0
+fi
+
+# Dependency files
+
+# MKL
+declare -a mklFiles=("libmkl_cntk_p.so" "libiomp5.so")
+
+# Open CV
+declare -a opencvFiles=("libopencv_core.so.3.1" "libopencv_imgproc.so.3.1" "libopencv_imgproc.so.3.1" "libopencv_imgcodecs.so.3.1")
+
+# libzip
+declare -a libzipFiles=("libzip.so.4")
+
+# CUDA
+declare -a cudaFiles=("libcudart.so.7.5" "libcublas.so.7.5" "libcurand.so.7.5" "libcusparse.so.7.5")
+
+# cuDNN
+declare -a cudnnFiles=("libcudnn.so.5")
+
+# OpenBLAS (Needed by Kaldi)
+declare -a openblasFiles=("libopenblas.so.0")
+
+# Kaldi
+declare -a kaldiFiles=("libkaldi-util.so" "libkaldi-matrix.so" "libkaldi-base.so" "libkaldi-hmm.so" "libkaldi-cudamatrix.so" "libkaldi-nnet.so" "libkaldi-lat.so" "libkaldi-tree.so")
+
+# OpenFst (from Kaldi)
+declare -a openfstFiles=("libfst.so.3")
+
+# Include files
+declare -a includeFiles=("Eval.h")
+
+# Include files 2.0
+declare -a includeFiles20=("CNTKLibrary.h" "CNTKLibraryInternals.h")
+
+# Set dependency sources paths
+mklVersion="2"
+mklPath="/usr/local/CNTKCustomMKL/$mklVersion/x64/parallel"
+opencvVersion="3.1.0"
+opencvPath="/usr/local/opencv-$opencvVersion/lib"
+libzipPath="/usr/local/lib"
+cudaPath="/usr/local/cuda/lib64"
+cudnnVersion="5.1"
+cudnnPath="/usr/local/cudnn-$cudnnVersion/cuda/lib64"
+openblasPath="/usr/local/openblas/lib"
+kaldiVersion="c024e8aa"
+kaldiPath="/usr/local/kaldi-$kaldiVersion/src/lib"
+openfstPath="/usr/local/kaldi-$kaldiVersion/tools/openfst/lib"
+
+# Set build paths
+buildPath="build/$targetConfig/release"
+basePath="BinaryDrops"
+baseDropPath="$basePath/cntk"
+baseBinariesPath="$baseDropPath/cntk"
+baseDependenciesPath="$baseBinariesPath/dependencies/lib"
+baseIncludePath="$baseDropPath/Include"
+includePath="Source/Common/Include"
+includePath20="Source/CNTKv2LibraryDll/API"
+extrasPath="Tools/cntk-binary-drop/linux/$targetConfig"
+gzipFile="BinaryDrops.tar.gz"
+
+# Make BinaryDrops directory
+mkdir -p $baseBinariesPath
+
+# Copy build binaries
+echo "Copying build binaries..." >&3
+cp -r $buildPath/* $baseBinariesPath
+# Remove unnessesary file(s) if exist(s)
+# Add Python artefacts to 2.0 Beta Drop
+# rm -rf $baseBinariesPath/python
+rm -f $baseBinariesPath/bin/brainscripttests
+rm -f $baseBinariesPath/bin/cppevalclient
+rm -f $baseBinariesPath/bin/evaltests
+rm -f $baseBinariesPath/bin/mathtests
+rm -f $baseBinariesPath/bin/networktests
+rm -f $baseBinariesPath/bin/readertests
+rm -f $baseBinariesPath/bin/v2librarytests
+# libcntklibrary-2.0.so added to drop for 2.0 Beta
+# rm -f $baseBinariesPath/lib/libcntklibrary-2.0.so
+
+# Make Include directory
+mkdir -p $baseIncludePath
+
+# Copy Include
+echo "Copying Include files..." >&3
+CopyFilesFromList $includePath includeFiles[@] $baseIncludePath 
+echo "Copying Include files for Version 2..." >&3
+CopyFilesFromList $includePath20 includeFiles20[@] $baseIncludePath 
+
+# Copy Examples
+echo "Copying Examples..." >&3
+cp -r Examples $baseDropPath
+# Include CPPEvalV2Client examples in 2.0 Beta drop
+# rm -rf $baseDropPath/Examples/Evaluation/CPPEvalV2Client
+
+# Copy Scripts (Scripts folder from the root of the Repo)
+echo "Copying Scripts..." >&3
+cp -r Scripts $baseDropPath
+# Remove test related file(s) if exist(s)
+rm -f $baseDropPath/Scripts/pytest.ini
+
+# Copy Extras
+echo "Copying Extras..." >&3
+cp -r $extrasPath/* $baseDropPath
+
+# Copy Dependencies
+echo "Copying Dependencies..." >&3
+
+# Make dependencies directory
+mkdir -p $baseDependenciesPath
+
+# Copy MKL
+echo "Copying MKL" >&3
+CopyFilesFromList $mklPath mklFiles[@] $baseDependenciesPath
+
+# Copy Open CV
+echo "Copying Open CV..." >&3
+CopyFilesFromList $opencvPath opencvFiles[@] $baseDependenciesPath
+
+# Copy libzip
+echo "Copying libzip..." >&3
+CopyFilesFromList $libzipPath libzipFiles[@] $baseDependenciesPath
+
+# Copy OpenBLAS (for Kaldi)
+echo "Copying OpenBLAS (for Kaldi)..." >&3
+CopyFilesFromList $openblasPath openblasFiles[@] $baseDependenciesPath
+
+# Copy Kaldi
+echo "Copying Kaldi..." >&3
+CopyFilesFromList $kaldiPath kaldiFiles[@] $baseDependenciesPath
+
+# Copy OpenFst (from Kaldi)
+echo "Copying OpenFst (Kaldi)..." >&3
+CopyFilesFromList $openfstPath openfstFiles[@] $baseDependenciesPath
+
+# GPU Drops only
+if [[ $targetConfig != "cpu" ]]; then
+
+    # Copy CUDA
+    echo "Copying CUDA..." >&3
+    CopyFilesFromList $cudaPath cudaFiles[@] $baseDependenciesPath
+
+    # Copy cuDNN
+    echo "Copying cuDNN..." >&3
+    CopyFilesFromList $cudnnPath cudnnFiles[@] $baseDependenciesPath
+
+fi
+
+echo "Making Archive and cleaning up..." >&3
+# Make GZipped TAR
+cd $basePath
+if [[ "$verbose" == true ]]; then
+    tar -cvzf $gzipFile cntk
+else
+    tar -czf $gzipFile cntk
+fi
+
+# Remove TAR sources
+rm -r cntk
