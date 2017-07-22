@@ -15,6 +15,8 @@
 
 namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
 
+    using namespace ::CNTK;
+
     struct MockDenseSequenceData : DenseSequenceData
     {
         const void* GetDataBuffer() override
@@ -22,24 +24,40 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
             return m_data;
         }
 
+        const NDShape& GetSampleShape() override
+        {
+            return m_sampleShape;
+        }
+
         void* m_data;
+        NDShape m_sampleShape;
     };
 
     // A mock deserializer that produces N sequential samples
     // with value from 0 .. N-1
 
-    class SequentialDeserializer : public IDataDeserializer
+    class SequentialDeserializer : public DataDeserializer
     {
     public:
+        struct MockSequenceInfo
+        {
+            size_t id;
+            size_t size;
+            size_t chunkId;
+            float startingValue;
+        };
+
         struct SequentialChunk : Chunk
         {
             std::vector<std::vector<float>> m_data;
             size_t m_sizeInSamples;
             size_t m_sizeInSequences;
-            const TensorShapePtr m_sampleLayout;
+            NDShape m_sampleShape;
 
-            SequentialChunk() : m_sizeInSamples{ 0 }, m_sizeInSequences{ 0 }, m_sampleLayout(std::make_shared<TensorShape>(1))
-            {}
+            SequentialChunk(size_t approxSize) : m_sizeInSamples{ 0 }, m_sizeInSequences{ 0 }, m_sampleShape({1})
+            {
+                m_data.reserve(approxSize);
+            }
 
             SequentialChunk(const SequentialChunk& other)
             {
@@ -72,7 +90,7 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
                 auto s = make_shared<MockDenseSequenceData>();
                 s->m_data = (void*)&data[0];
                 s->m_numberOfSamples = (uint32_t)data.size();
-                s->m_sampleLayout = m_sampleLayout;
+                s->m_sampleShape = m_sampleShape;
                 result.push_back(s);
             }
         };
@@ -83,15 +101,16 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
             size_t chunkSizeInSamples,
             size_t sweepNumberOfSamples,
             uint32_t maxSequenceLength)
-            : m_sampleLayout(make_shared<TensorShape>(1))
+            : m_sampleShape(NDShape({ 1 }))
         {
             std::mt19937_64 engine(seed);
-            std::uniform_int_distribution<int> length(1, maxSequenceLength);
+            boost::random::uniform_int_distribution<int> length(1, maxSequenceLength);
 
             // Let's generate our data.
             float currentValue = 0;
             size_t currentNumberOfSamples = 0;
-            SequentialChunkPtr currentChunk = std::make_shared<SequentialChunk>();
+            SequentialChunkPtr currentChunk = std::make_shared<SequentialChunk>(chunkSizeInSamples);
+            m_chunks.reserve(sweepNumberOfSamples / chunkSizeInSamples + 1);
             while (currentNumberOfSamples < sweepNumberOfSamples)
             {
                 size_t sequenceLength = 0;
@@ -111,11 +130,21 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
                     sequenceData.push_back(currentValue++);
                 }
 
-                if (currentChunk->SizeInSamples() > chunkSizeInSamples)
+                if (currentChunk->SizeInSamples() >= chunkSizeInSamples)
                 {
                     m_chunks.push_back(currentChunk);
-                    currentChunk = std::make_shared<SequentialChunk>();
+                    currentChunk = std::make_shared<SequentialChunk>(chunkSizeInSamples);
                 }
+
+                // Let's record information about the sequence.
+                MockSequenceInfo info
+                {
+                    currentChunk->m_data.size(),
+                    sequenceData.size(),
+                    m_chunks.size(),
+                    sequenceData.front()
+                };
+                m_sequenceInfos[(size_t)info.startingValue] = info;
 
                 currentChunk->AddSequence(std::move(sequenceData));
                 currentNumberOfSamples += sequenceLength;
@@ -136,53 +165,48 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
             return m_chunks;
         }
 
-        vector<StreamDescriptionPtr> GetStreamDescriptions() const override
+        vector<StreamInformation> StreamInfos() override
         {
-            return std::vector<StreamDescriptionPtr>
-            {
-                make_shared<StreamDescription>(StreamDescription{
-                    L"input",
-                    0,
-                    StorageType::dense,
-                    ElementType::tfloat,
-                    m_sampleLayout
-                })
-            };
+            StreamInformation si;
+            si.m_name = L"input";
+            si.m_id = 0;
+            si.m_storageFormat = StorageFormat::Dense;
+            si.m_elementType = DataType::Float;
+            si.m_sampleLayout = m_sampleShape;
+            return std::vector<StreamInformation>{si};
         }
 
         virtual ChunkPtr GetChunk(ChunkIdType chunkId) override
         {
             // We cannot simply give a chunk, otherwise we do not test the case when the chunk gets released.
             // Let's create a new one.
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             return std::make_shared<SequentialChunk>(*m_chunks[chunkId]);
         }
 
-        virtual bool GetSequenceDescription(const SequenceDescription&, SequenceDescription&) override
+        bool GetSequenceInfo(const SequenceInfo&, SequenceInfo&) override
         {
             throw logic_error("Not implemented");
         }
 
-        virtual ChunkDescriptions GetChunkDescriptions() override
+        virtual std::vector<ChunkInfo> ChunkInfos() override
         {
-            ChunkDescriptions result;
+            std::vector<ChunkInfo> result;
             for (size_t i = 0; i < m_chunks.size(); ++i)
             {
-                result.push_back(std::make_shared<ChunkDescription>(
-                    ChunkDescription{ (ChunkIdType)i, m_chunks[i]->SizeInSamples(), m_chunks[i]->SizeInSequences() }));
+                result.push_back(ChunkInfo{ (ChunkIdType)i, m_chunks[i]->SizeInSamples(), m_chunks[i]->SizeInSequences() });
             }
             return result;
         }
 
-        virtual void GetSequencesForChunk(ChunkIdType chunkId, vector<SequenceDescription>& descriptions) override
+        void SequenceInfosForChunk(ChunkIdType chunkId, std::vector<SequenceInfo>& descriptions) override
         {
             const auto& chunk = m_chunks[chunkId];
             for (size_t i = 0; i < chunk->SizeInSequences(); ++i)
             {
-                KeyType key;
+                SequenceKey key;
                 key.m_sample = 0;
-                key.m_sequence = (uint32_t)i;
-                descriptions.push_back(SequenceDescription{
+                key.m_sequence = (uint32_t)chunk->m_data[i][0];
+                descriptions.push_back(SequenceInfo{
                     i,
                     (uint32_t)(chunk->m_data[i].size()),
                     chunkId,
@@ -191,12 +215,50 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
             }
         }
 
+        size_t TotalSize() const
+        {
+            size_t size = 0;
+            for (auto& c : m_chunks)
+                size += c->m_sizeInSamples;
+            return size;
+        }
+
+        const std::map<size_t, MockSequenceInfo>& Corpus() const
+        {
+            return m_sequenceInfos;
+        }
+
     private:
         std::vector<SequentialChunkPtr> m_chunks;
-        TensorShapePtr m_sampleLayout;
+        std::map<size_t, MockSequenceInfo> m_sequenceInfos;
+        NDShape m_sampleShape;
 
         DISABLE_COPY_AND_MOVE(SequentialDeserializer);
     };
+
+    bool operator == (const SequentialDeserializer::MockSequenceInfo& a, const SequentialDeserializer::MockSequenceInfo& b)
+    {
+        return a.id == b.id && a.size == b.size && a.chunkId == b.chunkId && a.startingValue == b.startingValue;
+    }
+
+    bool operator != (const SequentialDeserializer::MockSequenceInfo& a, const SequentialDeserializer::MockSequenceInfo& b)
+    {
+        return !(a == b);
+    }
+
+    std::ostream& operator << (std::ostream& ostr, const SequentialDeserializer::MockSequenceInfo& a)
+    {
+        ostr << a.startingValue;
+        return ostr;
+    }
+
+    bool operator < (const SequentialDeserializer::MockSequenceInfo& a, const SequentialDeserializer::MockSequenceInfo& b)
+    {
+        return a.startingValue < b.startingValue;
+    }
+
+
+    typedef std::shared_ptr<SequentialDeserializer> SequentialDeserializerPtr;
 
     inline std::vector<float> ReadNextSamples(SequenceEnumeratorPtr sequenceEnumerator, size_t numSamples)
     {
@@ -211,7 +273,7 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
         std::vector<float> result;
         while (result.size() < numSamples)
         {
-            auto sequences = sequenceEnumerator->GetNextSequences(mbSize);
+            auto sequences = sequenceEnumerator->GetNextSequences(mbSize, mbSize);
             assert(!sequences.m_endOfEpoch);
             assert(sequences.m_data.size() == 1 || sequences.m_data.size() == 0);
             if (sequences.m_data.empty())
@@ -245,7 +307,7 @@ namespace Microsoft { namespace MSR { namespace CNTK { namespace Test {
         std::vector<float> epoch;
         while (!shouldBreak)
         {
-            auto sequences = sequenceEnumerator->GetNextSequences(mbSize);
+            auto sequences = sequenceEnumerator->GetNextSequences(mbSize, mbSize);
             shouldBreak = sequences.m_endOfEpoch;
             assert(sequences.m_data.size() == 1 || sequences.m_data.size() == 0);
             if (sequences.m_data.size() == 0)

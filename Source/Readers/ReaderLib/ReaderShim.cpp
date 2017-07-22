@@ -18,19 +18,37 @@
 #include "DataReader.h"
 #include "ReaderShim.h"
 #include "DataTransferer.h"
+#include "PerformanceProfiler.h"
+#include "Reader.h"
 
-namespace Microsoft { namespace MSR { namespace CNTK {
+namespace CNTK {
+
+using namespace Microsoft::MSR::CNTK;
 
 template <class ElemType>
-ReaderShim<ElemType>::ReaderShim(ReaderFactory factory)
-    : m_factory(factory), m_deviceId(CPUDEVICE), m_dataTransferers(2, DataTransfererPtr()), m_currentDataTransferIndex(0), m_endOfEpoch(false)
+ReaderShim<ElemType>::ReaderShim() :
+    m_deviceId(CPUDEVICE),
+    m_dataTransferers(2, DataTransfererPtr()),
+    m_currentDataTransferIndex(0),
+    m_endOfEpoch(false),
+    m_endOfSweep(false),
+    m_reader(nullptr),
+    m_factory(nullptr)
 {
 }
 
 template <class ElemType>
-ReaderShim<ElemType>::ReaderShim(ReaderPtr reader)
-    : m_deviceId(CPUDEVICE), m_dataTransferers(2, DataTransfererPtr()), m_currentDataTransferIndex(0), m_reader(reader), m_factory(nullptr), m_endOfEpoch(false)
+ReaderShim<ElemType>::ReaderShim(ReaderFactory factory) :
+    ReaderShim()
 {
+    m_factory = factory;
+}
+
+template <class ElemType>
+ReaderShim<ElemType>::ReaderShim(ReaderPtr reader) :
+    ReaderShim()
+{
+    m_reader = reader;
 }
 
 template <class ElemType>
@@ -52,8 +70,10 @@ void ReaderShim<ElemType>::Init(const ConfigParameters& config)
     m_streams = m_reader->GetStreamDescriptions();
     for (auto i : m_streams)
     {
-        m_nameToStreamId.insert(std::make_pair(i->m_name, i->m_id));
+        m_nameToStreamId.insert(std::make_pair(i.m_name, i.m_id));
     }
+
+    m_currentState = m_reader->GetState();
 }
 
 template <class ElemType>
@@ -79,6 +99,47 @@ void ReaderShim<ElemType>::StartDistributedMinibatchLoop(
     config.m_epochIndex = epoch;
 
     StartEpoch(config, inputs);
+    StartAsyncPrefetching();
+}
+
+template <class ElemType>
+void ReaderShim<ElemType>::SetCurrentSamplePosition(size_t currentSamplePosition)
+{
+    if (GetCurrentSamplePosition() == currentSamplePosition)
+        return;
+
+    // Make sure there are no outstanding reads.
+    if (m_prefetchTask.valid())
+        m_prefetchTask.wait();
+
+    // Let's check that there is no outstanding copies.
+    // Wait on all events if there are any pending copy operations in flight.
+    if (m_dataTransferers[m_currentDataTransferIndex])
+        m_dataTransferers[m_currentDataTransferIndex]->WaitForCopyCPUToGPU();
+
+    // Set current position.
+    std::map<std::wstring, size_t> state;
+    state[g_minibatchSourcePosition] = currentSamplePosition;
+    m_reader->SetState(state);
+    m_endOfEpoch = false;
+
+    m_currentState = m_reader->GetState();
+}
+
+template <class ElemType>
+void ReaderShim<ElemType>::SetConfiguration(const ReaderConfiguration& config, const std::map<std::wstring, int>& inputDescriptions)
+{
+    // Make sure there are no outstanding reads.
+    if (m_prefetchTask.valid())
+        m_prefetchTask.get();
+
+    // Let's check that there is no outstanding copies.
+    // Wait on all events if there are any pending copy operations in flight.
+    if (m_dataTransferers[m_currentDataTransferIndex])
+        m_dataTransferers[m_currentDataTransferIndex]->WaitForCopyCPUToGPU();
+
+    m_reader->SetConfiguration(config, inputDescriptions);
+    m_reader->SetState(m_currentState);
 }
 
 template <class ElemType>
@@ -86,9 +147,7 @@ void ReaderShim<ElemType>::StartEpoch(const EpochConfiguration& config, const st
 {
     // For adaptive minibatch, make sure there are no outstanding reads.
     if (m_prefetchTask.valid())
-    {
-        m_prefetchTask.wait();
-    }
+        m_prefetchTask.get();
 
     // Let's check that there is no outstanding copies.
     // Wait on all events if there are any pending copy operations in flight.
@@ -134,14 +193,18 @@ void ReaderShim<ElemType>::StartEpoch(const EpochConfiguration& config, const st
 
     m_endOfEpoch = false;
     m_reader->StartEpoch(config, inputDescriptions);
-    m_currentSamplePosition = m_reader->GetCurrentSamplePosition();
 
+    m_currentState = m_reader->GetState();
+}
+
+template <class ElemType>
+void ReaderShim<ElemType>::StartAsyncPrefetching()
+{
     auto localCurrentDataTransferIndex = m_currentDataTransferIndex;
     // Starting the prefetch task. There is always a single async read in flight.
     // When the network requests a new minibatch, we wait for the current async to finish, swap the buffers
     // and kick off the new prefetch.
-    m_prefetchTask = std::async(m_launchType,
-    [this, localCurrentDataTransferIndex]()
+    m_prefetchTask = std::async(m_launchType, [this, localCurrentDataTransferIndex]()
     {
         return PrefetchMinibatch(localCurrentDataTransferIndex);
     });
@@ -194,16 +257,18 @@ bool ReaderShim<ElemType>::GetMinibatch(StreamMinibatchInputs& matrices)
         }
     }
 
-    // Make sure the prefetch has finished.
-    assert(m_prefetchTask.valid());
+    if (!m_prefetchTask.valid())
+        StartAsyncPrefetching();
+
     auto result = m_prefetchTask.get();
 
     // Ok, prefetch is done.
 
     // Let's update our sample position.
-    m_currentSamplePosition = m_reader->GetCurrentSamplePosition();
+    m_currentState = m_reader->GetState();
 
     m_endOfEpoch = result.m_isEndOfEpoch;
+    m_endOfSweep = result.m_isEndOfSweep;
     if (m_endOfEpoch && !result.m_isDataAvailable)
     {
         // No data and end of epoch, simply return.
@@ -212,6 +277,8 @@ bool ReaderShim<ElemType>::GetMinibatch(StreamMinibatchInputs& matrices)
 
     // Remember current data transfer, async memcpy for it already started on the prefetch thread.
     auto currentDataTransferIndex = m_currentDataTransferIndex;
+
+    matrices.m_getKeyById = m_getKeyById;
 
     // Let's update the current data transferer.
     m_currentDataTransferIndex = (m_currentDataTransferIndex + 1) % 2;
@@ -260,11 +327,7 @@ bool ReaderShim<ElemType>::GetMinibatch(StreamMinibatchInputs& matrices)
     // It is time to issue the next prefetch.
     if (!m_endOfEpoch)
     {
-        // Starting the prefetch task. There is always a single async read in flight.
-        // When the network requests a new minibatch, we wait for the current async to finish, swap the buffers
-        // and kick off the new prefetch.
-        auto localCurrentDataTransferIndex = m_currentDataTransferIndex;
-        m_prefetchTask = std::async(m_launchType, [this, localCurrentDataTransferIndex]() { return PrefetchMinibatch(localCurrentDataTransferIndex); });
+        StartAsyncPrefetching();
     }
 
     // Let's wait till the previous memcopy has finished.
@@ -275,54 +338,16 @@ bool ReaderShim<ElemType>::GetMinibatch(StreamMinibatchInputs& matrices)
 }
 
 template <class ElemType>
-typename ReaderShim<ElemType>::PrefetchResult ReaderShim<ElemType>::PrefetchMinibatch(size_t currentDataTransferIndex)
-{
-    // Resetting layouts.
-    for (auto& mx : m_prefetchBuffers)
-        mx.second.m_mbLayout = std::make_shared<MBLayout>();
-
-    Minibatch minibatch = m_reader->ReadMinibatch();
-
-    // If there is no data we can simply return.
-    if (minibatch.m_data.empty())
-        return PrefetchResult{ minibatch.m_endOfEpoch, false };
-
-    // Ok we have some data. Let's load it to GPU.
-    // But before we need to make sure that corresponding compute has already finished from the last iteration.
-
-    // We need to make sure that the compute for the current transfer is finished before we start prefetch.
-    if (m_dataTransferers[currentDataTransferIndex])
-        m_dataTransferers[currentDataTransferIndex]->WaitForSyncPointOnAssignStreamAsync();
-
-    for (auto& mx : m_prefetchBuffers)
-    {
-        size_t streamId = m_nameToStreamId[mx.first];
-        const auto& stream = minibatch.m_data[streamId];
-        mx.second.m_mbLayout = stream->m_layout;
-
-        size_t sampleSize = m_streams[streamId]->m_sampleLayout->GetNumElements();
-        FillMatrixFromStream(m_streams[streamId]->m_storageType, mx.second.m_matrix.get(), sampleSize, stream, m_dataTransferers[currentDataTransferIndex].get());
-    }
-
-    // Let's record that we started the copy, so that the main thread can wait afterwards.
-    if (m_dataTransferers[currentDataTransferIndex])
-        m_dataTransferers[currentDataTransferIndex]->RecordCPUToGPUCopy();
-
-    return PrefetchResult{ minibatch.m_endOfEpoch, true };
-}
-
-
-template <class ElemType>
-/*static*/ void ReaderShim<ElemType>::FillMatrixFromStream(StorageType type, Matrix<ElemType>* matrix, size_t numRows, const StreamMinibatchPtr& stream, DataTransferer* transferer)
+void FillMatrixFromStream(StorageFormat type, Matrix<ElemType>* matrix, size_t numRows, const StreamMinibatchPtr& stream, DataTransferer* transferer)
 {
     size_t numCols = stream->m_layout->GetNumCols();
 
-    if (type == StorageType::dense)
+    if (type == StorageFormat::Dense)
     {
         auto data = reinterpret_cast<const ElemType*>(stream->m_data);
         matrix->SetValue(numRows, numCols, matrix->GetDeviceId(), const_cast<ElemType*>(data), matrixFlagNormal, transferer);
     }
-    else if (type == StorageType::sparse_csc)
+    else if (type == StorageFormat::SparseCSC)
     {
         // In the sparse case the m_data layout is identical to CUDA's CSC layout
         // (see http://docs.nvidia.com/cuda/cusparse/#compressed-sparse-column-format-csc).
@@ -335,6 +360,54 @@ template <class ElemType>
     }
     else
         RuntimeError("Storage type %d is not supported.", (int)type);
+}
+
+template <class ElemType>
+typename ReaderShim<ElemType>::PrefetchResult ReaderShim<ElemType>::PrefetchMinibatch(size_t currentDataTransferIndex)
+{
+    PROFILE_SCOPE(profilerEvtPrefetchMinibatch);
+
+    // Resetting layouts.
+    for (auto& mx : m_prefetchBuffers)
+        mx.second.m_mbLayout = std::make_shared<MBLayout>();
+
+    Minibatch minibatch = m_reader->ReadMinibatch();
+
+    // If there is no data we can simply return.
+    if (minibatch.m_data.empty())
+        return PrefetchResult{ minibatch.m_endOfSweep, minibatch.m_endOfEpoch, false };
+
+    // Ok we have some data. Let's load it to GPU.
+    // But before we need to make sure that corresponding compute has already finished from the last iteration.
+
+    // We need to make sure that the compute for the current transfer is finished before we start prefetch.
+    if (m_dataTransferers[currentDataTransferIndex])
+        m_dataTransferers[currentDataTransferIndex]->WaitForSyncPointOnAssignStreamAsync();
+
+    m_getKeyById = minibatch.m_getKeyById;
+
+    for (auto& mx : m_prefetchBuffers)
+    {
+        size_t streamId = m_nameToStreamId[mx.first];
+        const auto& stream = minibatch.m_data[streamId];
+        mx.second.m_mbLayout = stream->m_layout;
+
+        if (m_streams[streamId].m_sampleLayout.IsUnknown())
+        {
+            // Sample layout can be lazily updated on the first minibatch, so let reread it.
+            // In the future we should use NDShape for the sequence instead of sample.
+            m_streams = m_reader->GetStreamDescriptions();
+        }
+
+        size_t sampleSize = m_streams[streamId].m_sampleLayout.TotalSize();
+        FillMatrixFromStream(m_streams[streamId].m_storageFormat, mx.second.m_matrix.get(), sampleSize, stream, m_dataTransferers[currentDataTransferIndex].get());
+    }
+
+    // Let's record that we started the copy, so that the main thread can wait afterwards.
+    if (m_dataTransferers[currentDataTransferIndex])
+        m_dataTransferers[currentDataTransferIndex]->RecordCPUToGPUCopy();
+
+    return PrefetchResult{ minibatch.m_endOfSweep, minibatch.m_endOfEpoch, true };
 }
 
 template <class ElemType>
@@ -365,9 +438,35 @@ size_t ReaderShim<ElemType>::GetNumParallelSequencesForFixingBPTTMode()
 template <class ElemType>
 size_t ReaderShim<ElemType>::GetCurrentSamplePosition()
 {
-    return m_currentSamplePosition;
+    return m_currentState[g_minibatchSourcePosition];
+}
+template <class ElemType>
+const std::map<std::wstring, size_t>& ReaderShim<ElemType>::GetState()
+{
+    return m_currentState;
+}
+
+template <class ElemType>
+void ReaderShim<ElemType>::SetState(const std::map<std::wstring, size_t>& state)
+{
+    if (m_currentState == state)
+        return;
+
+    // Make sure there are no outstanding reads.
+    if (m_prefetchTask.valid())
+        m_prefetchTask.wait();
+
+    // Let's check that there is no outstanding copies.
+    // Wait on all events if there are any pending copy operations in flight.
+    if (m_dataTransferers[m_currentDataTransferIndex])
+        m_dataTransferers[m_currentDataTransferIndex]->WaitForCopyCPUToGPU();
+
+    // Set current position.
+    m_reader->SetState(state);
+    m_currentState = m_reader->GetState();
+    m_endOfEpoch = false;
 }
 
 template class ReaderShim<float>;
 template class ReaderShim<double>;
-} } }
+}

@@ -9,6 +9,7 @@
 #include <numeric>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include "../../../Source/Math/Matrix.h"
 #include "../../../Source/Math/CPUMatrix.h"
 #include "../../../Source/Math/GPUMatrix.h"
@@ -280,8 +281,8 @@ BOOST_AUTO_TEST_CASE(ConvolutionBackwardData)
             SingleMatrix workspace(deviceId);
             SingleMatrix workspaceB(baseDeviceId);
 
-            testEng->BackwardData(srcGrad, kernel, grad, workspace);
-            baseEng->BackwardData(srcGradB, kernelB, gradB, workspaceB);
+            testEng->BackwardData(srcGrad, kernel, grad, true, workspace);
+            baseEng->BackwardData(srcGradB, kernelB, gradB, true, workspaceB);
 
             std::stringstream tmsg;
             tmsg << "Geometry: " << (std::string)(*g) << ", Batch: " << n << ", Device: " << deviceId;
@@ -349,8 +350,8 @@ BOOST_AUTO_TEST_CASE(ConvolutionBackwardKernel)
             SingleMatrix workspace(deviceId);
             SingleMatrix workspaceB(baseDeviceId);
             
-            testEng->BackwardKernel(grad, in, kernel, false, workspace);
-            baseEng->BackwardKernel(gradB, inB, kernelB, false, workspaceB);
+            testEng->BackwardKernel(grad, in, kernel, true, false, workspace);
+            baseEng->BackwardKernel(gradB, inB, kernelB, true, false, workspaceB);
             
             std::stringstream tmsg;
             tmsg << "Geometry: " << (std::string)(*g) << ", Batch: " << n << ", Device: " << deviceId;
@@ -481,8 +482,15 @@ BOOST_AUTO_TEST_CASE(PoolingBackward)
                 SingleMatrix grad = initMat(gradBuf, crowIn, n, buf);
                 SingleMatrix gradB(grad.DeepClone(), baseDeviceId);
 
-                testEng->BackwardPooling(out, srcGrad, in, grad);
-                baseEng->BackwardPooling(outB, srcGradB, inB, gradB);
+                testEng->BackwardPooling(out, srcGrad, in, grad, true);
+                baseEng->BackwardPooling(outB, srcGradB, inB, gradB, true);
+                testEng->BackwardPooling(out, srcGrad, in, grad, true);
+                baseEng->BackwardPooling(outB, srcGradB, inB, gradB, true);
+
+                SingleMatrix gradReset(grad.DeepClone(), baseDeviceId);
+                SingleMatrix gradBReset(grad.DeepClone(), baseDeviceId);
+                testEng->BackwardPooling(out, srcGrad, in, gradReset, false);
+                baseEng->BackwardPooling(outB, srcGradB, inB, gradBReset, false);
 
                 std::stringstream tmsg;
                 tmsg << "Geometry: " << (std::string)(*g) << ", Pool: " << (int)kind << ", Batch: " << n << ", Device: " << deviceId;
@@ -496,6 +504,7 @@ BOOST_AUTO_TEST_CASE(PoolingBackward)
 
                 BOOST_REQUIRE_MESSAGE(!grad.HasNan("grad"), "grad" << msgNan);
                 BOOST_REQUIRE_MESSAGE(CheckEqual(grad, gradB, emsg, relErr, absErr * 8), "grad" << msg << ". " << emsg);
+                BOOST_REQUIRE_MESSAGE(CheckEqual(gradReset, gradBReset, emsg, relErr, absErr * 8), "grad" << msg << ". " << emsg);
                 BOOST_REQUIRE_MESSAGE(CountNans(gradBuf) == crowIn * 2 * n, "grad" << msgNotNan);
             }
         }
@@ -510,7 +519,7 @@ BOOST_AUTO_TEST_CASE(MaxUnpooling)
     boost::random::uniform_int_distribution<> batchSizeG(1, 8);
     // Using uniform distribution with positive values to avoid issues with
     // unpooling negative values.
-    std::uniform_real_distribution<float> nd(0, 1);
+    boost::random::uniform_real_distribution<float> nd(0, 1);
 
     auto initMat = [&](SingleMatrix& buf, size_t r, size_t c, vec& data) -> SingleMatrix
     {

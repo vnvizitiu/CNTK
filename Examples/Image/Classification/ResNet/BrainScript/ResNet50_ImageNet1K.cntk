@@ -1,15 +1,18 @@
-# Node: ResNet-50 with ImageNet -- 50 layers bottleneck ResNet for image classification
+# ResNet-50 with ImageNet -- 50 layers bottleneck ResNet for image classification
 # Reference: "Deep Residual Learning for Image Recognition" https://arxiv.org/abs/1512.03385
 
 command = TrainNetwork:BNStatistics:Eval
 
 precision = "float"; traceLevel = 1 ; deviceId = "auto"
 
-rootDir = "." ; configDir = "$RootDir$" ; dataDir = "$RootDir$" ;
-outputDir = "$rootDir$/Output" ;
+rootDir = "."
+configDir = "$RootDir$"
+dataDir = "$RootDir$"
+outputDir = "$RootDir$/Output"
+modelDir = "$OutputDir$/Models"
 
-meanDir = "$rootDir$/../../../DataSets/ImageNet"
-modelPath = "$outputDir$/Models/ResNet_50"
+meanDir = "$dataDir$"
+modelPath = "$modelDir$/ResNet_50"
 stderr = "$outputDir$/ResNet_50_BS_out"
 
 parallelTrain = true
@@ -25,11 +28,11 @@ TrainNetwork = {
 
         cMap        = 64:128:256:512:1024:2048  
         numLayers   = 2:3:5:2
-        bnTimeConst = 0
+        bnTimeConst = 4096
 
         # stride in BottleneckInc
-        stride1x1 = (2:2)
-        stride3x3 = (1:1)
+        stride1x1 = (1:1)
+        stride3x3 = (2:2)
 
         model = Sequential(
             # conv1 and max pooling
@@ -88,7 +91,7 @@ TrainNetwork = {
         gradUpdateType = "None"
         L2RegWeight = 0.0001
         dropoutRate = 0
-        numMBsToShowResult = 500
+        numMBsToShowResult = 100
 
         disableRegInBatchNormalization = true
 
@@ -110,9 +113,13 @@ TrainNetwork = {
             width = 224
             height = 224
             channels = 3
-            cropType = "Random"
+            cropType = "RandomSide"
             jitterType = "UniRatio"
-            cropRatio = 0.46666:0.875
+            sideRatio = 0.46666:0.875
+            aspectRatioRadius = 0.8:1.0
+            brightnessRadius = 0.2
+            contrastRadius = 0.2
+            saturationRadius = 0.4
             hflip = true
             meanFile = "$meanDir$/ImageNet1K_mean.xml"
         }
@@ -130,7 +137,7 @@ TrainNetwork = {
             height = 224
             channels = 3
             cropType = "Center"
-            cropRatio = 0.875
+            sideRatio = 0.875
             meanFile = "$meanDir$/ImageNet1K_mean.xml"
         }
         labels = {
@@ -140,7 +147,7 @@ TrainNetwork = {
 }
 
 # Re-statistics the mean and variance of batch normalization layers while other parameters frozen after training
-# more details: https://github.com/Microsoft/CNTK/wiki/Post-Batch-Normalization-Statistics#post-batch-normalization-statistics
+# more details: https://docs.microsoft.com/en-us/cognitive-toolkit/Post-Batch-Normalization-Statistics
 BNStatistics = {
     action = "bnstat"
     modelPath = "$modelPath$"
@@ -156,9 +163,9 @@ BNStatistics = {
             width = 224
             height = 224
             channels = 3
-            cropType = "Random"
+            cropType = "RandomSide"
             hflip = true
-            cropRatio = 0.46666:0.875
+            sideRatio = 0.46666:0.875
             jitterType = "UniRatio"
             meanFile = "$meanDir$/ImageNet1K_mean.xml"
         }
@@ -183,7 +190,7 @@ Eval = {
             height = 224
             channels = 3
             cropType = "Center"
-            cropRatio = 0.875
+            sideRatio = 0.875
             meanFile = "$meanDir$/ImageNet1K_mean.xml"
         }
         labels = {

@@ -79,6 +79,7 @@ void DataReader::Destroy()
 
 // DataReader Constructor
 // options - [in] string  of options (i.e. "-windowsize:11 -addenergy") data reader specific
+#pragma optimize("", off) // TODO work around potential VS2015 code optimization bug, replacing virtual- by non-virtual call in Init() below
 template <class ConfigRecordType>
 DataReader::DataReader(const ConfigRecordType& config)
 {
@@ -98,8 +99,10 @@ DataReader::DataReader(const ConfigRecordType& config)
         for (const auto& ioName : ioNames) // inputNames should map to node names
         {
             const ConfigRecordType& thisIO = config(ioName);
+            wstring readerType = thisIO(L"readerType", L"Cntk.Deserializers.TextFormat");
+
             // get the name for the reader we want to use, default to CNTKTextFormatReader
-            GetReaderProc getReaderProc = (GetReaderProc) Plugin::Load(thisIO(L"readerType", L"CNTKTextFormatReader"), GetReaderName(precision));
+            GetReaderProc getReaderProc = (GetReaderProc) Plugin::Load(readerType, GetReaderName(precision));
             m_ioNames.push_back(ioName);
             assert(getReaderProc != nullptr);
             getReaderProc(&m_dataReaders[ioName]); // instantiates the reader with the default constructor (no config processed at this point)
@@ -107,20 +110,23 @@ DataReader::DataReader(const ConfigRecordType& config)
     }
     else if (hasDeserializers)
     {
+        wstring readerType = config(L"readerType", L"Cntk.Composite");
+
         // Creating Composite Data Reader that allow to combine deserializers.
         // This should be changed to link statically when SGD uses the new interfaces.
         wstring ioName = L"ioName";
-        GetReaderProc getReaderProc = (GetReaderProc)Plugin::Load(config(L"readerType", L"CompositeDataReader"), GetReaderName(precision));
+        GetReaderProc getReaderProc = (GetReaderProc)Plugin::Load(readerType, GetReaderName(precision));
         m_ioNames.push_back(ioName);
         assert(getReaderProc != nullptr);
         getReaderProc(&m_dataReaders[ioName]);
     }
     else
     {
+        wstring readerType = config(L"readerType", L"Cntk.Deserializers.TextFormat");
         wstring ioName = L"ioName";
         // backward support to use only one type of data reader
         // get the name for the reader we want to use, default to CNTKTextFormatReader
-        GetReaderProc getReaderProc = (GetReaderProc)Plugin::Load(config(L"readerType", L"CNTKTextFormatReader"), GetReaderName(precision));
+        GetReaderProc getReaderProc = (GetReaderProc)Plugin::Load(readerType, GetReaderName(precision));
         m_ioNames.push_back(ioName);
         assert(getReaderProc != nullptr);
         getReaderProc(&m_dataReaders[ioName]);
@@ -234,7 +240,7 @@ size_t DataReader::GetCurrentSamplePosition()
 // GetMinibatch - Get the next minibatch (features and labels)
 // matrices - [in] a map with named matrix types (i.e. 'features', 'labels') mapped to the corresponding matrix,
 //             [out] each matrix resized if necessary containing data.
-// returns - true if there are more minibatches, false if no more minibatchs remain
+// returns - true if there are more minibatches, false if no more minibatches remain
 bool DataReader::GetMinibatch(StreamMinibatchInputs& matrices)
 {
     /**
@@ -267,7 +273,7 @@ bool DataReader::GetMinibatch(StreamMinibatchInputs& matrices)
 // latticeinput - lattice for each utterances in this minibatch
 // uids - lables stored in size_t vector instead of ElemType matrix
 // boundary - phone boundaries
-// returns - true if there are more minibatches, false if no more minibatchs remain
+// returns - true if there are more minibatches, false if no more minibatches remain
 bool DataReader::GetMinibatch4SE(std::vector<shared_ptr<const msra::dbn::latticepair>>& latticeinput, vector<size_t>& uids, vector<size_t>& boundaries, vector<size_t>& extrauttmap)
 {
     bool bRet = true;

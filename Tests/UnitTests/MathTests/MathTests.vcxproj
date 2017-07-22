@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" InitialTargets="CheckDependencies" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" InitialTargets="CheckDependencies" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -32,14 +32,14 @@
   <PropertyGroup Condition="$(DebugBuild)" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="$(ReleaseBuild)" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -77,11 +77,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Common.lib;Math.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Cntk.Common-$(CntkComponentVersion).lib;Cntk.Math-$(CntkComponentVersion).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_30,sm_30;%(CodeGeneration)</CodeGeneration>
+      <CodeGeneration>$(NvidiaCompute)</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="$(ReleaseBuild)">
@@ -103,8 +103,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalDependencies>Common.lib;Math.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Cntk.Common-$(CntkComponentVersion).lib;Cntk.Math-$(CntkComponentVersion).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>$(NvidiaCompute)</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="$(GpuBuild)">
     <ClCompile>
@@ -138,6 +142,7 @@
     <ClCompile Include="GPUMatrixCudaBlasTests.cpp" />
     <ClCompile Include="GPUMatrixTests.cpp" />
     <ClCompile Include="GPUSparseMatrixTests.cpp" />
+    <ClCompile Include="MatrixLearnerTests.cpp" />
     <ClCompile Include="MatrixBlasTests.cpp" />
     <ClCompile Include="MatrixDataSynchronizationTests.cpp" />
     <ClCompile Include="MatrixFileWriteReadTests.cpp" />
@@ -145,6 +150,7 @@
     <ClCompile Include="MatrixSparseDenseInteractionsTests.cpp" />
     <ClCompile Include="MatrixTests.cpp" />
     <ClCompile Include="QuantizersTests.cpp" />
+    <ClCompile Include="QuantizedOperationsTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -157,6 +163,6 @@
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA $(CudaVersion).targets" />
   </ImportGroup>
   <Target Name="CheckDependencies">
-    <Warning Condition="!$(HasBoost)" Text="MathTests requires the Boost library to build. Please see https://github.com/Microsoft/CNTK/wiki/Setup-CNTK-on-Windows#boost for installation instructions." />
+    <Error Condition="!$(HasBoost)" Text="MathTests requires the Boost library to build. Please see https://docs.microsoft.com/en-us/cognitive-toolkit/Setup-CNTK-on-Windows#boost for installation instructions." />
   </Target>
 </Project>

@@ -1,7 +1,8 @@
 dataDir: ../../Data
 tags:
-     - bvt-e  (build_sku == 'gpu') and ((flavor=='debug') ^ (device=='cpu'))
+     - bvt-e (build_sku == 'gpu') and ((flavor == 'release') if (os == 'windows') else ((flavor == 'debug') ^ (device == 'cpu')))
      - nightly-e (build_sku == 'gpu')
+     - weekly-e (build_sku == 'gpu')
 
 testCases:
   CNTK Run must be completed:

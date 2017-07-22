@@ -147,6 +147,12 @@
     <ClInclude Include="RNNNodes.h">
       <Filter>Nodes</Filter>
     </ClInclude>
+    <ClInclude Include="UserDefinedV2FunctionNode.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="SequenceReshapeNodes.h">
+      <Filter>Nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

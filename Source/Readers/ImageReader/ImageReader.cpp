@@ -15,7 +15,9 @@
 #include <omp.h>
 #include "TransformController.h"
 
-namespace Microsoft { namespace MSR { namespace CNTK {
+namespace CNTK {
+
+using namespace Microsoft::MSR::CNTK;
 
 // TODO: This class should go away eventually.
 // TODO: The composition of packer + randomizer + different deserializers in a generic manner is done in the CompositeDataReader.
@@ -45,11 +47,12 @@ ImageReader::ImageReader(const ConfigParameters& config)
     const bool multithreadedGetNextSequences = true;
     if (configHelper.ShouldRandomize())
     {
-        // We do not use legacy randomization.
-        bool useLegacyRandomization = false;
         // We do not do io prefetching, because chunks are single images currently.
         bool ioPrefetch = false;
-        randomizer = std::make_shared<BlockRandomizer>(0, 1, deserializer, ioPrefetch, BlockRandomizer::DecimationMode::sequence, useLegacyRandomization, multithreadedGetNextSequences);
+        randomizer = std::make_shared<BlockRandomizer>(0, 1, deserializer, ioPrefetch, multithreadedGetNextSequences,
+            /*maxNumberOfInvalidSequences =*/ 0, // default
+            /*sampleBasedRandomizationWindow =*/ true, // default
+            GetRandomSeed(config));
     }
     else
     {
@@ -57,7 +60,7 @@ ImageReader::ImageReader(const ConfigParameters& config)
     }
 
     // Create transformations for a single feature stream.
-    std::wstring featureName = m_streams[configHelper.GetFeatureStreamId()]->m_name;
+    std::wstring featureName = m_streams[configHelper.GetFeatureStreamId()].m_name;
     ConfigParameters featureStream = config(featureName);
 
     std::vector<Transformation> transformations;
@@ -77,16 +80,18 @@ ImageReader::ImageReader(const ConfigParameters& config)
     transformations.push_back(Transformation{ std::make_shared<CastTransformer>(featureStream), featureName });
 
     m_sequenceEnumerator = std::make_shared<TransformController>(transformations, randomizer);
-
+    bool useLocalTimeline = true;
     m_packer = std::make_shared<FramePacker>(
         m_sequenceEnumerator,
-        m_streams);
+        m_streams,
+        2 /* number of buffers*/,
+        useLocalTimeline);
 }
 
-std::vector<StreamDescriptionPtr> ImageReader::GetStreamDescriptions()
+std::vector<StreamInformation> ImageReader::GetStreamDescriptions()
 {
     assert(!m_streams.empty());
     return m_streams;
 }
 
-} } }
+}

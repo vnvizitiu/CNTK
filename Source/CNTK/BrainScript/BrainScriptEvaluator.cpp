@@ -920,7 +920,7 @@ static wstring FormatConfigValue(ConfigValuePtr arg, const wstring &how);
 // StringFunction implements
 //  - Format
 //  - Chr(c) -- gives a string of one character with Unicode value 'c'
-//  - Replace(s,what,withwhat) -- replace all occurences of 'what' with 'withwhat'
+//  - Replace(s,what,withwhat) -- replace all occurrences of 'what' with 'withwhat'
 //  - Substr(s,begin,num) -- get a substring
 // TODO: RegexReplace()
 class StringFunction : public String
@@ -1149,6 +1149,9 @@ struct Debug : public Object
     {
     }
 }; // fake class type to get the template below trigger
+
+#pragma warning(push)
+#pragma warning(disable : 4505) // 'function' : unreferenced local function has been removed
 template <>
 /*static*/ ConfigurableRuntimeType MakeRuntimeTypeConstructor<Debug>()
 {
@@ -1171,6 +1174,7 @@ template <>
     rtInfo.isConfigRecord = false;
     return rtInfo;
 }
+#pragma warning(pop)
 
 // =======================================================================
 // register ComputationNetwork with the ScriptableObject system

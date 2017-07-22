@@ -9,8 +9,9 @@
 #include "MemoryProvider.h"
 #include "SequenceEnumerator.h"
 #include "Packer.h"
+#include "CorpusDescriptor.h"
 
-namespace Microsoft { namespace MSR { namespace CNTK {
+namespace CNTK {
 
 // A base class for Packers.
 class PackerBase : public Packer
@@ -20,8 +21,6 @@ protected:
     struct StreamBuffer
     {
         size_t m_size; // buffer size in bytes.
-        // Memory provider.
-        // TODO: Should possibly switch to matrices here.
         MemoryProviderPtr m_memoryProvider;
         std::shared_ptr<char> m_data; // contiguous array of data.
 
@@ -29,16 +28,23 @@ protected:
             m_size(0), m_memoryProvider(m_memoryProvider), m_data(nullptr)
         {
         }
+
         void Resize(size_t newSize);
     };
 
-    PackerBase(SequenceEnumeratorPtr sequenceEnumerator,
-               const std::vector<StreamDescriptionPtr>& streams,
+    PackerBase(CorpusDescriptorPtr corpus,
+               SequenceEnumeratorPtr sequenceEnumerator,
+               const std::vector<StreamInformation>& streams,
                size_t numberOfBuffers);
 
     typedef std::vector<SequenceDataPtr> StreamBatch;
 
-    size_t GetSampleSize(StreamDescriptionPtr stream);
+    size_t GetSampleSize(const StreamInformation& stream);
+
+    std::vector<StreamInformation> GetStreamDescriptions() override
+    {
+        return m_outputStreamDescriptions;
+    }
 
     // Packs a sparse sample as dense:
     //  - 0-fills a region of sampleSize bytes in the block of memory pointed to by destination;
@@ -56,13 +62,19 @@ protected:
     // (sampleOffset is equal to the sum of sample sizes of all preceding samples).
     void PackDenseSample(char* destination, SequenceDataPtr sequence, size_t sampleOffset, size_t sampleSize);
 
+    // Establishes a mapping between id inside the mb layout and the global key in the corpus.
+    // Assumes the sequences inside MBLayout have the same order as Sequences.
+    void EstablishIdToKey(Minibatch& minibatch, const Sequences& sequences);
+
+    static void CheckNameUniqueness(const std::vector<StreamInformation>& streams);
+
     SequenceEnumeratorPtr m_sequenceEnumerator;
 
     // Input stream descriptions provided by the transformer.
-    std::vector<StreamDescriptionPtr> m_outputStreamDescriptions;
+    std::vector<StreamInformation> m_outputStreamDescriptions;
 
     // Output stream descriptions expected by the network.
-    std::vector<StreamDescriptionPtr> m_inputStreamDescriptions;
+    std::vector<StreamInformation> m_inputStreamDescriptions;
 
     // Indicates how many internal buffers with pinned memory are supported.
     // If N - then N sequential calls to PackMinibatch are valid, and N+1 call will overwrite 
@@ -76,14 +88,16 @@ protected:
     // Cyclic index of the current buffer. m_currentBufferIndex < m_numberOfBuffers;
     size_t m_currentBufferIndex;
 
-    // Minibatch size in samples.
-    size_t m_minibatchSize;
-
     // For which streams there should be a shape check for each sequence.
     std::vector<bool> m_checkSampleShape;
 
     // Memory providers. Each stream has its own memory provider.
     std::vector<MemoryProviderPtr> m_memoryProviders;
+
+    // Current config.
+    ReaderConfiguration m_config;
+
+    CorpusDescriptorPtr m_corpus;
 
 public:
     // Sets current epoch configuration.
@@ -119,4 +133,4 @@ inline void PackerBase::PackDenseSample(char* destination, SequenceDataPtr seque
     memcpy(destination, (const char*)(sequence->GetDataBuffer()) + sampleOffset, sampleSize);
 }
 
-}}}
+}
